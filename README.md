@@ -11,6 +11,7 @@ Addressing environmental and socio-economic challenges in Standing Rock’s Lako
 - Download the Expo app on your phone and scan the QR code to run the app on your phone
 - Install Docker Desktop
 - Now `cd` into the `api` directory
+- `npm install`
 - Run `docker-compose build` to build the API and PostgreSQL image
 - Run `docker-compose up` to start the API and PostgreSQL server
 - You can now access the API at `localhost:3000`, check `/health`
