@@ -38,12 +38,13 @@ router.post('/login', async (req: express.Request, res: express.Response) => {
 
 router.post('/register', async (req: express.Request, res: express.Response) => {
     try {
-        const {username, password, firstName, lastName} = req.body;
-        const user = await getUserByEmail(username);
+        const {email, phoneNumber, password, firstName, lastName} = req.body;
+        const user = await getUserByEmail(email);
+
 
         if (!user) {
             const hashedPassword = await hashPassword(password);
-            const newUser = await createUser(username, hashedPassword, firstName, lastName);
+            const newUser = await createUser(email, phoneNumber, hashedPassword, firstName, lastName);
             res.send(JSON.stringify(newUser));
         } else {
             res.status(400).send('User already exists');
