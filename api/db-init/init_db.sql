@@ -1,6 +1,9 @@
--- SQL Script to create and populate a basic user table
+\c postgres
 
--- Create a 'users' table
+-- Create a new database if it doesn't exist
+CREATE DATABASE woope;
+
+-- Connect to the newly created database
 \c woope
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,          -- Unique identifier for each user
@@ -14,7 +17,7 @@ CREATE TABLE users (
 INSERT INTO users (first_name, last_name, email, password) VALUES
 ('Alice', 'Smith', 'alice.smith@example.com', 'password123'),
 ('Bob', 'Johnson', 'bob.johnson@example.com', 'mypassword'),
-('Carol', 'Williams', 'carol.williams@example.com', 'carolspass');
+('Carol', 'Williams', 'carol.williams@example.com', 'carolspass'),
 ('Dakota', 'Wagner', 'wagnerdak@gmail.com', 'test123');
 
 -- Note: In a real-world application, passwords should never be stored in plain text.
