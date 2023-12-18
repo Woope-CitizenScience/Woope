@@ -1,10 +1,16 @@
 import { QueryResult } from "pg";
 const pool = require('../db');
 
-export const getUserByEmail = async (email: string) => {
+export const getUserByEmail = async (email: string, phoneNumber:string) => {
     try {
-        const query: string = 'SELECT * FROM users WHERE email = $1';
-        const values: string[] = [email];
+        let query;
+
+        if (email) {
+            query = 'SELECT * FROM users WHERE email = $1';
+        } else {
+            query = 'SELECT * FROM users WHERE phone_number = $1';
+        }
+        const values: string[] = [email, phoneNumber];
         const result: QueryResult = await pool.query(query, values);
         return result.rows[0];
     } catch (error) {
@@ -31,7 +37,6 @@ export const createUser = async (email:string, phoneNumber:number, hashedPasswor
         }
 
         let result = await pool.query(query, values);
-
         const userId = result.rows[0].user_id;
 
         // profile info
@@ -39,12 +44,9 @@ export const createUser = async (email:string, phoneNumber:number, hashedPasswor
         values = [userId, firstName, lastName];
         await pool.query(query, values);
 
-        // Optionally, handle other inserts like account_verifications here
+        // handle other inserts like account_verifications here
 
-        // Commit the transaction
         await pool.query('COMMIT');
-
-        // Return the newly created user's ID
         return userId;
 
     } catch (error) {

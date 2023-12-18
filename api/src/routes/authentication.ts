@@ -11,13 +11,13 @@ const refreshTokenLife:string = config.refreshTokenLife!;
 
 router.post('/login', async (req: express.Request, res: express.Response) => {
     try {
-        const { username, password } = req.body;
+        const { email, phoneNumber, password } = req.body;
 
-        if (!username || !password) {
+        if (!email || !password) {
             return res.status(400).send('Username and password are required');
         }
 
-        const user = await getUserByEmail(username);
+        const user = await getUserByEmail(email, phoneNumber);
 
         if (!user) {
             return res.status(404).send('User does not exist');
@@ -39,7 +39,7 @@ router.post('/login', async (req: express.Request, res: express.Response) => {
 router.post('/register', async (req: express.Request, res: express.Response) => {
     try {
         const {email, phoneNumber, password, firstName, lastName} = req.body;
-        const user = await getUserByEmail(email);
+        const user = await getUserByEmail(email, phoneNumber);
 
 
         if (!user) {
