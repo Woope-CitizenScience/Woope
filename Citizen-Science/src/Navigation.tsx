@@ -1,12 +1,13 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import '/src/screens/Welcome-Screen';
-import '/src/screens/Login-Screen';
-import '/src/screens/Signup-Screen';
+import WelcomeScreen from './screens/WelcomeScreen';
 
 const Stack = createNativeStackNavigator();
-export default AppNavigator = () => {
+const AppNavigation = () => {
     return(
-        //TODO Remove text and implement actual navigation
-        <>Input navigation screens</>
+        <Stack.Navigator initialRouteName={"Welcome"}>
+            <Stack.Screen name="Welcome" component={WelcomeScreen}/>
+        </Stack.Navigator>
     );
 };
+
+export default AppNavigation;
