@@ -9,7 +9,7 @@ const AppNavigation = () => {
     return(
         <Stack.Navigator initialRouteName={"Welcome"}>
             <Stack.Screen name="Welcome" component={WelcomeScreen}/>
-            <Stack.Screen name="Login" component={LoginScreen}/>
+            <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
             <Stack.Screen name="Signup" component={SignupScreen}/>
         </Stack.Navigator>
     );
