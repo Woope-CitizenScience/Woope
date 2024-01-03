@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { TextInput, ViewStyle, StyleSheet } from 'react-native';
-import { TextFieldProps } from './types'; // Adjust the import path as necessary
+import { TextFieldProps } from '../types'; // Adjust the import path as necessary
 
 const CustomTextField: React.FC<TextFieldProps> = ({
                                                        size,

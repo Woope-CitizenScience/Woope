@@ -3,13 +3,22 @@
 import React, { useState } from 'react';
 import { ImageBackground, SafeAreaView, Text, TouchableOpacity } from "react-native";
 import styles from '../StyleSheet';
-import CustomButton from '../CustomButton'; // Adjust the path to where your CustomButton is located
-import CustomTextField from '../CustomTextField'; // Adjust the path as necessary
+import CustomButton from '../components/CustomButton'; // Adjust the path to where your CustomButton is located
+import CustomTextField from '../components/CustomTextField'; // Adjust the path as necessary
 import { useNavigation } from '@react-navigation/native';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
+type NavigationParam = {
+    Login: undefined;
+    Signup: undefined;
+    Splash: undefined;
+};
+
+//Type for our Navigation in our component
+type NavigationProp = NativeStackNavigationProp<NavigationParam, 'Login'>;
 
 const LoginScreen: React.FC = () => {
-    const navigation = useNavigation();
+    const navigation = useNavigation<NavigationProp>();
 
 
     const [email, setEmail] = useState('');
@@ -17,10 +26,11 @@ const LoginScreen: React.FC = () => {
 
 
     // handleLoginPress:
-    // Here we need to define what will happen when the log in button us pressed. So user authentication.
+    // Here we need to define what will happen when the login button us pressed. So user authentication.
     const handleLoginPress = () => {
         console.log('Login button pressed');
         // logic for what should happen on login press
+        navigation.navigate('Splash');
     };
 
     // @ts-ignore

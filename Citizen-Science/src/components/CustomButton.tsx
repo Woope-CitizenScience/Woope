@@ -2,8 +2,8 @@
 
 import React from 'react';
 import { TouchableOpacity, Text, ViewStyle } from 'react-native';
-import { ButtonProps } from './types';
-import styles from './StyleSheet'; // Adjust the import path as necessary
+import { ButtonProps } from '../types';
+import styles from '../StyleSheet'; // Adjust the import path as necessary
 
 const CustomButton: React.FC<ButtonProps> = ({
     size,
@@ -13,6 +13,8 @@ const CustomButton: React.FC<ButtonProps> = ({
     onPress,
     position,
     borderRadius = 10, //default value. Like that all buttons look the same
+    borderColor,
+    borderWidth,
     disabled = false
 }) => {
     const buttonStyle: ViewStyle = {
@@ -21,6 +23,8 @@ const CustomButton: React.FC<ButtonProps> = ({
         height: size.height,
         backgroundColor,
         borderRadius,
+        borderColor,
+        borderWidth,
         position: 'absolute',
         left: position.horizontal,
         top: position.vertical,

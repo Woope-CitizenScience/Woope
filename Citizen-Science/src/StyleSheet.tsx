@@ -5,11 +5,11 @@ import React from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 
 const styles = StyleSheet.create({
-        title: {
+    title: {
             fontSize: 45,
             fontWeight: 'bold',
             color: '#fff',
-        },
+    },
     subTitle: {
         fontSize: 40,
         fontWeight: 'bold',
@@ -30,8 +30,13 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
     },
-    container: {},
-    threads:{}
+    backgroundColor: {
+        flex: 1,
+        backgroundColor: '#3a9bdc',
+        justifyContent: 'center',
+        alignItems: 'center'
+    }
+
 })
 
 export default styles;
