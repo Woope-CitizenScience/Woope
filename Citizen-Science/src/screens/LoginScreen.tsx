@@ -1,12 +1,14 @@
 // LoginScreen.tsx
 
 import React, { useState } from 'react';
-import { ImageBackground, SafeAreaView, Text, TouchableOpacity } from "react-native";
+import {Button, ImageBackground, SafeAreaView, Text, TouchableOpacity} from "react-native";
 import styles from '../StyleSheet';
 import CustomButton from '../components/CustomButton'; // Adjust the path to where your CustomButton is located
 import CustomTextField from '../components/CustomTextField'; // Adjust the path as necessary
 import { useNavigation } from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import LogoName from "../components/LogoName";
+import BackButton from "../components/BackButton";
 
 type NavigationParam = {
     Login: undefined;
@@ -35,14 +37,17 @@ const LoginScreen: React.FC = () => {
 
     // @ts-ignore
     return (
+
         <ImageBackground
             source={require('../../assets/background.png')}
             style={{ flex: 1, width: '100%', height: '100%' }}>
 
-            {/* Logo Name */}
-            <SafeAreaView style={{ flex: 1 }}>
-                <Text style={styles.title}>WOOPE</Text>
+            <SafeAreaView style={{flex: 1}}>
+                <BackButton/>
             </SafeAreaView>
+            {/* Logo Name */}
+            <LogoName position={'bottomRight'} color={'grey'}/>
+
 
             {/* Login title, fields and login button */}
             <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -58,6 +63,7 @@ const LoginScreen: React.FC = () => {
                     borderRadius={10}
                     position={{ horizontal: 50, vertical: 50 }}
                 />
+
 
                 {/* Password TextField */}
                 <CustomTextField

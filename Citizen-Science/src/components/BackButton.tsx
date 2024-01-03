@@ -1,6 +1,6 @@
 import React from 'react';
 import CustomButton from "./CustomButton";
-import {Button} from "react-native";
+import {Button, View} from "react-native";
 import navigation from "../Navigation";
 import {useNavigation} from "@react-navigation/native";
 
@@ -10,11 +10,14 @@ import {useNavigation} from "@react-navigation/native";
 const BackButton = () => {
     const navigation = useNavigation();
     return (
-       <Button
-           title={'<'}
-           onPress={() => navigation.goBack()}
-           color={'black'}
-           />
+        <View>
+            <Button
+                title={'Go Back'}
+                onPress={() => navigation.goBack()}
+                color={'black'}
+            />
+        </View>
+
         )
 }
 
