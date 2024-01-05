@@ -3,6 +3,7 @@ import WelcomeScreen from './screens/WelcomeScreen';
 import LoginScreen from './screens/LoginScreen';
 import SignupScreen from './screens/SignupScreen';
 import SplashScreen from "./screens/SplashScreen";
+import NavigationBar from "./components/NavigationBar";
 
 const Stack = createNativeStackNavigator();
 const AppNavigation = () => {
@@ -22,6 +23,11 @@ const AppNavigation = () => {
             />
             <Stack.Screen name="Signup" component={SignupScreen}/>
             <Stack.Screen name="Splash" component={SplashScreen}/>
+            <Stack.Screen
+                name="NavigationBar"
+                component={NavigationBar}
+                options={{ headerShown: false }}
+            />
         </Stack.Navigator>
     );
 };

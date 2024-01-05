@@ -1,7 +1,5 @@
-// LoginScreen.tsx
-
 import React, { useState } from 'react';
-import {Button, ImageBackground, SafeAreaView, Text, TouchableOpacity} from "react-native";
+import { ImageBackground, SafeAreaView, Text, TouchableOpacity} from "react-native";
 import styles from '../StyleSheet';
 import CustomButton from '../components/CustomButton'; // Adjust the path to where your CustomButton is located
 import CustomTextField from '../components/CustomTextField'; // Adjust the path as necessary
@@ -13,7 +11,7 @@ import BackButton from "../components/BackButton";
 type NavigationParam = {
     Login: undefined;
     Signup: undefined;
-    Splash: undefined;
+    NavigationBar: undefined;
 };
 
 //Type for our Navigation in our component
@@ -32,7 +30,7 @@ const LoginScreen: React.FC = () => {
     const handleLoginPress = () => {
         console.log('Login button pressed');
         // logic for what should happen on login press
-        navigation.navigate('Splash');
+        navigation.navigate('NavigationBar');
     };
 
     // @ts-ignore

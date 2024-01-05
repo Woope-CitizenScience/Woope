@@ -5,29 +5,40 @@ import LogoName from "../components/LogoName";
 import CustomButton from "../components/CustomButton";
 import Blobs from "../components/Blobs";
 import { useNavigation } from '@react-navigation/native';
+import {NativeStackNavigationProp} from "@react-navigation/native-stack";
+
+type NavigationParam = {
+    Welcome: undefined;
+    Signup: undefined;
+    Login: undefined;
+};
+
+//Type for our Navigation in our component
+type NavigationProp = NativeStackNavigationProp<NavigationParam, 'Welcome'>;
 const WelcomeScreen: React.FC = () => {
-    const navigation = useNavigation();
+    const navigation = useNavigation<NavigationProp>();
     const { height, width } = Dimensions.get('window')
     const titlePosition = height * -.20; // To place 'Welcome' text 75%  from the bottom of the screen
     const subtitlePosition = height * -.18; // // To place 'Welcome' in lakota text 75%  from the bottom of the screen
 
-    // @ts-ignore
+
     return(
         <View style={styles.backgroundColor}>
 
             {/* First blob cluster */}
-            <Blobs width={100} height={100} position={{horizontal: width-100, vertical: '5%'}}/>
-            <Blobs width={50} height={50} position={{horizontal: width-80, vertical: '18%'}}/>
-            <Blobs width={35} height={35} position={{horizontal: width-150, vertical: '1%'}}/>
+            <Blobs width={100} height={100} position={{ horizontal: width - 100, vertical: height * 0.05 }} />
+            <Blobs width={50} height={50} position={{ horizontal: width - 80, vertical: height * 0.18 }} />
+            <Blobs width={35} height={35} position={{ horizontal: width - 150, vertical: height * 0.01 }} />
 
             {/* Second blob cluster */}
-            <Blobs width={90} height={90} position={{horizontal: width-100, vertical: '45%'}}/>
-            <Blobs width={25} height={25} position={{horizontal: width-50, vertical: '42%'}}/>
+            <Blobs width={90} height={90} position={{ horizontal: width - 100, vertical: height * 0.45 }} />
+            <Blobs width={25} height={25} position={{ horizontal: width - 50, vertical: height * 0.42 }} />
 
             {/* Third blob cluster */}
-            <Blobs width={110} height={110} position={{horizontal: '75%', vertical: '86%'}}/>
-            <Blobs width={40} height={40} position={{horizontal: '88%', vertical: '83%'}}/>
-            <Blobs width={45} height={45} position={{horizontal: '60%', vertical: '94%'}}/>
+            <Blobs width={110} height={110} position={{ horizontal: width * 0.75, vertical: height * 0.86 }} />
+            <Blobs width={40} height={40} position={{ horizontal: width * 0.88, vertical: height * 0.83 }} />
+            <Blobs width={45} height={45} position={{ horizontal: width * 0.60, vertical: height * 0.94 }} />
+
 
 
             <LogoName
@@ -52,7 +63,7 @@ const WelcomeScreen: React.FC = () => {
                 backgroundColor={'white'}
                 onPress={() => navigation.navigate('Login')}
                 //TODO allow horizontal attr to take 'center' prop
-                position={{horizontal: 'center', vertical: height * 0.60}}
+                position={{ horizontal: (width - 300) / 2, vertical: height * 0.60 }}
             />
 
             <CustomButton
@@ -62,7 +73,7 @@ const WelcomeScreen: React.FC = () => {
                 backgroundColor={'#3a9bdc'}
                 onPress={() => navigation.navigate('Signup')}
                 //TODO allow horizontal attr to take 'center' prop
-                position={{horizontal: 'center', vertical: height * 0.70}}
+                position={{ horizontal: (width - 300) / 2, vertical: height * 0.70 }}
                 borderRadius={10}
                 borderColor={'white'}
                 borderWidth={3}
