@@ -27,11 +27,12 @@ const rotateBlob = () => {
 
 const Blobs: React.FC<BlobProps> = ({
     rotationDeg,
+    image,
     width,
     height,
     position
     }) => {
-    const blob = getRandomBlob();
+    const blob = image || getRandomBlob() ;
     const rotation = rotationDeg || `${rotateBlob()}deg`;
     return(
         <SafeAreaView style={{

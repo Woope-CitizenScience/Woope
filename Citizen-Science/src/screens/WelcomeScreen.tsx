@@ -23,7 +23,18 @@ const WelcomeScreen: React.FC = () => {
     return(
         <View style={styles.backgroundColor}>
 
+
+            {/* Logo Name */}
             <LogoName position={'topLeft'} color={'white'} />
+
+            {/* Top Right Corner Blob */}
+            <Blobs
+                rotationDeg={'40deg'}
+                // TODO width and height has to be scaled with dimensions
+                width={480}
+                height={480}
+                image={require('../../assets/blobs/corner_blobs/Corner_Blob_2.png')}
+                position={{horizontal: width * -0.40, vertical: height * 0.73}} />
 
             {/* First blob cluster */}
             <Blobs width={100} height={100} position={{ horizontal: width * 0.75, vertical: height * 0.05 }} />
@@ -59,18 +70,34 @@ const WelcomeScreen: React.FC = () => {
                 position={{horizontal: width * 0.08, vertical: height * 0.46}}
             />
 
-            {/*<CustomButton*/}
-            {/*    size={{width: 300, height: 70}}*/}
-            {/*    label={'Signup'}*/}
-            {/*    labelColor={'white'}*/}
-            {/*    backgroundColor={'#3a9bdc'}*/}
-            {/*    onPress={() => navigation.navigate('Signup')}*/}
-            {/*    //TODO allow horizontal attr to take 'center' prop*/}
-            {/*    position={{ horizontal: (width - 300) / 2, vertical: height * 0.70 }}*/}
-            {/*    borderRadius={10}*/}
-            {/*    borderColor={'white'}*/}
-            {/*    borderWidth={3}*/}
-            {/*/>*/}
+            {/* Login Button */}
+            <CustomButton
+                //TODO size will be scaled based on dimension
+                size={{width: 300, height: 70}}
+                label={'Login'}
+                labelColor={'#3a9bdc'}
+                backgroundColor={'white'}
+                onPress={() => navigation.navigate('Login')}
+                position={{ horizontal: 'center', vertical: height * 0.65 }}
+                borderRadius={10}
+                borderColor={'white'}
+                borderWidth={3}
+            />
+
+            {/* Signup Button */}
+            <CustomButton
+                //TODO size will be scaled based on dimension
+                size={{width: 300, height: 70}}
+                label={'Signup'}
+                labelColor={'white'}
+                backgroundColor={'#3a9bdc'}
+                onPress={() => navigation.navigate('Signup')}
+                position={{ horizontal: 'center', vertical: height * 0.75 }}
+                borderRadius={10}
+                borderColor={'white'}
+                borderWidth={3}
+            />
+
 
         </View>
     )
@@ -91,18 +118,5 @@ const welcomeScreenStyles = StyleSheet.create({
       position: 'absolute',
       width: '100%'
     },
-    title: {
-        // Overriding font size from StyleSheet.tsx
-        fontSize: 50,
-        textAlign: 'left',
-        fontWeight: 'bold',
-        color: '#fff',
-    },
-    subtitle: {
-        // Overriding font size and weight from StyleSheet.tsx
-        fontSize: 20,
-        fontWeight: 'normal',
-        color: '#fff'
 
-    },
 });
