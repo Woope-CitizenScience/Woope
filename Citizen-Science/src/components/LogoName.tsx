@@ -1,11 +1,23 @@
-import {SafeAreaView, Text, StyleSheet } from "react-native";
+import {SafeAreaView, Text, StyleSheet, Dimensions} from "react-native";
 import styles from "../StyleSheet";
 import React from "react";
 import {LogoNameProps} from "../types";
-const LogoName: React.FC<LogoNameProps> = ({position, color}) => {
+
+const { height, width } = Dimensions.get('window');
+const LogoName: React.FC<LogoNameProps> = ({
+                                               position,
+                                               color
+                                            }) => {
     return(
-        <SafeAreaView style={[logoStyles.container, logoStyles[position]]}>
-            <Text style={[styles.title, {color: color}, {fontSize: 20}]}>WOOPE</Text>
+        <SafeAreaView style={[
+            logoStyles.container,
+            logoStyles[position]]}>
+            <Text style={[
+                styles.title,
+                {color: color},
+                {fontSize: 20}]}>
+                WOOPE
+            </Text>
         </SafeAreaView>
 
     )
@@ -18,14 +30,13 @@ const logoStyles = StyleSheet.create({
         margin: 10,
     },
     topLeft: {
-        alignSelf: 'flex-start',
-        marginTop: 0,
-        marginLeft: 0,
+        position: 'absolute',
+        left: width * 0.01,
+        top: height * 0.01
     },
     bottomRight: {
         position: 'absolute',
-        bottom: 0,
-        right: 0
+        left: width * 0.75,
+        top: height * 0.95
     }
-
-})
+});

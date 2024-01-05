@@ -41,8 +41,9 @@ export type BlobProps = {
 };
 
 export type TitleProps = {
-
-};
-export type SubtitleProps = {
-
+    text: string;
+    fontSize: number;
+    textStyle: 'title' | 'subtitle';
+    color: string;
+    position: { horizontal: number, vertical: number };
 };

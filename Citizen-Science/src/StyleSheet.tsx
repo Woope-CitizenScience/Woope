@@ -10,15 +10,10 @@ const styles = StyleSheet.create({
             fontWeight: 'bold',
             color: '#fff',
     },
-    subTitle: {
+    subtitle: {
         fontSize: 40,
-        fontWeight: 'bold',
+        fontWeight: 'normal',
         color: '#fff',
-        textAlign: 'center',
-        position: 'absolute',
-        top: -135,
-        left: 50,
-        right: 50,
     },
     button: {
         padding: 10,
