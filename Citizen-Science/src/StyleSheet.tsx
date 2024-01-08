@@ -3,6 +3,7 @@
 
 import React from 'react';
 import {StyleSheet, Text, View} from 'react-native';
+import {responsiveFontSize} from "react-native-responsive-dimensions";
 
 const styles = StyleSheet.create({
     title: {
@@ -22,7 +23,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     buttonText: {
-        fontSize: 16,
+        fontSize: responsiveFontSize(2),
         fontWeight: 'bold',
     },
     backgroundColor: {

@@ -7,6 +7,11 @@ import Blobs from "../components/Blobs";
 import { useNavigation } from '@react-navigation/native';
 import {NativeStackNavigationProp} from "@react-navigation/native-stack";
 import ScreenTitle from "../components/ScreenTitle";
+//TODO remove this once all props using it already have it imported
+import {
+    responsiveHeight,
+    responsiveWidth,
+} from "react-native-responsive-dimensions";
 
 type NavigationParam = {
     Welcome: undefined;
@@ -29,55 +34,52 @@ const WelcomeScreen: React.FC = () => {
 
             {/* Top Right Corner Blob */}
             <Blobs
-                rotationDeg={'40deg'}
-                // TODO width and height has to be scaled with dimensions
-                width={480}
-                height={480}
+                rotationDeg={'45deg'}
+                widthPercentage={80}
+                heightPercentage={25}
                 image={require('../../assets/blobs/corner_blobs/Corner_Blob_2.png')}
-                position={{horizontal: width * -0.40, vertical: height * 0.73}} />
+                position={{top: 85, left: -22}} />
 
             {/* First blob cluster */}
-            <Blobs width={100} height={100} position={{ horizontal: width * 0.75, vertical: height * 0.05 }} />
-            <Blobs width={50} height={50} position={{ horizontal: width * 0.85, vertical: height * 0.18 }} />
-            <Blobs width={35} height={35} position={{ horizontal: width * 0.70, vertical: height * 0.01 }} />
+            <Blobs rotationDeg={'0deg'} widthPercentage={24} heightPercentage={12} position={{ top: 1, left: 75}} />
+            <Blobs rotationDeg={'0deg'} widthPercentage={10} heightPercentage={5} position={{ top: 20, left: 88 }} />
+            <Blobs rotationDeg={'0deg'} widthPercentage={10} heightPercentage={5} position={{ top: 1, left: 64 }} />
 
             {/* Second blob cluster */}
-            <Blobs width={90} height={90} position={{ horizontal: width * 0.80, vertical: height * 0.45 }} />
-            <Blobs width={25} height={25} position={{ horizontal: width * 0.90, vertical: height * 0.42 }} />
+            <Blobs rotationDeg={'0deg'} widthPercentage={8} heightPercentage={4} position={{ top: 45, left: 90 }} />
+            <Blobs rotationDeg={'0deg'} widthPercentage={16} heightPercentage={9} position={{ top: 50, left: 80 }} />
 
             {/* Third blob cluster */}
-            <Blobs width={110} height={110} position={{ horizontal: width * 0.75, vertical: height * 0.86 }} />
-            <Blobs width={40} height={40} position={{ horizontal: width * 0.88, vertical: height * 0.83 }} />
-            <Blobs width={45} height={45} position={{ horizontal: width * 0.60, vertical: height * 0.94 }} />
+            <Blobs rotationDeg={'0deg'} widthPercentage={8} heightPercentage={4} position={{ top: 84, left: 91 }} />
+            <Blobs rotationDeg={'0deg'} widthPercentage={18} heightPercentage={9} position={{ top: 89, left: 81 }} />
+            <Blobs rotationDeg={'0deg'} widthPercentage={5} heightPercentage={3} position={{ top: 97, left: 78 }} />
 
             {/* Welcome title */}
             <ScreenTitle
                 text={'Welcome'}
                 textStyle={'title'}
-                // TODO font size with be determined with PixelRatio lib
-                fontSize={45}
+                fontSize={4}
                 color={'white'}
-                position={{horizontal: width * 0.08, vertical: height * 0.40}}
+                position={{top: 35, left: 8}}
             />
 
             {/* Welcome subtitle */}
             <ScreenTitle
                 text={'(taŋyáŋ yah)'}
                 textStyle={'subtitle'}
-                // TODO font size with be determined with PixelRatio lib
-                fontSize={25}
+                fontSize={2}
                 color={'white'}
-                position={{horizontal: width * 0.08, vertical: height * 0.46}}
+                position={{top: 42.5, left: 10}}
             />
 
             {/* Login Button */}
             <CustomButton
-                //TODO size will be scaled based on dimension
-                size={{width: 300, height: 70}}
+                size={{width: responsiveWidth(70), height: responsiveHeight(8)}}
                 label={'Login'}
                 labelColor={'#3a9bdc'}
                 backgroundColor={'white'}
                 onPress={() => navigation.navigate('Login')}
+                //TODO fix the position to accept responsive lib
                 position={{ horizontal: 'center', vertical: height * 0.65 }}
                 borderRadius={10}
                 borderColor={'white'}
@@ -86,19 +88,17 @@ const WelcomeScreen: React.FC = () => {
 
             {/* Signup Button */}
             <CustomButton
-                //TODO size will be scaled based on dimension
-                size={{width: 300, height: 70}}
+                size={{width: responsiveWidth(70), height: responsiveHeight(8)}}
                 label={'Signup'}
                 labelColor={'white'}
                 backgroundColor={'#3a9bdc'}
+                //TODO fix the position to accept responsive lib
                 onPress={() => navigation.navigate('Signup')}
                 position={{ horizontal: 'center', vertical: height * 0.75 }}
                 borderRadius={10}
                 borderColor={'white'}
                 borderWidth={3}
             />
-
-
         </View>
     )
 };

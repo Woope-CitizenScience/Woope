@@ -1,12 +1,14 @@
 import {Image, SafeAreaView, StyleSheet} from "react-native";
 import React from "react";
 import {BlobProps} from "../types";
+import {responsiveHeight, responsiveWidth} from "react-native-responsive-dimensions";
 
 
 const blobs = [
-    require('../../assets/blobs/Blob_1.png'),
-    require('../../assets/blobs/Blob_2.png'),
-    require('../../assets/blobs/Blob_3.png'),
+    // TODO get rid of blobs 1-3 because they cause deformation
+    // require('../../assets/blobs/Blob_1.png'),
+    // require('../../assets/blobs/Blob_2.png'),
+    // require('../../assets/blobs/Blob_3.png'),
     require('../../assets/blobs/Blob_4.png'),
     require('../../assets/blobs/Blob_5.png'),
     require('../../assets/blobs/Blob_6.png'),
@@ -28,24 +30,25 @@ const rotateBlob = () => {
 const Blobs: React.FC<BlobProps> = ({
     rotationDeg,
     image,
-    width,
-    height,
+    widthPercentage,
+    heightPercentage,
     position
     }) => {
     const blob = image || getRandomBlob() ;
     const rotation = rotationDeg || `${rotateBlob()}deg`;
     return(
         <SafeAreaView style={{
-            flex: 1,
-            position: 'absolute',
-            left: position.horizontal,
-            top: position.vertical
+            justifyContent: 'center',
+            position:'absolute',
+            top: responsiveHeight(position.top),
+            left: responsiveWidth(position.left),
+            alignItems: 'center'
         }}>
             <Image
                 source={blob}
                 style={{
-                    width: width,
-                    height: height,
+                    width: responsiveWidth(widthPercentage),
+                    height: responsiveHeight(heightPercentage),
                     transform: [{rotate: rotation}]
                 }}
             />

@@ -1,11 +1,13 @@
 // Props for Custom Button creation
+import {DimensionValue} from "react-native";
+
 export type ButtonProps = {
     size: { width: number; height: number };
     label: string;
     labelColor: string;
     backgroundColor?: string;
     onPress: () => void;
-    position: { horizontal: number | string; vertical: number | string};
+    position: { horizontal: DimensionValue | string ; vertical: DimensionValue | string};
     borderRadius?: number;
     borderColor?: string;
     borderWidth?: number;
@@ -35,9 +37,9 @@ export type BlobProps = {
     // Rotation is not required because it is randomized in the Blob component
     rotationDeg?: string; // Format: '45deg'
     image?: string;
-    width: number;
-    height: number;
-    position: { horizontal: number | string; vertical: number | string } ;
+    widthPercentage: number;
+    heightPercentage: number;
+    position: { top: number; left: number} ;
 
 };
 
@@ -46,5 +48,5 @@ export type TitleProps = {
     fontSize: number;
     textStyle: 'title' | 'subtitle';
     color: string;
-    position: { horizontal: number, vertical: number };
+    position: { top: number; left: number};
 };

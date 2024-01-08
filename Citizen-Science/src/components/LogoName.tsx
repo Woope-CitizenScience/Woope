@@ -2,6 +2,7 @@ import {SafeAreaView, Text, StyleSheet, Dimensions} from "react-native";
 import styles from "../StyleSheet";
 import React from "react";
 import {LogoNameProps} from "../types";
+import {responsiveFontSize} from "react-native-responsive-dimensions";
 
 const { height, width } = Dimensions.get('window');
 const LogoName: React.FC<LogoNameProps> = ({
@@ -15,7 +16,7 @@ const LogoName: React.FC<LogoNameProps> = ({
             <Text style={[
                 styles.title,
                 {color: color},
-                {fontSize: 20}]}>
+                {fontSize: responsiveFontSize(2)}]}>
                 WOOPE
             </Text>
         </SafeAreaView>
