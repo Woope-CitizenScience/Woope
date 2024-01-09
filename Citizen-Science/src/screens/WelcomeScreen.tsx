@@ -91,9 +91,10 @@ const WelcomeScreen: React.FC = () => {
                 size={{width: responsiveWidth(70), height: responsiveHeight(8)}}
                 label={'Signup'}
                 labelColor={'white'}
-                backgroundColor={'#3a9bdc'}
+                backgroundColor={'#5EA1E9'}
                 //TODO fix the position to accept responsive lib
                 onPress={() => navigation.navigate('Signup')}
+                //TODO potentially implement react responsive library
                 position={{ horizontal: 'center', vertical: height * 0.75 }}
                 borderRadius={10}
                 borderColor={'white'}

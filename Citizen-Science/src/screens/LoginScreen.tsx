@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import { ImageBackground, SafeAreaView, Text, TouchableOpacity} from "react-native";
+import { ImageBackground, SafeAreaView, Text, TouchableOpacity, Dimensions} from "react-native";
 import styles from '../StyleSheet';
-import CustomButton from '../components/CustomButton'; // Adjust the path to where your CustomButton is located
-import CustomTextField from '../components/CustomTextField'; // Adjust the path as necessary
+import CustomButton from '../components/CustomButton';
+import CustomTextField from '../components/CustomTextField';
 import { useNavigation } from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import LogoName from "../components/LogoName";
 import BackButton from "../components/BackButton";
+import ScreenTitle from "../components/ScreenTitle";
+import {responsiveHeight, responsiveWidth} from "react-native-responsive-dimensions";
 
 type NavigationParam = {
     Login: undefined;
@@ -19,6 +21,8 @@ type NavigationProp = NativeStackNavigationProp<NavigationParam, 'Login'>;
 
 const LoginScreen: React.FC = () => {
     const navigation = useNavigation<NavigationProp>();
+    const { height, width } = Dimensions.get('window')
+
 
 
     const [email, setEmail] = useState('');
@@ -37,64 +41,71 @@ const LoginScreen: React.FC = () => {
     return (
 
         <ImageBackground
-            source={require('../../assets/background.png')}
+            source={require('../../assets/background1.png')}
             style={{ flex: 1, width: '100%', height: '100%' }}>
 
-            <SafeAreaView style={{flex: 1}}>
-                <BackButton/>
-            </SafeAreaView>
-            {/* Logo Name */}
-            <LogoName position={'bottomRight'} color={'grey'}/>
-
-
-            {/* Login title, fields and login button */}
             <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <Text style={styles.subTitle}>Login</Text>
+                <BackButton />
+
+                {/* Logo Name */}
+                <LogoName position={'bottomRight'} color={'grey'}/>
+
+
+                {/* Login title, fields and login button */}
+                <ScreenTitle
+                    text={'Login'}
+                    textStyle={'title'}
+                    // TODO font size with be determined with PixelRatio lib
+                    fontSize={5}
+                    color={'white'}
+                    position={{top: 25, left: 5}}
+                />
+
 
                 {/* Email TextField */}
                 <CustomTextField
-                    size={{ width: 300, height: 50 }}
+                    size={{ width: width * 0.70, height: height * 0.05 }}
                     placeholder="Email"
                     value={email}
                     onChangeText={setEmail}
-                    borderColor="#1e90ff"
+                    borderColor="#5EA1E9"
                     borderRadius={10}
-                    position={{ horizontal: 50, vertical: 50 }}
+                    position={{ horizontal: 'center', vertical: height * 0.61 }}
                 />
 
 
                 {/* Password TextField */}
                 <CustomTextField
-                    size={{ width: 300, height: 50 }}
+                    size={{ width: width * 0.70, height: height * 0.05 }}
                     placeholder="Password"
                     value={password}
                     onChangeText={setPassword}
                     secureTextEntry={true} // To hide password input
-                    borderColor="#1e90ff"
+                    borderColor="#5EA1E9"
                     borderRadius={10}
-                    position={{ horizontal: 50, vertical: 110 }}
+                    position={{ horizontal: 'center', vertical: height * 0.68 }}
                 />
 
                 <CustomButton
-                    size={{ width: 300, height: 50 }}
+                    size={{width: responsiveWidth(70), height: responsiveHeight(5.5)}}
                     label="Login"
                     labelColor="white"
-                    backgroundColor="#1e90ff"
-                    onPress={handleLoginPress}
-                    position={{ horizontal: 50, vertical: 170 }}
+                    backgroundColor="#5EA1E9"
+                    //TODO potentially redirect to home page after account creation
+                    onPress={() => handleLoginPress()}
+                    //TODO potentially implement react responsive library
+                    position={{ horizontal: 'center', vertical: height * 0.75 }}
                 />
-            </SafeAreaView>
 
-            {/* Don't have an account? Sign Up */}
-            <SafeAreaView style={{ alignItems: 'center', marginTop: 20 }}>
-                <Text style={{position: 'absolute', top: -165}}>
+                <Text style={{fontSize: width * 0.04, position: 'absolute', top: height * 0.85}}>
                     Don't have an account?{' '}
                     <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
-                        <Text style={{ color: '#1e90ff', textDecorationLine: 'underline' }}>
+                        <Text style={{fontSize: width * 0.04,  color: '#1e90ff', textDecorationLine: 'underline' }}>
                             Sign Up
                         </Text>
                     </TouchableOpacity>
                 </Text>
+
             </SafeAreaView>
 
         </ImageBackground>
