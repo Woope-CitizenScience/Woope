@@ -1,8 +1,11 @@
 import React, { useEffect } from 'react';
-import {View, Image, StyleSheet, ImageBackground} from 'react-native';
+import { View, ImageBackground, Dimensions } from 'react-native';
 import { useNavigation, NavigationContainerRef } from '@react-navigation/native';
 
-const scaleFactor = 0.5;
+// Get full width and height of the device's screen
+const screenWidth = Dimensions.get('window').width;
+const screenHeight = Dimensions.get('window').height;
+
 function SplashScreen() {
     const navigation = useNavigation<NavigationContainerRef<any>>();
 
@@ -15,16 +18,15 @@ function SplashScreen() {
         return () => clearTimeout(splashTimer); // This will cancel our splash screen after 2 seconds
     }, []);
 
-    const image = require('../../assets/SplashScreen.png')
+    const image = require('../../assets/splashh.png');
     return (
         <View style={{ flex: 1 }}>
-            <Image
+            <ImageBackground
                 source={image}
-                style={{ width: '100%', height: '100%', justifyContent: 'center', resizeMode: 'cover'}}
-            >
-            </Image>
+                style={{ width: screenWidth, height: screenHeight }}
+            />
         </View>
-
     );
 }
+
 export default SplashScreen;
