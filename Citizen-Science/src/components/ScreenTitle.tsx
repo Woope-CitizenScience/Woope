@@ -5,12 +5,12 @@ import styleSheet from "../StyleSheet";
 import { responsiveFontSize, responsiveHeight, responsiveWidth } from "react-native-responsive-dimensions";
 
 const ScreenTitle: React.FC<TitleProps> = ({
-                                               text,
-                                               fontSize,
-                                               textStyle,
-                                               color,
-                                               position
-                                           }) => {
+    text,
+    fontSize,
+    textStyle,
+    color,
+    position
+}) => {
 
     const textAppearanceStyle = StyleSheet.create({
         text: {

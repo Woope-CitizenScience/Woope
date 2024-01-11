@@ -3,7 +3,7 @@
 import React from 'react';
 import { TouchableOpacity, Text, ViewStyle } from 'react-native';
 import { ButtonProps } from '../types';
-import styles from '../StyleSheet'; // Adjust the import path as necessary
+import styles from '../StyleSheet';
 
 const CustomButton: React.FC<ButtonProps> = ({
     size,
