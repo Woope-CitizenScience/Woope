@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ImageBackground, SafeAreaView, Text, TouchableOpacity, Dimensions} from "react-native";
+import { ImageBackground, SafeAreaView, Text, TouchableOpacity} from "react-native";
 import styles from '../StyleSheet';
 import CustomButton from '../components/CustomButton';
 import CustomTextField from '../components/CustomTextField';
@@ -8,7 +8,7 @@ import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import LogoName from "../components/LogoName";
 import BackButton from "../components/BackButton";
 import ScreenTitle from "../components/ScreenTitle";
-import {responsiveHeight, responsiveWidth} from "react-native-responsive-dimensions";
+import {responsiveFontSize, responsiveHeight, responsiveWidth} from "react-native-responsive-dimensions";
 
 type NavigationParam = {
     Login: undefined;
@@ -21,7 +21,6 @@ type NavigationProp = NativeStackNavigationProp<NavigationParam, 'Login'>;
 
 const LoginScreen: React.FC = () => {
     const navigation = useNavigation<NavigationProp>();
-    const { height, width } = Dimensions.get('window')
 
 
 
@@ -64,26 +63,26 @@ const LoginScreen: React.FC = () => {
 
                 {/* Email TextField */}
                 <CustomTextField
-                    size={{ width: width * 0.70, height: height * 0.05 }}
+                    size={{width: responsiveWidth(70), height: responsiveHeight(5.5)}}
                     placeholder="Email"
                     value={email}
                     onChangeText={setEmail}
                     borderColor="#5EA1E9"
                     borderRadius={10}
-                    position={{ horizontal: 'center', vertical: height * 0.61 }}
+                    position={{ horizontal: responsiveWidth(15), vertical: responsiveHeight(61) }}
                 />
 
 
                 {/* Password TextField */}
                 <CustomTextField
-                    size={{ width: width * 0.70, height: height * 0.05 }}
+                    size={{width: responsiveWidth(70), height: responsiveHeight(5.5)}}
                     placeholder="Password"
                     value={password}
                     onChangeText={setPassword}
                     secureTextEntry={true} // To hide password input
                     borderColor="#5EA1E9"
                     borderRadius={10}
-                    position={{ horizontal: 'center', vertical: height * 0.68 }}
+                    position={{ horizontal: responsiveWidth(15), vertical: responsiveHeight(68) }}
                 />
 
                 <CustomButton
@@ -93,14 +92,13 @@ const LoginScreen: React.FC = () => {
                     backgroundColor="#5EA1E9"
                     //TODO potentially redirect to home page after account creation
                     onPress={() => handleLoginPress()}
-                    //TODO potentially implement react responsive library
-                    position={{ horizontal: 'center', vertical: height * 0.75 }}
+                    position={{ horizontal: responsiveWidth(15), vertical: responsiveHeight(75) }}
                 />
 
-                <Text style={{fontSize: width * 0.04, position: 'absolute', top: height * 0.85}}>
+                <Text style={{fontSize: responsiveFontSize(2), position: 'absolute', top: responsiveHeight(84)}}>
                     Don't have an account?{' '}
                     <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
-                        <Text style={{fontSize: width * 0.04,  color: '#1e90ff', textDecorationLine: 'underline' }}>
+                        <Text style={{fontSize: responsiveFontSize(2),  color: '#5EA1E9', textDecorationLine: 'underline' }}>
                             Sign Up
                         </Text>
                     </TouchableOpacity>

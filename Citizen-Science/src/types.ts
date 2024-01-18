@@ -24,7 +24,7 @@ export type TextFieldProps = {
     secureTextEntry?: boolean;
     borderColor?: string;
     borderRadius?: number;
-    position: { horizontal: number | string; vertical: number | string};
+    position: { horizontal: DimensionValue | undefined ; vertical: DimensionValue | undefined};
     // Other properties as needed, like keyboardType, returnKeyType, etc.
 };
 

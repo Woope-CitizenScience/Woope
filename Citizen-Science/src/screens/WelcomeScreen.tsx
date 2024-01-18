@@ -79,8 +79,7 @@ const WelcomeScreen: React.FC = () => {
                 labelColor={'#3a9bdc'}
                 backgroundColor={'white'}
                 onPress={() => navigation.navigate('Login')}
-                //TODO fix the position to accept responsive lib
-                position={{ horizontal: 'center', vertical: height * 0.65 }}
+                position={{ horizontal: responsiveWidth(15), vertical: responsiveHeight(65) }}
                 borderRadius={10}
                 borderColor={'white'}
                 borderWidth={3}
@@ -95,7 +94,7 @@ const WelcomeScreen: React.FC = () => {
                 //TODO fix the position to accept responsive lib
                 onPress={() => navigation.navigate('Signup')}
                 //TODO potentially implement react responsive library
-                position={{ horizontal: 'center', vertical: height * 0.75 }}
+                position={{ horizontal: responsiveWidth(15), vertical: responsiveHeight(75) }}
                 borderRadius={10}
                 borderColor={'white'}
                 borderWidth={3}

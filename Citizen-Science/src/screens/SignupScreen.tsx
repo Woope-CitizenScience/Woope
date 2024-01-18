@@ -48,37 +48,37 @@ const SignupScreen = () => {
 
                 {/* Name TextField */}
                 <CustomTextField
-                    size={{  width: width * 0.70, height: height * 0.05 }}
+                    size={{width: responsiveWidth(70), height: responsiveHeight(5.5)}}
                     placeholder="Name"
                     value={email}
                     onChangeText={setName}
                     borderColor="#5EA1E9"
                     borderRadius={10}
-                    position={{ horizontal: 'center', vertical: height * 0.60 }}
+                    position={{ horizontal: responsiveWidth(15), vertical: responsiveHeight(60) }}
                 />
 
                 {/* Email TextField */}
                 <CustomTextField
-                    size={{  width: width * 0.70, height: height * 0.05 }}
+                    size={{width: responsiveWidth(70), height: responsiveHeight(5.5)}}
                     placeholder="Email"
                     value={email}
                     onChangeText={setEmail}
                     borderColor="#5EA1E9"
                     borderRadius={10}
-                    position={{ horizontal: 'center', vertical: height * 0.69 }}
+                    position={{ horizontal: responsiveWidth(15), vertical: responsiveHeight(69) }}
                 />
 
 
                 {/* Password TextField */}
                 <CustomTextField
-                    size={{  width: width * 0.70, height: height * 0.05 }}
+                    size={{width: responsiveWidth(70), height: responsiveHeight(5.5)}}
                     placeholder="Password"
                     value={password}
                     onChangeText={setPassword}
                     secureTextEntry={true} // To hide password input
                     borderColor="#5EA1E9"
                     borderRadius={10}
-                    position={{ horizontal: 'center', vertical: height * 0.78 }}
+                    position={{ horizontal: responsiveWidth(15), vertical: responsiveHeight(78) }}
                 />
 
                 <CustomButton
@@ -89,7 +89,7 @@ const SignupScreen = () => {
                     //TODO potentially redirect to home page after account creation
                     onPress={() => navigation.navigate('Login')}
                     //TODO potentially implement react responsive library
-                    position={{ horizontal: 'center', vertical: height * 0.86 }}
+                    position={{ horizontal: responsiveWidth(15), vertical: responsiveHeight(86) }}
                 />
 
             </SafeAreaView>
