@@ -49,7 +49,7 @@ const WelcomeScreen: React.FC = () => {
             <Blobs rotationDeg={'0deg'} widthPercentage={18} heightPercentage={9} position={{ top: 89, left: 81 }} />
             <Blobs rotationDeg={'0deg'} widthPercentage={5} heightPercentage={3} position={{ top: 97, left: 78 }} />
 
-            {/* Welcome title */}
+            {/* 'Welcome' title */}
             <ScreenTitle
                 text={'Welcome'}
                 textStyle={'title'}
@@ -59,7 +59,7 @@ const WelcomeScreen: React.FC = () => {
                 position={{top: 35, left: 8}}
             />
 
-            {/* Welcome subtitle */}
+            {/* 'Welcome' subtitle in Lakota language */}
             <ScreenTitle
                 text={'(taŋyáŋ yah)'}
                 textStyle={'subtitle'}

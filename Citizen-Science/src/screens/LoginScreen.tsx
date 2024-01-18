@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { ImageBackground, SafeAreaView, Text, TouchableOpacity} from "react-native";
-import styles from '../StyleSheet';
 import CustomButton from '../components/CustomButton';
 import CustomTextField from '../components/CustomTextField';
 import { useNavigation } from '@react-navigation/native';
@@ -19,7 +18,6 @@ type NavigationParam = {
     NavigationBar: undefined;
 };
 
-//Type for our Navigation in our component
 type NavigationProp = NativeStackNavigationProp<NavigationParam, 'Login'>;
 
 const LoginScreen: React.FC = () => {
@@ -39,7 +37,6 @@ const LoginScreen: React.FC = () => {
         navigation.navigate('NavigationBar');
     };
 
-    // @ts-ignore
     return (
 
         <ImageBackground
@@ -60,9 +57,10 @@ const LoginScreen: React.FC = () => {
                 {/* Logo Name */}
                 <LogoName position={'bottomRight'} color={'grey'}/>
 
+                {/* Back Button */}
                 <BackButton />
 
-                {/* Login title, fields and login button */}
+                {/*  'Welome Back' title on login */}
                 <ScreenTitle
                     text={'Welcome \nBack'}
                     textStyle={'title'}
@@ -97,6 +95,7 @@ const LoginScreen: React.FC = () => {
                     position={{ horizontal: responsiveWidth(15), vertical: responsiveHeight(68) }}
                 />
 
+                {/* Login Button */}
                 <CustomButton
                     size={{width: responsiveWidth(70), height: responsiveHeight(5.5)}}
                     label="Login"
@@ -107,6 +106,7 @@ const LoginScreen: React.FC = () => {
                     position={{ horizontal: responsiveWidth(15), vertical: responsiveHeight(75) }}
                 />
 
+                {/* Giving Users the option to signup if they are not registered */}
                 <Text style={{fontSize: responsiveFontSize(2), position: 'absolute', top: responsiveHeight(84)}}>
                     Don't have an account?{' '}
                     <TouchableOpacity onPress={() => navigation.navigate('Signup')}>

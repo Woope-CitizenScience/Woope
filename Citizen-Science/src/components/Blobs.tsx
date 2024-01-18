@@ -1,4 +1,4 @@
-import {Image, SafeAreaView, StyleSheet} from "react-native";
+import {Image, SafeAreaView} from "react-native";
 import React from "react";
 import {BlobProps} from "../types";
 import {responsiveHeight, responsiveWidth} from "react-native-responsive-dimensions";
