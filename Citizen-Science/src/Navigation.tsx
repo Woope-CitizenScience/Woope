@@ -22,7 +22,11 @@ const AppNavigation = () => {
                 component={LoginScreen}
                 options={{animation: 'slide_from_bottom'}}
             />
-            <Stack.Screen name="Signup" component={SignupScreen}/>
+            <Stack.Screen
+                name="Signup"
+                component={SignupScreen}
+                options={{animation: 'slide_from_bottom'}}
+            />
             <Stack.Screen name="Home" component={HomeScreen}/>
             <Stack.Screen name="Splash" component={SplashScreen}/>
             <Stack.Screen

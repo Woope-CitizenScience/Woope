@@ -5,15 +5,15 @@ import { TextInput, ViewStyle, StyleSheet } from 'react-native';
 import { TextFieldProps } from '../types';
 
 const CustomTextField: React.FC<TextFieldProps> = ({
-    size,
-    placeholder,
-    value,
-    onChangeText,
-    secureTextEntry = false,
-    borderColor = '#000', // Default color
-    borderRadius = 5,
-    position,
-}) => {
+   size,
+   placeholder,
+   value,
+   onChangeText,
+   secureTextEntry = false,
+   borderColor = '#000', // Default color
+   borderRadius = 5,
+   position,
+   }) => {
     const textFieldStyle: ViewStyle = {
         width: size.width,
         height: size.height,

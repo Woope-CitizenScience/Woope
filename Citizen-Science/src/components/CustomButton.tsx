@@ -15,8 +15,7 @@ const CustomButton: React.FC<ButtonProps> = ({
     borderRadius = 10, //default value. Like that all buttons look the same
     borderColor,
     borderWidth,
-    disabled = false
-}) => {
+    }) => {
     const buttonStyle: ViewStyle = {
         ...styles.button,
         width: size.width,
@@ -28,14 +27,12 @@ const CustomButton: React.FC<ButtonProps> = ({
         position: 'absolute',
         left: position.horizontal,
         top: position.vertical,
-        opacity: disabled ? 0.5 : 1
     };
 
     return (
         <TouchableOpacity
             style={buttonStyle}
-            onPress={onPress}
-            disabled={disabled}>
+            onPress={onPress} >
             <Text style={[styles.buttonText, { color: labelColor }]}>
                 {label}
             </Text>

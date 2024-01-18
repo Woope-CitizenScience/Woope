@@ -7,11 +7,7 @@ import Blobs from "../components/Blobs";
 import { useNavigation } from '@react-navigation/native';
 import {NativeStackNavigationProp} from "@react-navigation/native-stack";
 import ScreenTitle from "../components/ScreenTitle";
-//TODO remove this once all props using it already have it imported
-import {
-    responsiveHeight,
-    responsiveWidth,
-} from "react-native-responsive-dimensions";
+import {responsiveHeight, responsiveWidth} from "react-native-responsive-dimensions";
 
 type NavigationParam = {
     Welcome: undefined;
@@ -23,7 +19,6 @@ type NavigationParam = {
 type NavigationProp = NativeStackNavigationProp<NavigationParam, 'Welcome'>;
 const WelcomeScreen: React.FC = () => {
     const navigation = useNavigation<NavigationProp>();
-    const { height, width } = Dimensions.get('window')
 
     return(
         <View style={styles.backgroundColor}>
@@ -60,6 +55,7 @@ const WelcomeScreen: React.FC = () => {
                 textStyle={'title'}
                 fontSize={4}
                 color={'white'}
+                // Uses responsive library {width, height} through the components file
                 position={{top: 35, left: 8}}
             />
 
@@ -69,6 +65,7 @@ const WelcomeScreen: React.FC = () => {
                 textStyle={'subtitle'}
                 fontSize={2}
                 color={'white'}
+                // Uses responsive library {width, height} through the components file
                 position={{top: 42.5, left: 10}}
             />
 
@@ -91,9 +88,7 @@ const WelcomeScreen: React.FC = () => {
                 label={'Signup'}
                 labelColor={'white'}
                 backgroundColor={'#5EA1E9'}
-                //TODO fix the position to accept responsive lib
                 onPress={() => navigation.navigate('Signup')}
-                //TODO potentially implement react responsive library
                 position={{ horizontal: responsiveWidth(15), vertical: responsiveHeight(75) }}
                 borderRadius={10}
                 borderColor={'white'}

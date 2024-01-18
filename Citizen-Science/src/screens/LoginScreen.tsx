@@ -8,7 +8,10 @@ import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import LogoName from "../components/LogoName";
 import BackButton from "../components/BackButton";
 import ScreenTitle from "../components/ScreenTitle";
+
 import {responsiveFontSize, responsiveHeight, responsiveWidth} from "react-native-responsive-dimensions";
+import Blobs from "../components/Blobs";
+
 
 type NavigationParam = {
     Login: undefined;
@@ -29,7 +32,7 @@ const LoginScreen: React.FC = () => {
 
 
     // handleLoginPress:
-    // Here we need to define what will happen when the login button us pressed. So user authentication.
+    // Here we need to define what will happen when the login button is pressed. So user authentication.
     const handleLoginPress = () => {
         console.log('Login button pressed');
         // logic for what should happen on login press
@@ -43,21 +46,30 @@ const LoginScreen: React.FC = () => {
             source={require('../../assets/background1.png')}
             style={{ flex: 1, width: '100%', height: '100%' }}>
 
+
             <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <BackButton />
+
+                {/* First Blob Cluster */}
+                <Blobs rotationDeg={'0deg'} widthPercentage={20} heightPercentage={10} position={{ top: 45, left: 75 }} />
+                <Blobs rotationDeg={'0deg'} widthPercentage={10} heightPercentage={5} position={{ top: 45, left: 60 }} />
+
+                {/* Second Blob Cluster */}
+                <Blobs rotationDeg={'0deg'} widthPercentage={20} heightPercentage={10} position={{ top: 6, left: 80 }} />
+                <Blobs rotationDeg={'0deg'} widthPercentage={6} heightPercentage={3} position={{ top: 15, left: 93 }} />
 
                 {/* Logo Name */}
                 <LogoName position={'bottomRight'} color={'grey'}/>
 
+                <BackButton />
 
                 {/* Login title, fields and login button */}
                 <ScreenTitle
-                    text={'Login'}
+                    text={'Welcome \nBack'}
                     textStyle={'title'}
-                    // TODO font size with be determined with PixelRatio lib
                     fontSize={5}
                     color={'white'}
-                    position={{top: 25, left: 5}}
+                    // Uses responsive library {width, height} through the components file
+                    position={{top: 20, left: 5}}
                 />
 
 
@@ -90,7 +102,7 @@ const LoginScreen: React.FC = () => {
                     label="Login"
                     labelColor="white"
                     backgroundColor="#5EA1E9"
-                    //TODO potentially redirect to home page after account creation
+                    //TODO: potentially redirect to home page after account creation
                     onPress={() => handleLoginPress()}
                     position={{ horizontal: responsiveWidth(15), vertical: responsiveHeight(75) }}
                 />

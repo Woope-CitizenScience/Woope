@@ -5,10 +5,6 @@ import {responsiveHeight, responsiveWidth} from "react-native-responsive-dimensi
 
 
 const blobs = [
-    // TODO get rid of blobs 1-3 because they cause deformation
-    // require('../../assets/blobs/Blob_1.png'),
-    // require('../../assets/blobs/Blob_2.png'),
-    // require('../../assets/blobs/Blob_3.png'),
     require('../../assets/blobs/Blob_4.png'),
     require('../../assets/blobs/Blob_5.png'),
     require('../../assets/blobs/Blob_6.png'),
