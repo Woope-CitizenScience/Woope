@@ -1,14 +1,13 @@
 import {config} from '../config/config'
 import express from 'express';
-import { getUser, createUser } from '../models/users';
+import {getUser, createUser, getUserByRefreshToken} from '../models/users';
 import {hashPassword, comparePasswords} from '../utils/password';
+import {createAccessToken, createRefreshToken} from '../utils/token';
+import jwt from 'jsonwebtoken';
+
 const pool = require('../db');
 const router = require('express').Router();
-
-const accessTokenSecret:string = config.accessTokenSecret!;
 const refreshTokenSecret:string = config.refreshTokenSecret!;
-const accessTokenLife:string = config.accessTokenLife!;
-const refreshTokenLife:string = config.refreshTokenLife!;
 
 router.post('/login', async (req: express.Request, res: express.Response) => {
     try {
@@ -23,9 +22,16 @@ router.post('/login', async (req: express.Request, res: express.Response) => {
             return res.status(404).send('User does not exist');
         }
 
-        if (await comparePasswords(password, user.password_hash)) {
-			await pool.query('UPDATE users SET last_login = NOW() WHERE user_id = $1', [user.user_id]);
-            res.status(200).send('Logged in');
+
+        if (await comparePasswords(password, user.password_hash as string)) {
+            const accessToken = await createAccessToken(user);
+            const refreshToken = await createRefreshToken(user);
+            const hashedRefreshToken = await hashPassword(refreshToken);
+
+            await pool.query('UPDATE users SET last_login = NOW() WHERE user_id = $1', [user.user_id]);
+            await pool.query('UPDATE users SET refresh_token = $1 WHERE user_id = $2', [hashedRefreshToken, user.user_id]);
+
+            res.status(200).json({ 'accessToken': accessToken, 'refreshToken': refreshToken });
         } else {
             res.status(401).send('Invalid password');
         }
@@ -36,23 +42,79 @@ router.post('/login', async (req: express.Request, res: express.Response) => {
     }
 });
 
+router.post('/logout', async (req: express.Request, res: express.Response) => {
+    const { userId } = req.body;
 
-router.post('/register', async (req: express.Request, res: express.Response) => {
+    if (!userId) {
+        return res.status(400).send('User ID is required');
+    }
+
     try {
-        const {email, phoneNumber, password, firstName, lastName} = req.body;
-        const user = await getUser(email, phoneNumber);
+        await pool.query('UPDATE users SET refresh_token = NULL WHERE user_id = $1', [userId]);
 
-
-        if (!user) {
-            const hashedPassword = await hashPassword(password);
-            const newUser = await createUser(email, phoneNumber, hashedPassword, firstName, lastName);
-            res.status(201).send(JSON.stringify(newUser));
-        } else {
-            res.status(400).send('User already exists');
-        }
+        res.status(200).send('Successfully logged out');
     } catch (error) {
         const err = error as Error;
-        res.status(500).send(err.message);
+        res.status(500).send(`Internal server error: ${err.message}`);
+    }
+});
+
+
+router.post('/register', async (req: express.Request, res: express.Response) => {
+    const { email, phoneNumber, password, firstName, lastName } = req.body;
+
+    try {
+        const existingUser = await getUser(email, phoneNumber);
+        if (existingUser) {
+            return res.status(400).send('User already exists');
+        }
+
+        const hashedPassword = await hashPassword(password);
+        const newUser = await createUser(email, phoneNumber, hashedPassword, firstName, lastName);
+
+        if (!newUser) {
+            return res.status(500).send('Error creating user');
+        }
+
+        const refreshToken = await createRefreshToken(newUser);
+        const hashedRefreshToken = await hashPassword(refreshToken);
+
+        await pool.query('UPDATE users SET refresh_token = $1 WHERE user_id = $2', [hashedRefreshToken, newUser.user_id]);
+
+        const accessToken = await createAccessToken(newUser);
+        res.status(201).json({ 'accessToken': accessToken, 'refreshToken': refreshToken });
+    } catch (error) {
+        res.status(500).send(`Internal server error: ${(error as Error).message}`);
+    }
+});
+
+
+router.post('/refresh-access-token', async (req: express.Request, res: express.Response) => {
+    const { refreshToken } = req.body;
+    if (!refreshToken) {
+        return res.status(401).send('Refresh token is required');
+    }
+
+    try {
+        jwt.verify(refreshToken, refreshTokenSecret);
+        const decode = jwt.decode(refreshToken) as jwt.JwtPayload;
+        const user = await getUserByRefreshToken(decode?.user_id);
+
+        if (!user) {
+            return res.status(403).send('Invalid user');
+        }
+        if (!user.refresh_token || !await comparePasswords(refreshToken, user.refresh_token)) {
+            return res.status(403).send('Invalid refresh token');
+        }
+
+        const newAccessToken = await createAccessToken(user);
+        res.status(200).json({ accessToken: newAccessToken });
+    } catch (error) {
+        if (error instanceof jwt.JsonWebTokenError) {
+            res.status(403).send('Invalid refresh token');
+        } else {
+            res.status(500).send(`Internal server error: ${(error as Error).message}`);
+        }
     }
 });
 
