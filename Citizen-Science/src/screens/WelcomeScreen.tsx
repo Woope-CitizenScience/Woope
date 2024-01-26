@@ -1,5 +1,5 @@
 import React from 'react';
-import {Button, SafeAreaView, Text, View, StyleSheet, Dimensions} from "react-native";
+import {Button, SafeAreaView, Text, View, StyleSheet, Platform} from "react-native";
 import styles from "../StyleSheet";
 import LogoName from "../components/LogoName";
 import CustomButton from "../components/CustomButton";
@@ -21,6 +21,7 @@ const WelcomeScreen: React.FC = () => {
     const navigation = useNavigation<NavigationProp>();
 
     return(
+
         <View style={styles.backgroundColor}>
 
 
@@ -56,7 +57,7 @@ const WelcomeScreen: React.FC = () => {
                 fontSize={4}
                 color={'white'}
                 // Uses responsive library {width, height} through the components file
-                position={{top: 35, left: 8}}
+                position={{top: 0, left: 0}}
             />
 
             {/* 'Welcome' subtitle in Lakota language */}
@@ -66,7 +67,7 @@ const WelcomeScreen: React.FC = () => {
                 fontSize={2}
                 color={'white'}
                 // Uses responsive library {width, height} through the components file
-                position={{top: 42.5, left: 10}}
+                position={{top: 2, left: 0}}
             />
 
             {/* Login Button */}
@@ -76,7 +77,7 @@ const WelcomeScreen: React.FC = () => {
                 labelColor={'#3a9bdc'}
                 backgroundColor={'white'}
                 onPress={() => navigation.navigate('Login')}
-                position={{ horizontal: responsiveWidth(15), vertical: responsiveHeight(65) }}
+                position={{ top: 13, left: 0 }}
                 borderRadius={10}
                 borderColor={'white'}
                 borderWidth={3}
@@ -89,12 +90,13 @@ const WelcomeScreen: React.FC = () => {
                 labelColor={'white'}
                 backgroundColor={'#5EA1E9'}
                 onPress={() => navigation.navigate('Signup')}
-                position={{ horizontal: responsiveWidth(15), vertical: responsiveHeight(75) }}
+                position={{ top: 15, left: 0 }}
                 borderRadius={10}
                 borderColor={'white'}
                 borderWidth={3}
             />
         </View>
+
     )
 };
 export default WelcomeScreen;

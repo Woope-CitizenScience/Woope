@@ -21,7 +21,7 @@ const ScreenTitle: React.FC<TitleProps> = ({
 
     const positionStyle = StyleSheet.create({
         container: {
-            position: 'absolute',
+            // position: 'absolute',
             top: responsiveHeight(position.top),
             left: responsiveWidth(position.left),
             alignItems: 'center',

@@ -7,7 +7,7 @@ export type ButtonProps = {
     labelColor: string;
     backgroundColor?: string;
     onPress: () => void;
-    position: { horizontal: DimensionValue | undefined ; vertical: DimensionValue | undefined};
+    position: { top: number; left: number};
     borderRadius?: number;
     borderColor?: string;
     borderWidth?: number;
@@ -24,7 +24,7 @@ export type TextFieldProps = {
     secureTextEntry?: boolean;
     borderColor?: string;
     borderRadius?: number;
-    position: { horizontal: DimensionValue | undefined ; vertical: DimensionValue | undefined};
+    position: { top: number; left: number};
     // Other properties as needed, like keyboardType, returnKeyType, etc.
 };
 
