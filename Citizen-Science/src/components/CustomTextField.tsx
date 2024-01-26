@@ -3,6 +3,7 @@
 import React from 'react';
 import { TextInput, ViewStyle, StyleSheet } from 'react-native';
 import { TextFieldProps } from '../types';
+import {responsiveHeight, responsiveWidth} from "react-native-responsive-dimensions";
 
 const CustomTextField: React.FC<TextFieldProps> = ({
    size,
@@ -21,10 +22,9 @@ const CustomTextField: React.FC<TextFieldProps> = ({
         borderRadius,
         borderWidth: 1,
         paddingHorizontal: 10, // Padding inside the text field
-        position:'absolute',
-        left: position.horizontal,
-        top: position.vertical,
-        // Add other styles as needed
+        top: responsiveHeight(position.top),
+        left: responsiveWidth(position.left),
+
     };
 
     return (

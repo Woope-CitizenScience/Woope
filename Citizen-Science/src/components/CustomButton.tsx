@@ -4,6 +4,7 @@ import React from 'react';
 import { TouchableOpacity, Text, ViewStyle } from 'react-native';
 import { ButtonProps } from '../types';
 import styles from '../StyleSheet';
+import {responsiveHeight, responsiveWidth} from "react-native-responsive-dimensions";
 
 const CustomButton: React.FC<ButtonProps> = ({
     size,
@@ -24,9 +25,8 @@ const CustomButton: React.FC<ButtonProps> = ({
         borderRadius,
         borderColor,
         borderWidth,
-        position: 'absolute',
-        left: position.horizontal,
-        top: position.vertical,
+        top: responsiveHeight(position.top),
+        left: responsiveWidth(position.left),
     };
 
     return (
