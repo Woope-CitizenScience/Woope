@@ -6,7 +6,7 @@ import Login from "./screens/Login";
 import Home from "./screens/Home";
 import * as React from "react";
 import { MapScreen } from './screens/Map/Map.Screen';
-import { MapHome } from './screens/Home/Home.Screen';
+import { MapHome } from './screens/MapHome/MapHome.Screen';
 
 
 const Stack = createNativeStackNavigator();

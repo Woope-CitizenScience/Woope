@@ -4,7 +4,7 @@ import {Appbar} from 'react-native-paper';
 import {Card, Button, TextInput} from 'react-native-paper';
 import * as Location from 'expo-location';
 import React2, {useState, useEffect} from 'react';
-import {HomePage} from './Home.Style'
+import {HomePage} from './MapHome.Style'
 
 interface MapPageScreenProps {
     navigation: any;
