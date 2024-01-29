@@ -13,6 +13,10 @@ const Home = () => {
         });
     }
 
+    const ToMap = () => {
+            navigator.navigate("MapHome");
+    }
+
   return (
     <View style={styles.container}>
         <Text>Email: {auth.currentUser?.email}</Text>
@@ -21,6 +25,12 @@ const Home = () => {
         style={styles.button}
     >
         <Text style={styles.buttonText}>Sign out</Text>
+    </TouchableOpacity>
+    <TouchableOpacity
+        onPress={ToMap}
+        style={styles.button}
+    >
+        <Text style={styles.buttonText}>Map section</Text>
     </TouchableOpacity>
     </View>
   );
