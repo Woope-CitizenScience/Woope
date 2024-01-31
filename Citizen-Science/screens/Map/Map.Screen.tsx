@@ -42,6 +42,10 @@ export const MapScreen = () => {
                       title="Your Location"
                     />
                   )}
+                  <Marker 
+                  coordinate={{latitude: 34.239958, longitude: -118.529187}}
+                  title="CSUN Library"
+                  />
                 </MapView>
               )}
               </View>
