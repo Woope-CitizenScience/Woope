@@ -42,8 +42,8 @@ export const MapScreen = () => {
                       title="Your Location"
                     />
                   )}
-                  <Marker 
-                  coordinate={{latitude: 34.239958, longitude: -118.529187}}
+                  <Marker                                                       //hard coded coordinate
+                  coordinate={{latitude: 34.239958, longitude: -118.529187}}    //to be replaced with function that loads pins from pin DB
                   title="CSUN Library"
                   />
                 </MapView>
