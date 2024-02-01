@@ -51,10 +51,10 @@ const SignupScreen = () => {
                 <Blobs rotationDeg={'0deg'} widthPercentage={20} heightPercentage={10} position={{ top: 6, left: 80 }} />
                 <Blobs rotationDeg={'0deg'} widthPercentage={6} heightPercentage={3} position={{ top: 15, left: 93 }} />
 
-                {/* Logo name */}
+
                 <LogoName position={'bottomRight'} color={'grey'}/>
 
-                {/* Back Button */}
+
                 <BackButton />
 
                 {/* 'Create an Account' title on signup */}
