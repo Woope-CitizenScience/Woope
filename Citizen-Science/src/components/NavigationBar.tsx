@@ -9,7 +9,6 @@ import CalendarScreen from '../screens/CalendarScreen';
 import MapScreen from '../screens/MapScreen';
 import ResourceScreen from '../screens/ResourceScreen';
 import CitizenScienceScreen from '../screens/CitizenScience';
-import { responsiveFontSize, responsiveWidth, responsiveHeight } from "react-native-responsive-dimensions";
 
 const Tab = createBottomTabNavigator();
 interface AnimatedTabIconProps {
@@ -29,14 +28,13 @@ const AnimatedTabIcon: React.FC<AnimatedTabIconProps> = ({ focused, IconPath }) 
         };
     });
 
-        return (
-            <Animated.View style={animatedStyle}>
-                {/* Todo: Add responsive lib to height and width of icons */}
-                <Svg height="24" width="24" viewBox="0 0 24 24">
-                    <Path fill={focused ? '#0059ed' : 'white'} d={IconPath} />
-                </Svg>
-            </Animated.View>
-        );
+    return (
+        <Animated.View style={animatedStyle}>
+            <Svg height="24" width="24" viewBox="0 0 24 24">
+                <Path fill={focused ? '#007AFF' : 'black'} d={IconPath} />
+            </Svg>
+        </Animated.View>
+    );
 };
 
 const NavigationBar = () => {
@@ -51,7 +49,7 @@ const NavigationBar = () => {
                             case 'Home':
                                 IconPath= mdiHome;
                                 break;
-                            case 'Science':
+                            case 'Citizen Science':
                                 IconPath = mdiTestTube;
                                 break;
                             case 'Calendar':
@@ -68,27 +66,24 @@ const NavigationBar = () => {
                         }
                         return <AnimatedTabIcon focused={focused} IconPath={IconPath} />;
                     },
-                    tabBarActiveTintColor: '#0059ed',
-                    tabBarInactiveTintColor: 'white',
+                    tabBarActiveTintColor: 'blue',
+                    tabBarInactiveTintColor: 'black',
                     tabBarStyle:{
-                        backgroundColor: '#5EA1E9',
+                        backgroundColor: 'lightblue',
                         paddingBottom: 13,
                         paddingTop: 2,
-                        height: responsiveHeight(11),
+                        height: 80,
                         borderTopLeftRadius: 20,
                         borderTopRightRadius: 20,
 
                     },
                     tabBarLabelStyle: {
                         marginBottom: 3,
-                        fontSize: responsiveFontSize(1.6),
-                        fontWeight: "bold"
                     },
                 })}
             >
                 <Tab.Screen name="Home" component={HomeScreen} />
-                {/* TODO: Find a way to make 'Citizen Science' fit */}
-                <Tab.Screen name="Science" component={CitizenScienceScreen} />
+                <Tab.Screen name="Citizen Science" component={CitizenScienceScreen} />
                 <Tab.Screen name="Calendar" component={CalendarScreen} />
                 <Tab.Screen name="Resource" component={ResourceScreen} />
                 <Tab.Screen name="Map" component={MapScreen} />
