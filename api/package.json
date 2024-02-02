@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "dev": "nodemon --legacy-watch src/server.ts"
   },
@@ -18,6 +19,7 @@
     "typescript": "^5.3.2"
   },
   "dependencies": {
+    "axios": "^1.6.7",
     "bcryptjs": "^2.4.3",
     "db-migrate": "^0.11.14",
     "db-migrate-pg": "^1.5.2",
