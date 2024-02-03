@@ -3,7 +3,7 @@ import { authenticateToken } from '../middleware/authMiddleware';
 const router = require('express').Router();
 
 router.get('/', (req: express.Request, res: express.Response) => {
-  res.send('Authenticated!');
+  res.send('OK');
 });
 
 router.get('/protected-route', authenticateToken, (req: express.Request, res: express.Response) => {
