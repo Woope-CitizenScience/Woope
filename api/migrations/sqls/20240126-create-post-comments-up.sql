@@ -15,7 +15,7 @@ CREATE TABLE posts (
 CREATE TABLE comments (
     comment_id SERIAL PRIMARY KEY,
     post_id INTEGER NOT NULL,
-    parent_comment_id INTEGER, -- This can be NULL for top-level comments
+    parent_comment_id INTEGER,
     user_id INTEGER NOT NULL,
     content TEXT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -60,7 +60,7 @@ BEGIN
         -- If a like is removed, decrement the likes_count
         UPDATE comments SET likes_count = likes_count - 1 WHERE comment_id = OLD.comment_id;
     END IF;
-    RETURN NULL; -- For AFTER triggers, it is recommended to return NULL
+    RETURN NULL;
 END;
 $$ LANGUAGE plpgsql;
 
