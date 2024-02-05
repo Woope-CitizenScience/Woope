@@ -1,11 +1,13 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import SideMenu from '../components/SideMenu';
+import WelcomeBanner from '../components/WelcomeBanner';
 
 const HomeScreen = () => {
     return (
-        <View style={styles.container}>
-            <Text style={styles.text}>HomeScreen</Text>
-        </View>
+        
+		<SideMenu/>
+            
     );
 };
 

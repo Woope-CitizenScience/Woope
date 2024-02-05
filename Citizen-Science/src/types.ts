@@ -50,3 +50,25 @@ export type TitleProps = {
     color: string;
     position: { top: number; left: number};
 };
+
+
+
+export type IconButtonProps = {
+    iconName: string;
+	onPress: () => void;
+	iconSize: number,
+	iconColor: string,
+    borderWidth?: number;
+    borderRadius?: number;
+    borderColor?: string;
+    height?: number,
+    width?: number,
+    backgroundColor?: string,
+    paddingHorizontal?: number,
+    paddingBottom?: number,
+    paddingTop?: number,
+    paddingLeft?: number,
+	paddingRight?: number,
+    paddingVertical?: number,
+
+}
