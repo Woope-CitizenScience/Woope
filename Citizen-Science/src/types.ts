@@ -1,6 +1,4 @@
 // Props for Custom Button creation
-import {DimensionValue} from "react-native";
-
 export type ButtonProps = {
     size: { width: number; height: number };
     label: string;
@@ -12,7 +10,7 @@ export type ButtonProps = {
     borderColor?: string;
     borderWidth?: number;
     disabled?: boolean;
-    // Other styling properties as needed
+
 };
 
 //Props for Custom TextField Creation
