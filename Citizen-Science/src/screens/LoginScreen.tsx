@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ImageBackground, SafeAreaView, Text, TouchableOpacity, Platform, KeyboardAvoidingView, TextInput} from "react-native";
+import { ImageBackground, SafeAreaView, Text, TouchableOpacity, Platform, KeyboardAvoidingView} from "react-native";
 import CustomButton from '../components/CustomButton';
 import CustomTextField from '../components/CustomTextField';
 import { useNavigation } from '@react-navigation/native';
