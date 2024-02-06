@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import {ImageBackground, SafeAreaView, TouchableOpacity, Platform, KeyboardAvoidingView} from "react-native";
-import styles from '../StyleSheet';
+import {ImageBackground, SafeAreaView, Platform, KeyboardAvoidingView} from "react-native";
 import CustomButton from '../components/CustomButton';
 import CustomTextField from '../components/CustomTextField';
 import { useNavigation } from '@react-navigation/native';
@@ -8,8 +7,7 @@ import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import LogoName from "../components/LogoName";
 import BackButton from "../components/BackButton";
 import ScreenTitle from "../components/ScreenTitle";
-import homeScreen from "./HomeScreen";
-import loginScreen from "./LoginScreen";
+
 import {responsiveHeight, responsiveWidth} from "react-native-responsive-dimensions";
 import Blobs from "../components/Blobs";
 
@@ -30,11 +28,23 @@ const SignupScreen = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
+    const handleSignUpPress = () => {
+
+        console.log('Signing up with the following details:');
+        console.log(`First Name: ${firstName}`);
+        console.log(`Last Name: ${lastName}`);
+        console.log(`Email: ${email}`);
+        console.log(`Password: ${password}`);
+
+
+        navigation.replace('Login')
+    };
+
     return(
 
         <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "height"}
-            style={{ flex: 1, paddingBottom: 20 }}>
+            style={{ flex: 1 }}>
 
         <ImageBackground
             source={require('../../assets/background2.png')}
@@ -55,7 +65,8 @@ const SignupScreen = () => {
                 <LogoName position={'bottomRight'} color={'grey'}/>
 
 
-                <BackButton />
+                <BackButton position={{ top: -25, left: -45 }} />
+
 
                 {/* 'Create an Account' title on signup */}
                 <ScreenTitle
@@ -98,6 +109,7 @@ const SignupScreen = () => {
                     borderColor="#5EA1E9"
                     borderRadius={10}
                     position={{ top: 10, left: 0 }}
+                    textContentType={'oneTimeCode'}
                 />
 
 
@@ -111,6 +123,7 @@ const SignupScreen = () => {
                     borderColor="#5EA1E9"
                     borderRadius={10}
                     position={{ top: 11, left: 0 }}
+                    textContentType={'oneTimeCode'}
                 />
 
                 {/* Signup Button */}
@@ -120,7 +133,7 @@ const SignupScreen = () => {
                     labelColor="white"
                     backgroundColor="#5EA1E9"
                     //TODO potentially redirect to home page after account creation
-                    onPress={() => navigation.replace('Login')}
+                    onPress={handleSignUpPress}
                     position={{ top: 13, left: 0 }}
                 />
 
