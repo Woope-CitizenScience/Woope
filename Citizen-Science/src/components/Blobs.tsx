@@ -1,8 +1,7 @@
-import {Image, SafeAreaView} from "react-native";
-import React from "react";
-import {BlobProps} from "../types";
-import {responsiveHeight, responsiveWidth} from "react-native-responsive-dimensions";
-
+import React, { useState, useEffect } from 'react';
+import { Image, SafeAreaView } from "react-native";
+import { BlobProps } from "../types";
+import { responsiveHeight, responsiveWidth } from "react-native-responsive-dimensions";
 
 const blobs = [
     require('../../assets/blobs/Blob_4.png'),
@@ -11,45 +10,49 @@ const blobs = [
     require('../../assets/blobs/Blob_7.png'),
     require('../../assets/blobs/Blob_8.png'),
     require('../../assets/blobs/Blob_9.png'),
-    require('../../assets/blobs/Blob_10.png')
+    require('../../assets/blobs/Blob_10.png'),
 ];
 
+const Blobs: React.FC<BlobProps> = ({
+                                        image,
+                                        widthPercentage,
+                                        heightPercentage,
+                                        position,
+                                    }) => {
+    // State to hold the selected blob image
+    const [selectedBlob, setSelectedBlob] = useState(image || getRandomBlob());
+
+    useEffect(() => {
+        // If an image is provided via props, use it; otherwise, select a random blob
+        if (!image) {
+            setSelectedBlob(getRandomBlob());
+        }
+    }, [image]); // This dependency ensures the effect runs only when the image prop changes
+
+    return (
+        <SafeAreaView style={{
+            justifyContent: 'center',
+            position: 'absolute',
+            top: responsiveHeight(position.top),
+            left: responsiveWidth(position.left),
+            alignItems: 'center',
+        }}>
+            <Image
+                source={selectedBlob}
+                style={{
+                    width: responsiveWidth(widthPercentage),
+                    height: responsiveHeight(heightPercentage),
+                    // Removed rotation styling
+                }}
+            />
+        </SafeAreaView>
+    );
+};
+
+export default Blobs;
+
+// Helper function to get a random blob
 const getRandomBlob = () => {
     const randomIndex = Math.floor(Math.random() * blobs.length);
     return blobs[randomIndex];
 };
-
-const rotateBlob = () => {
-    return Math.floor(Math.random() * 37) * 10; // Degrees increment by 10 so (10, 20, 30, ... 360)
-}
-
-const Blobs: React.FC<BlobProps> = ({
-    rotationDeg,
-    image,
-    widthPercentage,
-    heightPercentage,
-    position
-    }) => {
-    const blob = image || getRandomBlob() ;
-    const rotation = rotationDeg || `${rotateBlob()}deg`;
-    return(
-        <SafeAreaView style={{
-            justifyContent: 'center',
-            position:'absolute',
-            top: responsiveHeight(position.top),
-            left: responsiveWidth(position.left),
-            alignItems: 'center'
-        }}>
-            <Image
-                source={blob}
-                style={{
-                    width: responsiveWidth(widthPercentage),
-                    height: responsiveHeight(heightPercentage),
-                    transform: [{rotate: rotation}]
-                }}
-            />
-        </SafeAreaView>
-    )
-};
-
-export default Blobs;

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ImageBackground, SafeAreaView, Text, TouchableOpacity, Platform, KeyboardAvoidingView} from "react-native";
+import { ImageBackground, SafeAreaView, Text, TouchableOpacity, Platform, KeyboardAvoidingView, TextInput} from "react-native";
 import CustomButton from '../components/CustomButton';
 import CustomTextField from '../components/CustomTextField';
 import { useNavigation } from '@react-navigation/native';
@@ -59,21 +59,22 @@ const LoginScreen: React.FC = () => {
                 <Blobs rotationDeg={'0deg'} widthPercentage={20} heightPercentage={10} position={{ top: 6, left: 80 }} />
                 <Blobs rotationDeg={'0deg'} widthPercentage={6} heightPercentage={3} position={{ top: 15, left: 93 }} />
 
-                {/* Logo Name */}
+
                 <LogoName position={'bottomRight'} color={'grey'}/>
 
-                {/* Back Button */}
-                <BackButton />
 
-                {/*  'Welome Back' title on login */}
+                <BackButton position={{ top: -30, left: -45 }} />
+
+
+                {/*  'Welcome Back' title on login */}
                 <ScreenTitle
                     text={'Welcome \nBack'}
                     textStyle={'title'}
                     fontSize={5}
                     color={'white'}
-                    // Uses responsive library {width, height} through the components file
                     position={{top: -17, left: -20}}
                 />
+
 
 
                 {/* Email TextField */}
@@ -85,6 +86,7 @@ const LoginScreen: React.FC = () => {
                     borderColor="#5EA1E9"
                     borderRadius={10}
                     position={{ top: 8, left: 0 }}
+                    textContentType={'oneTimeCode'}
                 />
 
 
@@ -98,6 +100,7 @@ const LoginScreen: React.FC = () => {
                     borderColor="#5EA1E9"
                     borderRadius={10}
                     position={{ top: 10, left: 0 }}
+                    textContentType={'oneTimeCode'}
                 />
 
                 {/* Login Button */}

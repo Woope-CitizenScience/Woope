@@ -25,7 +25,7 @@ export type TextFieldProps = {
     borderColor?: string;
     borderRadius?: number;
     position: { top: number; left: number};
-    // Other properties as needed, like keyboardType, returnKeyType, etc.
+    textContentType?: 'none' | 'URL' | 'addressCity' | 'addressCityAndState' | 'addressState' | 'countryName' | 'creditCardNumber' | 'emailAddress' | 'familyName' | 'fullStreetAddress' | 'givenName' | 'jobTitle' | 'location' | 'middleName' | 'name' | 'namePrefix' | 'nameSuffix' | 'nickname' | 'organizationName' | 'postalCode' | 'streetAddressLine1' | 'streetAddressLine2' | 'sublocality' | 'telephoneNumber' | 'username' | 'password' | 'newPassword' | 'oneTimeCode';
 };
 
 export type LogoNameProps = {
@@ -50,3 +50,7 @@ export type TitleProps = {
     color: string;
     position: { top: number; left: number};
 };
+
+export type BackButtonProps = {
+    position: {top: number; left: number};
+}
