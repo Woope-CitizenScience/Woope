@@ -42,10 +42,14 @@ export const MapScreen = () => {
                       title="Your Location"
                     />
                   )}
-                  <Marker                                                       //hard coded coordinate
-                  coordinate={{latitude: 34.239958, longitude: -118.529187}}    //to be replaced with function that loads pins from pin DB
-                  title="CSUN Library"
-                  />
+                  <Marker                                                       //hard pin
+                  coordinate={{latitude: 34.239958, longitude: -118.529187}}    //to be replaced with function that loads pins from pin DB  <Image source = {require("../../../assets/vecteezy_college-graduate-icon")} />
+                  title="CSUN Library">
+                  </Marker>
+                  <Marker                                                       //hard pin
+                  coordinate={{latitude: 46.085323, longitude: -100.674631}}
+                  title="BCE College">
+                  </Marker>
                 </MapView>
               )}
               </View>
