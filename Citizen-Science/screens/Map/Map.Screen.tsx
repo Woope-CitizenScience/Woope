@@ -9,10 +9,18 @@ import { mapStyle } from './Map.Style';
 const windowWidth = Dimensions.get("window").width;
 const windowHeight = Dimensions.get("window").height;
 
+
+
 export const MapScreen = () => {
     const [currentLocation, setCurrentLocation] = useState(null);
     const [initialRegion, setInitialRegion] = useState(null);
-      
+    const [markerCoordinate, setMarkerCoordinate] = useState(null);
+
+  const handleMapPress = (event) => {
+    const { coordinate } = event.nativeEvent;
+    setMarkerCoordinate(coordinate);
+  };
+
         useEffect(() => {
             const getLocation = async () => {        
               let location = await Location.getCurrentPositionAsync({});
@@ -32,7 +40,8 @@ export const MapScreen = () => {
         return (
             <View style={mapStyle.flex}>
               {initialRegion && (
-                <MapView style={mapStyle.map} initialRegion={initialRegion}>
+                <MapView style={mapStyle.map} initialRegion={initialRegion} onPress={handleMapPress}
+                >
                   {currentLocation && (
                     <Marker
                       coordinate={{
@@ -49,7 +58,15 @@ export const MapScreen = () => {
                   <Marker                                                       //hard pin
                   coordinate={{latitude: 46.085323, longitude: -100.674631}}
                   title="BCE College">
-                  </Marker>
+                  </Marker>                                                     
+                  {markerCoordinate && (                                        //user defined soft pin to be uploaded to future DB
+                      <Marker                                                   //for saving/sharing
+                      pinColor='aqua'
+                      coordinate={markerCoordinate}
+                      title="Dynamic Marker"
+                      description="This marker updates on press"
+                     />
+                  )}
                 </MapView>
               )}
               </View>
