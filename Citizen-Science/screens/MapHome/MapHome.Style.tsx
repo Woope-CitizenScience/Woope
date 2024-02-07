@@ -7,12 +7,12 @@ export const HomePage = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         flexDirection: "row",
-        backgroundColor: "rgb(196,12,67)",
+        backgroundColor: "#5EA1E9",
     },
     view: {
         width: "80%"
     },
     cardButton: {
-        color: "rgb(196,12,67)",
+        color: "#5EA1E9",
     }
 })
