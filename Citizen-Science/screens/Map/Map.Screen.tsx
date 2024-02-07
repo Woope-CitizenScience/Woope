@@ -28,7 +28,7 @@ export const MapScreen = () => {
         
             getLocation();
           }, []);
-        
+         
         return (
             <View style={mapStyle.flex}>
               {initialRegion && (
