@@ -26,6 +26,7 @@ export const MapHome = (props: MapPageScreenProps) => {
         })()
     };
     const ViewMap = () => props.navigation.navigate("MapScreen");
+    const ViewSMap = () => props.navigation.navigate("SMapScreen");
 
     return(
         <SafeAreaView style = {HomePage.content}>
@@ -46,7 +47,7 @@ export const MapHome = (props: MapPageScreenProps) => {
                     <Button 
                     mode="contained"
                     onPress={() => {
-                        ViewMap();
+                        ViewSMap();
                        }}
                     >View Map</Button>
                 </Card.Content>
