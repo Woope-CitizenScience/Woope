@@ -7,7 +7,7 @@ import { mapStyle } from './Map.Style';
 
 const windowWidth = Dimensions.get("window").width;
 const windowHeight = Dimensions.get("window").height;
-const customMarkerImage = require('../../assets/College_marker.jpg');
+const customMarkerImage = require('../../assets/College_marker.png');
 
 const markersData = [
   { title: "CSUN Library", coordinate: { latitude: 34.239958, longitude: -118.529187 } },
