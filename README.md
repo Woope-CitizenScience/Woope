@@ -5,6 +5,20 @@ Addressing environmental and socio-economic challenges in Standing Rock’s Lako
 
 ## Local Setup
 - Install Node v16, I recommend using [Node Version Manager](https://github.com/nvm-sh/nvm)
+- For Android testing, install Android Studio and set up an emulator with Android 8,as backend calls don't work on the Expo app
+- You will need to place `.env` files in the `api` and `Citizen-Science` directories with the following contents:
+  - `api/.env`:
+    ```
+    ACCESS_TOKEN_SECRET=39b3cfd461ccb82ba097358c1c0557bbfac4a1a9fbd9bfc6e1bac511e7c9ca60
+    ACCESS_TOKEN_LIFE=15m
+    REFRESH_TOKEN_SECRET=8c3cd2786ddf92f44f85af2694572241c9c0571cfc4e173e5c86a4fa82dd51cc
+    REFRESH_TOKEN_LIFE=30d
+    ```
+  - `Citizen-Science/.env`:
+    ```
+    EXPO_PUBLIC_API_URL=http://<YOUR IP ADDRESS OF THE COMPUTER RUNNING THE API>:3000
+    example: EXPO_PUBLIC_API_URL=http://192.168.0.100:3000
+    ```
 - `cd Citizen-Science` to enter the React Native project
 - `npm install` to install dependencies
 - `npx expo start` to start the Expo server
