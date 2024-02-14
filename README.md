@@ -5,7 +5,6 @@ Addressing environmental and socio-economic challenges in Standing Rock’s Lako
 
 ## Local Setup
 - Install Node v16, I recommend using [Node Version Manager](https://github.com/nvm-sh/nvm)
-- For Android testing, install Android Studio and set up an emulator with Android 8,as backend calls don't work on the Expo app
 - You will need to place `.env` files in the `api` and `Citizen-Science` directories with the following contents:
   - `api/.env`:
     ```
