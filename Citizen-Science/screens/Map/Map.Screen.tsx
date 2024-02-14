@@ -59,7 +59,8 @@ export const MapScreen = () => {
               coordinate={marker.coordinate}
               title={marker.title}
             >
-              <Image source={customMarkerImage} style={{ width: 30, height: 30 }} />
+              <Image source={customMarkerImage} style={{ width: 30, height: 30 }} //image credited to Vecteezy.com. Artist Muttaki Al Muhtadi. (Do not remove this comment or we can be sued. Seriously DO NOT REMOVE!!!)
+              />
             </Marker>
           ))}
           {markerCoordinate && (
