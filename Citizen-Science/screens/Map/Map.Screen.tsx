@@ -58,8 +58,9 @@ export const MapScreen = () => {
               key={index}
               coordinate={marker.coordinate}
               title={marker.title}
-              //image={customMarkerImage}
-            />
+            >
+              <Image source={customMarkerImage} style={{ width: 30, height: 30 }} />
+            </Marker>
           ))}
           {markerCoordinate && (
             <Marker
