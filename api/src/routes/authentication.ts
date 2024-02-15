@@ -66,7 +66,7 @@ router.post('/register', async (req: express.Request, res: express.Response) => 
     try {
         const existingUser = await getUser(email, phoneNumber);
         if (existingUser) {
-            return res.status(400).send('User already exists');
+            return res.status(400).json({error: 'User already exists'});
         }
 
         const hashedPassword = await hashPassword(password);
@@ -84,7 +84,7 @@ router.post('/register', async (req: express.Request, res: express.Response) => 
         const accessToken = await createAccessToken(newUser);
         res.status(201).json({ 'accessToken': accessToken, 'refreshToken': refreshToken });
     } catch (error) {
-        res.status(500).send(`Internal server error: ${(error as Error).message}`);
+        res.status(500).json({error: `${(error as Error).message}`});
     }
 });
 
@@ -117,6 +117,25 @@ router.post('/refresh-access-token', async (req: express.Request, res: express.R
         }
     }
 });
+
+router.post('/verify-access-token', async (req: express.Request, res: express.Response) => {
+	const { accessToken } = req.body;
+	if (!accessToken) {
+		return res.status(401).send('Access token is required');
+	}
+
+	try {
+		jwt.verify(accessToken, config.accessTokenSecret!);
+		res.status(200).send('Valid access token');
+	} catch (error) {
+		if (error instanceof jwt.JsonWebTokenError) {
+			res.status(403).send('Invalid access token');
+		} else {
+			res.status(500).send(`Internal server error: ${(error as Error).message}`);
+		}
+	}
+});
+
 
 
 module.exports = router;

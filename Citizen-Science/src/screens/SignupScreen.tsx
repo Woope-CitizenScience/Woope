@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import {ImageBackground, SafeAreaView, Platform, KeyboardAvoidingView} from "react-native";
+import React, {useContext, useState} from 'react';
+import {ImageBackground, SafeAreaView, Platform, KeyboardAvoidingView, Text} from "react-native";
 import CustomButton from '../components/CustomButton';
 import CustomTextField from '../components/CustomTextField';
 import { useNavigation } from '@react-navigation/native';
@@ -7,9 +7,11 @@ import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import LogoName from "../components/LogoName";
 import BackButton from "../components/BackButton";
 import ScreenTitle from "../components/ScreenTitle";
-
+import {registerUser} from "../api/auth";
 import {responsiveHeight, responsiveWidth} from "react-native-responsive-dimensions";
 import Blobs from "../components/Blobs";
+import {storeToken} from "../util/token";
+import {AuthContext} from "../util/AuthContext";
 
 type NavigationParam = {
     Login: undefined;
@@ -17,30 +19,88 @@ type NavigationParam = {
     NavigationBar: undefined;
 };
 
+interface Errors {
+	email?: string;
+	firstName?: string;
+	lastName?: string;
+	password?: string;
+	dateOfBirth?: string;
+}
+
+interface UserInfo {
+	firstName: string;
+	lastName: string;
+	email: string;
+	dateOfBirth: string;
+	password: string;
+}
+
 //Type for our Navigation in our component
 type NavigationProp = NativeStackNavigationProp<NavigationParam, 'Signup'>;
 
 const SignupScreen = () => {
     const navigation = useNavigation<NavigationProp>();
+	const [userInfo, setUserInfo] = useState<UserInfo>({
+		firstName: '',
+		lastName: '',
+		email: '',
+		dateOfBirth: '',
+		password: ''
+	});
+	const [errors, setErrors] = useState<Errors>({});
+	const { setUserToken } = useContext(AuthContext);
 
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+	const handleInputChange = (field: keyof UserInfo, value: string) => {
+		setUserInfo(prevState => ({ ...prevState, [field]: value }));
+	};
 
-    const handleSignUpPress = () => {
+    const handleSignUpPress = async () => {
+	    if (validate()) {
+		    try {
+			    const response = await registerUser(userInfo.email, userInfo.password, userInfo.firstName, userInfo.lastName);
 
-        console.log('Signing up with the following details:');
-        console.log(`First Name: ${firstName}`);
-        console.log(`Last Name: ${lastName}`);
-        console.log(`Email: ${email}`);
-        console.log(`Password: ${password}`);
+			    await storeToken('accessToken', response.accessToken);
+			    await storeToken('refreshToken', response.refreshToken);
 
-
-        navigation.replace('Login')
+				setUserToken(response.accessToken);
+		    } catch (error) {
+			    console.log('Signup failed', error);
+		    }
+	    }
     };
 
-    return(
+	const validate = (): boolean => {
+		let newErrors: Errors = {};
+		let isValid = true;
+
+		if (!userInfo.email.includes('@') || !userInfo.email.includes('.')) {
+			newErrors.email = 'Invalid email';
+			isValid = false;
+		}
+		if (userInfo.password.length < 8) {
+			newErrors.password = 'Password must be at least 8 characters';
+			isValid = false;
+		}
+		if (userInfo.firstName.length === 0) {
+			newErrors.firstName = 'First name is required';
+			isValid = false;
+		}
+		if (userInfo.lastName.length === 0) {
+			newErrors.lastName = 'Last name is required';
+			isValid = false;
+		}
+		// for when we add date of birth
+		// if (userInfo.dateOfBirth.length === 0) {
+		// 	newErrors.dateOfBirth = 'Date of birth is required';
+		// 	isValid = false;
+		// }
+
+		setErrors(newErrors);
+		return isValid;
+	};
+
+
+	return(
 
         <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -78,12 +138,11 @@ const SignupScreen = () => {
                     position={{top: -10 , left: -20}}
                 />
 
-                {/* Name TextField */}
                 <CustomTextField
                     size={{width: responsiveWidth(30), height: responsiveHeight(5.5)}}
                     placeholder="First Name"
-                    value={firstName}
-                    onChangeText={setFirstName}
+                    value={userInfo.firstName}
+                    onChangeText={(value) => handleInputChange('firstName', value)}
                     borderColor="#5EA1E9"
                     borderRadius={10}
                     position={{ top: 14.5, left: -20 }}
@@ -92,40 +151,37 @@ const SignupScreen = () => {
                 <CustomTextField
                     size={{width: responsiveWidth(30), height: responsiveHeight(5.5)}}
                     placeholder="Last Name"
-                    value={lastName}
-                    onChangeText={setLastName}
+                    value={userInfo.lastName}
+                    onChangeText={(value) => handleInputChange('lastName', value)}
                     borderColor="#5EA1E9"
                     borderRadius={10}
                     position={{ top: 9, left: 20 }}
                 />
 
-                {/* Email TextField */}
                 <CustomTextField
                     size={{width: responsiveWidth(70), height: responsiveHeight(5.5)}}
                     // TODO: Add option to signup with phone number
                     placeholder="Email"
-                    value={email}
-                    onChangeText={setEmail}
+                    value={userInfo.email}
+                    onChangeText={(value) => handleInputChange('email', value)}
                     borderColor="#5EA1E9"
                     borderRadius={10}
                     position={{ top: 10, left: 0 }}
                     textContentType={'oneTimeCode'}
                 />
 
-
                 {/* Password TextField */}
                 <CustomTextField
                     size={{width: responsiveWidth(70), height: responsiveHeight(5.5)}}
                     placeholder="Password"
-                    value={password}
-                    onChangeText={setPassword}
+                    value={userInfo.password}
+                    onChangeText={(value) => handleInputChange('password', value)}
                     secureTextEntry={true} // To hide password input
                     borderColor="#5EA1E9"
                     borderRadius={10}
                     position={{ top: 11, left: 0 }}
                     textContentType={'oneTimeCode'}
                 />
-
                 {/* Signup Button */}
                 <CustomButton
                     size={{width: responsiveWidth(70), height: responsiveHeight(5.5)}}

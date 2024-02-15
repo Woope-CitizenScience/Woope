@@ -14,7 +14,7 @@ export interface RefreshToken {
 	iat: number;
 	user_id: number;
 }
-export const storeToken = async (key: string, value: string) => {
+export const storeToken = async (key: string, value: any) => {
 	try {
 		await SecureStore.setItemAsync(key, value);
 	} catch (error) {
@@ -30,3 +30,11 @@ export const getToken = async (key: string) => {
 		return null;
 	}
 };
+
+export const deleteToken = async (key: string) => {
+	try {
+		await SecureStore.deleteItemAsync(key);
+	} catch (error) {
+		console.error('Error deleting the auth token', error);
+	}
+}
