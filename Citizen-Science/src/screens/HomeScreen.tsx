@@ -3,7 +3,8 @@ import { View, Text, StyleSheet, Button } from 'react-native';
 import { AuthContext } from '../util/AuthContext';
 import { jwtDecode } from 'jwt-decode';
 import "core-js/stable/atob";
-import { AccessToken} from "../util/token";
+import {AccessToken, deleteToken} from "../util/token";
+import {logoutUser} from "../api/auth";
 
 const HomeScreen = () => {
 	const { userToken, setUserToken } = useContext(AuthContext);
@@ -18,18 +19,9 @@ const HomeScreen = () => {
 		}
 
 		try {
-			const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/auth/logout`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({ userId }),
-			});
+			const response = await logoutUser(userId)
 
-			if (!response.ok) {
-				throw new Error('Logout failed with status: ' + response.status);
-			}
-
+			await deleteToken('accessToken');
 			setUserToken(null);
 		} catch (error) {
 			console.error('Logout error:', error);

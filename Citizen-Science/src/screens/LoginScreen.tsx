@@ -12,7 +12,7 @@ import {responsiveFontSize, responsiveHeight, responsiveWidth} from "react-nativ
 import Blobs from "../components/Blobs";
 import {loginUser} from "../api/auth";
 import {storeToken} from "../util/token"
-import { AuthContext} from "../util/AuthContext";
+import { AuthContext } from "../util/AuthContext";
 
 
 type NavigationParam = {
