@@ -18,7 +18,7 @@ export const authenticateToken = (req: express.Request, res: express.Response, n
   if (token == null) return res.sendStatus(401);
 
   jwt.verify(token, config.accessTokenSecret, (err, user) => {
-    if (err) return res.sendStatus(403);
+    if (err) return res.sendStatus(401);
     req.user = user as User;
     next();
   });
