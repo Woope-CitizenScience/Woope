@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { ImageBackground, SafeAreaView, Text, TouchableOpacity, Platform, KeyboardAvoidingView} from "react-native";
+import React, {useContext, useState} from 'react';
+import {ImageBackground, KeyboardAvoidingView, Platform, SafeAreaView, Text, TouchableOpacity} from "react-native";
 import CustomButton from '../components/CustomButton';
 import CustomTextField from '../components/CustomTextField';
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import LogoName from "../components/LogoName";
 import BackButton from "../components/BackButton";
@@ -10,6 +10,9 @@ import ScreenTitle from "../components/ScreenTitle";
 
 import {responsiveFontSize, responsiveHeight, responsiveWidth} from "react-native-responsive-dimensions";
 import Blobs from "../components/Blobs";
+import {loginUser} from "../api/auth";
+import {storeToken} from "../util/token"
+import { AuthContext } from "../util/AuthContext";
 
 
 type NavigationParam = {
@@ -22,20 +25,21 @@ type NavigationProp = NativeStackNavigationProp<NavigationParam, 'Login'>;
 
 const LoginScreen: React.FC = () => {
     const navigation = useNavigation<NavigationProp>();
-
-
-
-    const [email, setEmail] = useState('');
+	const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+	const { setUserToken } = useContext(AuthContext);
+	const handleLoginPress = async () => {
+		try {
+			const response = await loginUser(email, password);
 
+			await storeToken('accessToken', response.accessToken);
+			await storeToken('refreshToken', response.refreshToken);
 
-    // handleLoginPress:
-    // Here we need to define what will happen when the login button is pressed. So user authentication.
-    const handleLoginPress = () => {
-        console.log('Login button pressed');
-        // logic for what should happen on login press
-        navigation.navigate('NavigationBar');
-    };
+			setUserToken(response.accessToken);
+		} catch (error) {
+			console.log('Login failed', error);
+		}
+	};
 
     return (
         <KeyboardAvoidingView
