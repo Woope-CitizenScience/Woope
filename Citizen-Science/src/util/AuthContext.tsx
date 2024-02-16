@@ -1,5 +1,6 @@
 import React, {createContext, useState, useEffect, ReactNode} from 'react';
 import {getToken} from "./token";
+import {refreshAccessToken} from "./fetchWithToken";
 
 interface AuthContextType {
 	userToken: string | null;
@@ -40,20 +41,13 @@ export const AuthProvider = ({children}: AuthProviderProps) => {
 						// Attempt to refresh the access token
 						const refreshToken = await getToken('refreshToken');
 						if (refreshToken) {
-							const refreshResponse = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/auth/refresh-token`, {
-								method: 'POST',
-								headers: {
-									'Content-Type': 'application/json',
-								},
-								body: JSON.stringify({ refreshToken }),
-							});
+							const refreshedAccessToken = await refreshAccessToken();
 
-							if (refreshResponse.ok) {
-								const newAccessToken = await refreshResponse.json();
-								setUserToken(newAccessToken);
+							if (refreshedAccessToken) {
+								setUserToken(refreshedAccessToken);
 							} else {
 								// Handle refresh token invalidity
-								console.error('Refresh token invalid or expired:', refreshResponse);
+								console.error('Refresh token invalid or expired:');
 								// Potentially redirect to login or clear tokens
 							}
 						}
