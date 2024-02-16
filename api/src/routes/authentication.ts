@@ -108,7 +108,7 @@ router.post('/refresh-access-token', async (req: express.Request, res: express.R
         }
 
         const newAccessToken = await createAccessToken(user);
-        res.status(200).json({ accessToken: newAccessToken });
+        res.status(201).json({ accessToken: newAccessToken });
     } catch (error) {
         if (error instanceof jwt.JsonWebTokenError) {
             res.status(403).send('Invalid refresh token');

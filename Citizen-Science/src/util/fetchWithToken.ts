@@ -4,10 +4,10 @@ import {deleteToken, getToken, storeToken} from "./token";
 interface Options {
 	headers?: Record<string, string>;
 }
-const refreshToken = async () => {
+export const refreshAccessToken = async () => {
 	try {
 		const refreshTokenValue = await getToken('refreshToken');
-		const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/refresh-access-token`, {
+		const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/auth/refresh-access-token`, {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify({refreshToken: refreshTokenValue}),
@@ -19,6 +19,7 @@ const refreshToken = async () => {
 		} else {
 			// Handle refresh token failure (e.g., redirect to login)
 			deleteToken('accessToken');
+			deleteToken('refreshToken');
 		}
 	} catch (error) {
 		console.error('Error refreshing token:', error);
@@ -38,7 +39,8 @@ export const fetchWithToken = async (url: RequestInfo, options: Options = {}) =>
 
 	// If access token is expired or invalid
 	if (response.status === 401) {
-		accessToken = await refreshToken();
+		console.log('Access token expired or invalid. Attempting to refresh token...');
+		accessToken = await refreshAccessToken();
 		if (accessToken) {
 			options.headers['Authorization'] = `Bearer ${accessToken}`;
 			response = await fetch(url, options); // Retry the request with the new token
