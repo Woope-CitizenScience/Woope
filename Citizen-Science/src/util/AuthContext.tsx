@@ -47,8 +47,8 @@ export const AuthProvider = ({children}: AuthProviderProps) => {
 								setUserToken(refreshedAccessToken);
 							} else {
 								// Handle refresh token invalidity
-								console.error('Refresh token invalid or expired:');
-								// Potentially redirect to login or clear tokens
+								console.error('Refresh token invalid or expired');
+								setUserToken(null)
 							}
 						}
 					}

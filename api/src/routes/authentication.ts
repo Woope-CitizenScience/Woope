@@ -14,12 +14,12 @@ router.post('/login', async (req: express.Request, res: express.Response) => {
         const { email, phoneNumber, password } = req.body;
 
         if (!email && !password) {
-            return res.status(400).send('Username and password are required');
+            return res.status(400).json('Username and password are required');
         }
 
         const user = await getUser(email, phoneNumber);
         if (!user) {
-            return res.status(404).send('User does not exist');
+            return res.status(404).json('User does not exist');
         }
 
 
@@ -33,12 +33,12 @@ router.post('/login', async (req: express.Request, res: express.Response) => {
 
             res.status(200).json({ 'accessToken': accessToken, 'refreshToken': refreshToken });
         } else {
-            res.status(401).send('Invalid password');
+            res.status(401).json('Invalid password');
         }
 
     } catch (error) {
         const err = error as Error;
-        res.status(500).send(`Internal server error: ${err.message}`);
+        res.status(500).json(`Internal server error: ${err.message}`);
     }
 });
 
@@ -46,16 +46,16 @@ router.post('/logout', async (req: express.Request, res: express.Response) => {
     const { userId } = req.body;
 
     if (!userId) {
-        return res.status(400).send('User ID is required');
+        return res.status(400).json('User ID is required');
     }
 
     try {
         await pool.query('UPDATE users SET refresh_token = NULL WHERE user_id = $1', [userId]);
 
-        res.status(200).send('Successfully logged out');
+        res.status(200).json('Successfully logged out');
     } catch (error) {
         const err = error as Error;
-        res.status(500).send(`Internal server error: ${err.message}`);
+        res.status(500).json(`Internal server error: ${err.message}`);
     }
 });
 
@@ -73,7 +73,7 @@ router.post('/register', async (req: express.Request, res: express.Response) => 
         const newUser = await createUser(email, phoneNumber, hashedPassword, firstName, lastName);
 
         if (!newUser) {
-            return res.status(500).send('Error creating user');
+            return res.status(500).json('Error creating user');
         }
 
         const refreshToken = await createRefreshToken(newUser);
@@ -92,7 +92,7 @@ router.post('/register', async (req: express.Request, res: express.Response) => 
 router.post('/refresh-access-token', async (req: express.Request, res: express.Response) => {
     const { refreshToken } = req.body;
     if (!refreshToken) {
-        return res.status(401).send('Refresh token is required');
+        return res.status(401).json('Refresh token is required');
     }
 
     try {
@@ -101,19 +101,19 @@ router.post('/refresh-access-token', async (req: express.Request, res: express.R
         const user = await getUserByRefreshToken(decode?.user_id);
 
         if (!user) {
-            return res.status(403).send('Invalid user');
+            return res.status(403).json('Invalid user');
         }
         if (!user.refresh_token || !await comparePasswords(refreshToken, user.refresh_token)) {
-            return res.status(403).send('Invalid refresh token');
+            return res.status(403).json('Invalid refresh token');
         }
 
         const newAccessToken = await createAccessToken(user);
         res.status(201).json({ accessToken: newAccessToken });
     } catch (error) {
         if (error instanceof jwt.JsonWebTokenError) {
-            res.status(403).send('Invalid refresh token');
+            res.status(403).json('Invalid refresh token');
         } else {
-            res.status(500).send(`Internal server error: ${(error as Error).message}`);
+            res.status(500).json(`Internal server error: ${(error as Error).message}`);
         }
     }
 });
@@ -121,17 +121,17 @@ router.post('/refresh-access-token', async (req: express.Request, res: express.R
 router.post('/verify-access-token', async (req: express.Request, res: express.Response) => {
 	const { accessToken } = req.body;
 	if (!accessToken) {
-		return res.status(401).send('Access token is required');
+		return res.status(401).json('Access token is required');
 	}
 
 	try {
 		jwt.verify(accessToken, config.accessTokenSecret!);
-		res.status(200).send('Valid access token');
+		res.status(200).json('Valid access token');
 	} catch (error) {
 		if (error instanceof jwt.JsonWebTokenError) {
-			res.status(403).send('Invalid access token');
+			res.status(403).json('Invalid access token');
 		} else {
-			res.status(500).send(`Internal server error: ${(error as Error).message}`);
+			res.status(500).json(`Internal server error: ${(error as Error).message}`);
 		}
 	}
 });

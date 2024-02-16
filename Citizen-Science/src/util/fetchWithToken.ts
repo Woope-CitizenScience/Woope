@@ -4,6 +4,13 @@ import {deleteToken, getToken, storeToken} from "./token";
 interface Options {
 	headers?: Record<string, string>;
 }
+
+interface FetchWithTokenResponse {
+	response: Response;
+	newAccessToken?: string;
+	tokenRefreshFailed?: boolean;
+}
+
 export const refreshAccessToken = async () => {
 	try {
 		const refreshTokenValue = await getToken('refreshToken');
@@ -18,6 +25,7 @@ export const refreshAccessToken = async () => {
 			return data.accessToken;
 		} else {
 			// Handle refresh token failure (e.g., redirect to login)
+			console.log('deleting tokens')
 			deleteToken('accessToken');
 			deleteToken('refreshToken');
 		}
@@ -26,7 +34,7 @@ export const refreshAccessToken = async () => {
 	}
 };
 
-export const fetchWithToken = async (url: RequestInfo, options: Options = {}) => {
+export const fetchWithToken = async (url: RequestInfo, options: Options = {}): Promise<FetchWithTokenResponse> => {
 	let accessToken = await getToken('accessToken');
 
 	// Add the token to the headers
@@ -43,9 +51,12 @@ export const fetchWithToken = async (url: RequestInfo, options: Options = {}) =>
 		accessToken = await refreshAccessToken();
 		if (accessToken) {
 			options.headers['Authorization'] = `Bearer ${accessToken}`;
-			response = await fetch(url, options); // Retry the request with the new token
+			response = await fetch(url, options); // retry the request with the new token
+			return { response, newAccessToken: accessToken };
+		} else {
+			return { response, tokenRefreshFailed: true };
 		}
 	}
 
-	return response;
+	return { response };
 };
