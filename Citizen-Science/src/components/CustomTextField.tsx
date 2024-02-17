@@ -1,7 +1,7 @@
 // CustomTextField.tsx
 
 import React from 'react';
-import { TextInput, ViewStyle, StyleSheet } from 'react-native';
+import { TextInput, ViewStyle} from 'react-native';
 import { TextFieldProps } from '../types';
 import {responsiveHeight, responsiveWidth} from "react-native-responsive-dimensions";
 
@@ -14,6 +14,7 @@ const CustomTextField: React.FC<TextFieldProps> = ({
    borderColor = '#000', // Default color
    borderRadius = 5,
    position,
+   textContentType,
    }) => {
     const textFieldStyle: ViewStyle = {
         width: size.width,
@@ -34,7 +35,7 @@ const CustomTextField: React.FC<TextFieldProps> = ({
             value={value}
             onChangeText={onChangeText}
             secureTextEntry={secureTextEntry}
-            // Include other TextInput properties here
+            textContentType={textContentType}
         />
     );
 };

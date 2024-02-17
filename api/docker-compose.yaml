@@ -13,10 +13,10 @@ services:
             DB_USER: 'postgres'
             DB_PASSWORD: 'postgres'
             DB_NAME: 'postgres'
-            ACCESS_TOKEN_SECRET: 123456789
-            REFRESH_TOKEN_SECRET: 123456789
-            ACCESS_TOKEN_EXPIRATION: 15m
-            REFRESH_TOKEN_EXPIRATION: 7d
+            ACCESS_TOKEN_SECRET: process.env.ACCESS_TOKEN_SECRET
+            REFRESH_TOKEN_SECRET: process.env.REFRESH_TOKEN_SECRET
+            ACCESS_TOKEN_LIFE: process.env.ACCESS_TOKEN_LIFE
+            REFRESH_TOKEN_LIFE: process.env.REFRESH_TOKEN_LIFE
     postgres:
         image: postgres:16
         ports:

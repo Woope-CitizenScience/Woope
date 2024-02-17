@@ -1,6 +1,4 @@
 // Props for Custom Button creation
-import {DimensionValue} from "react-native";
-
 export type ButtonProps = {
     size: { width: number; height: number };
     label: string;
@@ -12,7 +10,7 @@ export type ButtonProps = {
     borderColor?: string;
     borderWidth?: number;
     disabled?: boolean;
-    // Other styling properties as needed
+
 };
 
 //Props for Custom TextField Creation
@@ -25,7 +23,7 @@ export type TextFieldProps = {
     borderColor?: string;
     borderRadius?: number;
     position: { top: number; left: number};
-    // Other properties as needed, like keyboardType, returnKeyType, etc.
+    textContentType?: 'none' | 'URL' | 'addressCity' | 'addressCityAndState' | 'addressState' | 'countryName' | 'creditCardNumber' | 'emailAddress' | 'familyName' | 'fullStreetAddress' | 'givenName' | 'jobTitle' | 'location' | 'middleName' | 'name' | 'namePrefix' | 'nameSuffix' | 'nickname' | 'organizationName' | 'postalCode' | 'streetAddressLine1' | 'streetAddressLine2' | 'sublocality' | 'telephoneNumber' | 'username' | 'password' | 'newPassword' | 'oneTimeCode';
 };
 
 export type LogoNameProps = {
@@ -70,5 +68,8 @@ export type IconButtonProps = {
     paddingLeft?: number,
 	paddingRight?: number,
     paddingVertical?: number,
+};
 
+export type BackButtonProps = {
+    position: {top: number; left: number};
 }
