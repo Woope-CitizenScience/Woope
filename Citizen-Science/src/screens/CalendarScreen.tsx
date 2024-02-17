@@ -39,4 +39,11 @@ const styles = StyleSheet.create({
 		color: '#232f46',
 	},
 });
+
 export default CalendarScreen;
+
+
+// Thematic Refrence LINKS DELETE LATER
+// https://aktalakota.stjo.org/lakota_spirit_animal/wolf-sungmanitu-t%c8%9fanka/
+// https://www.lakotaonline.com/resources/references-information/calendar-of-events
+// https://aktalakota.stjo.org/lakota-seasons-moon-phases/
