@@ -8,14 +8,14 @@ import {
 	responsiveWidth,
 } from "react-native-responsive-dimensions";
 import IconButton from "./IconButton";
-
+import React from "react";
 
 interface ScreenHeaderProps {
 	title: string;
-	navigation: any,
+	navigation: any;
 }
 
-const ScreenHeader: React.FC<ScreenHeaderProps> = ({ title, navigation}) => {
+const ScreenHeader: React.FC<ScreenHeaderProps> = ({ title, navigation }) => {
 	const insets = useSafeAreaInsets();
 
 	return (
@@ -31,7 +31,9 @@ const ScreenHeader: React.FC<ScreenHeaderProps> = ({ title, navigation}) => {
 			>
 				<IconButton
 					iconName={"menu"}
-					onPress={() => {navigation.openDrawer()}}
+					onPress={() => {
+						navigation.openDrawer();
+					}}
 					iconSize={responsiveHeight(4.5)}
 					iconColor={"black"}
 					paddingVertical={3}

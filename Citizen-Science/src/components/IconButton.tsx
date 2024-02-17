@@ -9,6 +9,7 @@ import { responsiveHeight } from "react-native-responsive-dimensions";
 import { Double } from "react-native/Libraries/Types/CodegenTypes";
 import { IconButtonProps } from "../types";
 import styles from "../StyleSheet";
+import React from "react";
 
 const IconButton: React.FC<IconButtonProps> = ({
 	iconName,
@@ -38,7 +39,7 @@ const IconButton: React.FC<IconButtonProps> = ({
 		paddingHorizontal,
 		paddingTop,
 		paddingBottom,
-        paddingLeft,
+		paddingLeft,
 		paddingRight,
 		paddingVertical,
 	};
