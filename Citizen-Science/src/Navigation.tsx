@@ -36,9 +36,10 @@ const AppNavigation = () => {
 			) : (
 				// No token found, user is not signed in
 				<>
-					<Stack.Screen name="Welcome" component={WelcomeScreen} options={{ animation: 'fade' }} />
+					<Stack.Screen name="NavigationBar" component={NavigationBar} />
+					{/* <Stack.Screen name="Welcome" component={WelcomeScreen} options={{ animation: 'fade' }} />
 					<Stack.Screen name="Login" component={LoginScreen} options={{ animation: 'slide_from_bottom' }} />
-					<Stack.Screen name="Signup" component={SignupScreen} options={{ animation: 'slide_from_bottom' }} />
+					<Stack.Screen name="Signup" component={SignupScreen} options={{ animation: 'slide_from_bottom' }} /> */}
 				</>
 			)}
 		</Stack.Navigator>
