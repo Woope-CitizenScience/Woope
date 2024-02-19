@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {View, Text, StyleSheet, Button, Modal, TextInput, TouchableOpacity, Dimensions} from 'react-native';
+import {View, Text, StyleSheet, Button, Modal, TextInput, TouchableOpacity, Dimensions, SafeAreaView} from 'react-native';
 import {fetchWithToken} from '../util/fetchWithToken';
 import {useIsFocused} from "@react-navigation/native";
 import {AuthContext} from "../util/AuthContext";
@@ -45,8 +45,8 @@ const CalendarScreen: React.FC = () => {
     };
 
 	const [items, setItems] = useState({});
-	const [modalVisible, setModalVisible] = useState(false);	
-	const [eventName, setEventName] = useState('');	
+	const [modalVisible, setModalVisible] = useState(false);
+	const [eventName, setEventName] = useState('');
 	const [eventDate, setEventDate] = useState('');
 	const [showDatePicker, setShowDatePicker] = useState(false);
 	const now = new Date();
@@ -55,7 +55,7 @@ const CalendarScreen: React.FC = () => {
 	const [startTime, setStartTime] = useState('');
 	const [location, setLocation] = useState('');
 
-	
+    // TODO Uncomment when implementing backend
 	// testing fetchWithToken
 	// useEffect(() => {
 	// 	if (isFocused) {
@@ -72,11 +72,11 @@ const CalendarScreen: React.FC = () => {
 	// }, [isFocused]);
 
 	// Calendar ~EV
-	
-	const loadItems = async (day: any) => {	
+
+	const loadItems = async (day: any) => {
 		if (!day) {
 			return;
-		}	
+		}
 		try {
 			const storedEvents = await AsyncStorage.getItem('events');
 			let parsedStoredEvents = storedEvents ? JSON.parse(storedEvents) : {};
@@ -97,37 +97,37 @@ const CalendarScreen: React.FC = () => {
 			startTime: startTime,
 			location: location
 		};
-	
+
 		if (eventName === '' || eventDate === '' || startTime === '' || location === '') {
 			alert('Please enter all details for the event.');
 			return;
 		}
-	
+
 		try {
 			const storedEvents = await AsyncStorage.getItem('events');
 			let parsedStoredEvents = storedEvents ? JSON.parse(storedEvents) : {};
-	
+
 			// No need to merge hard-coded events here if they are only temporary
 			// But if they should be included, ensure they have the same structure
-	
+
 			const updatedEventsForDate = parsedStoredEvents[event.date]
 				? [...parsedStoredEvents[event.date], event]
 				: [event];
-	
+
 			const updatedEvents = {
 				...parsedStoredEvents,
 				[event.date]: updatedEventsForDate,
 			};
-	
+
 			await AsyncStorage.setItem('events', JSON.stringify(updatedEvents));
-	
+
 			// Reset form
 			setEventName('');
 			setEventDate('');
 			setStartTime('');
 			setLocation('');
 			setModalVisible(false);
-	
+
 			loadItems({ dateString: event.date }); // Make sure to refresh the events
 		} catch (error) {
 			console.log(error, 'error in event creation');
@@ -138,7 +138,7 @@ const CalendarScreen: React.FC = () => {
 
 	const deleteEvent = async (day: string, event: Event) => {		// Handle for the User Deleted Cal Events ~EV
 		try {
-			const storedEvents = await AsyncStorage.getItem('events');	
+			const storedEvents = await AsyncStorage.getItem('events');
 			const parsedStoredEvents = storedEvents ? JSON.parse(storedEvents) : {};
 			const updatedEvents = {
 				...parsedStoredEvents,
@@ -165,7 +165,18 @@ const CalendarScreen: React.FC = () => {
 	};
 
 
-    // Render Items
+	const handleDeleteAllEvents = async () => {
+		try {
+			await AsyncStorage.removeItem('events');
+			console.log('All events deleted successfully');
+			// Optionally set state or trigger a UI update
+		} catch (error) {
+			console.error('Error deleting all events:', error);
+		}
+	};
+
+
+	// Render Items
     const renderItem = (item: Item) => {
         return (
 			<TouchableOpacity style={{marginRight: 10, marginTop: 17}}>
@@ -178,7 +189,11 @@ const CalendarScreen: React.FC = () => {
                                 alignItems: 'center',
                             }}>
 
-                            <Text style={{fontWeight: 'bold'}}>
+							{/*<Button title="Delete All Events" onPress={handleDeleteAllEvents} />*/}
+
+
+
+							<Text style={{fontWeight: 'bold'}}>
                                 {item.name} {'\n'}
                                 <Text style={{fontSize: 12, fontWeight: 'normal'}}>
                                     {item.startTime} {'\n'}
@@ -187,7 +202,6 @@ const CalendarScreen: React.FC = () => {
                                     {item.location}
                                 </Text>
                             </Text>
-
                             <Avatar.Text label="C"/>
                         </View>
                     </Card.Content>
@@ -195,16 +209,30 @@ const CalendarScreen: React.FC = () => {
             </TouchableOpacity>
 		);
     };
-	
+
 	return (
-		<View style={[styles.container, {backgroundColor: modalVisible ? 'white' : '#F0F0F0'}]}>
+		<SafeAreaView style={[styles.container, {backgroundColor: modalVisible ? 'white' : 'white'}]}>
 		  <Agenda
-			items={items}
-			loadItemsForMonth={loadItems}
-			renderItem={renderItem}
-			// Additional props
+			  items={items}
+			  loadItemsForMonth={loadItems}
+			  renderItem={renderItem}
+			  theme={{
+				  agendaDayTextColor: '#5EA1E9',
+				  agendaDayNumColor: '#5EA1E9',
+				  agendaTodayColor: '#5EA1E9',
+				  agendaKnobColor: '#5EA1E9'
+			  }}
+
+			  renderEmptyData={() => {
+				  return (
+					  <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+						  <Text>No Items For This Day</Text>
+					  </View>
+				  );
+			  }}
+
 		  />
-		  
+
 		  <Modal
 			animationType="slide"
 			transparent={true}
@@ -223,7 +251,7 @@ const CalendarScreen: React.FC = () => {
 				  onChangeText={setEventName}
 				  placeholderTextColor={'darkgray'}
 				/>
-	
+
 				<TextInput
 				  style={styles.input}
 				  placeholder="Start Time (HH:MM AM/PM)"
@@ -257,7 +285,7 @@ const CalendarScreen: React.FC = () => {
 						display="default"
 						onChange={handleDateChange}
 					/>
-					
+
 				)}
 				<Button title="Create Event" onPress={userCreateEvent} />
 					<TouchableOpacity
@@ -275,14 +303,15 @@ const CalendarScreen: React.FC = () => {
 			<Text style={styles.createButtonText}>Create Event</Text>
 			</TouchableOpacity>
 		)}
-		</View>
+		</SafeAreaView>
 
 	  );
 	};
-	
+
 	const styles = StyleSheet.create({
 		container: {
 		  flex: 1,
+		  backgroundColor: 'white',
 		},
 		centeredView: {
 		  flex: 1,
