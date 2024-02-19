@@ -61,7 +61,7 @@ router.post('/logout', async (req: express.Request, res: express.Response) => {
 
 
 router.post('/register', async (req: express.Request, res: express.Response) => {
-    const { email, phoneNumber, password, firstName, lastName } = req.body;
+    const { email, phoneNumber, password, firstName, lastName, dateOfBirth } = req.body;
 
     try {
         const existingUser = await getUser(email, phoneNumber);
@@ -70,7 +70,7 @@ router.post('/register', async (req: express.Request, res: express.Response) => 
         }
 
         const hashedPassword = await hashPassword(password);
-        const newUser = await createUser(email, phoneNumber, hashedPassword, firstName, lastName);
+        const newUser = await createUser(email, phoneNumber, hashedPassword, firstName, lastName, dateOfBirth);
 
         if (!newUser) {
             return res.status(500).send('Error creating user');
