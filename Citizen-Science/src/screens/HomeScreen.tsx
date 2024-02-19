@@ -186,6 +186,10 @@ const HomeScreen = () => {
 
 	return (
 	<View style={styles.flexContainer}>
+		{data && <Text>{JSON.stringify(data, null, 2)}</Text>}
+		<TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
+			<MaterialIcons name="logout" size={24} color="black" />
+		</TouchableOpacity>
 		<KeyboardAwareFlatList
 			data={posts}
 			keyExtractor={(item) => item.id}
@@ -309,8 +313,6 @@ const HomeScreen = () => {
 				</Animated.View>
 			</View>
 		</Modal>
-		{data && <Text>{JSON.stringify(data, null, 2)}</Text>}
-		<Button title="Logout" onPress={handleLogout} />
 	</View>
 	);
 };
@@ -318,7 +320,7 @@ const HomeScreen = () => {
 const styles = StyleSheet.create({
 	flexContainer: {
 		flex: 1,
-		padding: 24,
+		padding: 22,
 	},
 	postBox: {
 		backgroundColor: '#B4D7EE',
@@ -337,6 +339,7 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.2,
 		shadowRadius: 6,
 		elevation: 5,
+		marginTop: 6,
 	},
 	postBoxInner: {
 		borderRadius: 20,
@@ -542,6 +545,13 @@ const styles = StyleSheet.create({
 	timestamp: {
 		fontSize: 12,
 		color: '#999',
+	},
+	logoutButton: {
+		padding: 5,
+		backgroundColor: 'lightblue',
+		borderRadius: 5,
+		alignSelf: 'flex-start',
+		marginTop: -33,
 	},
 });
 
