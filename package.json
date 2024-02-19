@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@types/react-native-calendars": "^1.1264.7"
+  }
+}

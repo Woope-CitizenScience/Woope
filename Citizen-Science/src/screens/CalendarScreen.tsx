@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {View, Text, StyleSheet, Button, Modal, TextInput, TouchableOpacity} from 'react-native';
+import {View, Text, StyleSheet, Button, Modal, TextInput, TouchableOpacity, Dimensions} from 'react-native';
 import {fetchWithToken} from '../util/fetchWithToken';
 import {useIsFocused} from "@react-navigation/native";
 import {AuthContext} from "../util/AuthContext";
@@ -20,6 +20,11 @@ interface Item {
 	height: number;
   };
 
+  //reactive styling attempt for blobs in views  
+//   const windowWidth = Dimensions.get('window').width;
+//   const windowHeight = Dimensions.get('window').height;
+//   const widthPercentage = (percentage) => (windowWidth * percentage) / 100;
+//   const heightPercentage = (percentage) => (windowHeight * percentage) / 100;
 
 const CalendarScreen: React.FC = () => {
 	const [items, setItems] = useState({});
@@ -57,6 +62,7 @@ const CalendarScreen: React.FC = () => {
 		} catch (error) {
 		console.error('Error loading events:', error);
 		}
+	};
         // setTimeout(() => {
         //     const newItems = { ...items };      // create a copy of the state to avoid direct mutations to fill with 100 random default events ~EV
 		// 	console.log("Loading items for month:", day);
@@ -72,8 +78,7 @@ const CalendarScreen: React.FC = () => {
         //     }
         //     setItems(newItems);
         // }, 1000);
-    };
-
+    
 	const userCreateEvent = async () => { 							// Handle for the User Created Cal Events ~EV
 		const event : Event = { name: eventName, date: eventDate, height: 500,}; 		// Created a new event with the user input ~EV
 		
@@ -96,20 +101,39 @@ const CalendarScreen: React.FC = () => {
 			setEventDate('');
 			setModalVisible(false);
 	  
-			loadItems();									
+			loadItems(event.date);									
 		}
 		catch (error) {
-			console.log('error in event creation', error);
+			console.log(error, 'error in event creation');
 			alert('Error creating event');
+		}
+	};
+
+
+	const deleteEvent = async (day: string, event: Event) => {		// Handle for the User Deleted Cal Events ~EV
+		try {
+			const storedEvents = await AsyncStorage.getItem('events');	
+			const parsedStoredEvents = storedEvents ? JSON.parse(storedEvents) : {};
+			const updatedEvents = {
+				...parsedStoredEvents,
+				[day]: parsedStoredEvents[day].filter((e: Event) => e !== event),
+			};
+			await AsyncStorage.setItem('events', JSON.stringify(updatedEvents));
+			loadItems(day);
+		} catch (error) {
+			console.log(error, 'error in event deletion');
+			alert('Error deleting event');
 		}
 	};
 
     // Render Items
     const renderItem = (item: Item) => {
         return (
+			<TouchableOpacity onPress={() => {setModalVisible(true);}}>
 			<View style={styles.item}>
 				<Text>{item.name}</Text>
 			</View>
+			</TouchableOpacity>
 		);
     };
 	
@@ -133,7 +157,20 @@ const CalendarScreen: React.FC = () => {
 				);
 			  }}
 		  />
-	
+			
+			{/* <TouchableOpacity onPress={() => handleOpenDeleteModal(item)}>
+				<View style={styles.item}>
+					<Text>{item.name}</Text>
+				</View>
+			</TouchableOpacity>
+
+			<DeleteEventModal
+				visible={deleteModalVisible}
+				event={selectedEvent}
+				onDelete={handleDeleteEvent}
+				onClose={() => setDeleteModalVisible(false)}
+			/> */}
+
 		  <TouchableOpacity
 			style={styles.createButton}
 			onPress={() => setModalVisible(true)}
@@ -150,37 +187,13 @@ const CalendarScreen: React.FC = () => {
 			}}
 		  >
 			<View style={styles.centeredView}>
-			  <View style={styles.modalView}>
-				<Blobs
-					widthPercentage={10}
-					heightPercentage={10}
-					position={{ top: 10 , left: 22}}
-		   		/>
-				<Blobs
-					widthPercentage={10}
-					heightPercentage={10}
-					position={{ top: 3 , left: 14}}
-		   		/>
-				<Blobs
-					widthPercentage={10}
-					heightPercentage={10}
-					position={{ top: 1 , left: 29}}
-		   		/>
-				<Blobs
-					widthPercentage={10}
-					heightPercentage={19}
-					position={{ top: 27 , left: 4}}
-		   		/>
-				<Blobs
-					widthPercentage={8}
-					heightPercentage={9}
-					position={{ top: 32 , left: 24}}
-		   		/>
-				<Blobs
-					widthPercentage={8}
-					heightPercentage={9}
-					position={{ top: 12 , left: 2}}
-		   		/>
+			  <View style={[styles.modalView, { overflow: 'hidden' }]}>
+			  	<Blobs rotationDeg={'10deg'} widthPercentage={20} heightPercentage={8} position={{ top: 1, left: 15}} />
+				<Blobs rotationDeg={'20deg'} widthPercentage={10} heightPercentage={7} position={{ top: 13, left: 2 }} />
+				<Blobs rotationDeg={'30deg'} widthPercentage={10} heightPercentage={7} position={{ top: 20, left: 8 }} />
+				<Blobs rotationDeg={'10deg'} widthPercentage={17} heightPercentage={12} position={{ top: 19, left: 20 }} />
+    			<Blobs rotationDeg={'20deg'} widthPercentage={15} heightPercentage={13} position={{ top: 30, left: 0 }} />
+    			<Blobs rotationDeg={'30deg'} widthPercentage={15} heightPercentage={8} position={{ top: 5, left: 20 }} />
 				<TextInput
 				  style={styles.input}
 				  placeholder="Event Name"
@@ -256,7 +269,7 @@ const CalendarScreen: React.FC = () => {
 	  modalView: {
 		backgroundColor: 'white', //B3FAF4
 		borderRadius: 20,
-		padding: 75,
+		padding: 65,
 		alignItems: 'center',
 		shadowColor: '#000',
 		shadowOffset: {
@@ -273,19 +286,9 @@ const CalendarScreen: React.FC = () => {
 		borderWidth: 1,
 		marginBottom: 30,
 		paddingHorizontal: 10,
-		width: 300,
+		width: 250,
 		backgroundColor: 'white',
 	  },
 	});
 
 export default CalendarScreen;
-
-
-// Thematic Refrence LINKS DELETE LATER
-// https://aktalakota.stjo.org/lakota_spirit_animal/wolf-sungmanitu-t%c8%9fanka/
-// https://www.lakotaonline.com/resources/references-information/calendar-of-events
-// https://aktalakota.stjo.org/lakota-seasons-moon-phases/
-// Technichal Refrence LINKS DELETE LATER
-// https://wix.github.io/react-native-calendars/docs/Components/Agenda
-// https://wix.github.io/react-native-calendars/docs/Testing
-// https://reactnative.dev/docs/asyncstorage
