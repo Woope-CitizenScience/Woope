@@ -1,15 +1,15 @@
-import { View, StyleSheet, Button, Animated, LayoutAnimation } from "react-native";
-import {
-	SafeAreaView,
-	useSafeAreaInsets,
-} from "react-native-safe-area-context";
+import { View, StyleSheet, Animated, LayoutAnimation } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
 	responsiveHeight,
 	responsiveWidth,
 } from "react-native-responsive-dimensions";
 import IconButton from "./IconButton";
-import React, { useEffect, useRef, useState, useTransition } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import WelcomeBanner from "./WelcomeBanner";
+import { AuthContext } from "../util/AuthContext";
+import { jwtDecode } from "jwt-decode";
+import { AccessToken } from "../util/token";
 
 interface ScreenHeaderProps {
 	title: string;
@@ -17,13 +17,30 @@ interface ScreenHeaderProps {
 }
 
 const ScreenHeader: React.FC<ScreenHeaderProps> = ({ title, navigation }) => {
-	const insets = useSafeAreaInsets();
+	const { userToken } = useContext(AuthContext);
+	const decodedToken = userToken ? jwtDecode<AccessToken>(userToken) : null;
+	const firstName = decodedToken ? decodedToken.firstName : null;
+	const lastName = decodedToken ? decodedToken.lastName : null;
+
+	function checkNames(firstName: string | null, lastName: string | null) {
+		if (firstName === null && lastName === null) {
+			return "Community Forum";
+		} else if (firstName === null) {
+			return "" + lastName;
+		} else if (lastName === null) {
+			return "" + firstName;
+		} else {
+			return firstName + " " + lastName;
+		}
+	}
 
 	function WelcomeFadeAway() {
 		const [shouldRender, setShouldRender] = useState(true);
 		const position = useRef(new Animated.Value(0)).current;
 
-		{/* Make this persit screen change or refresh */}
+		{
+			/* Make this persit screen change or refresh */
+		}
 		useEffect(() => {
 			const timer = setTimeout(() => {
 				Animated.timing(position, {
@@ -34,7 +51,7 @@ const ScreenHeader: React.FC<ScreenHeaderProps> = ({ title, navigation }) => {
 					LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
 					setShouldRender(false);
 				});
-			}, 2000);
+			}, 3500);
 			return () => clearTimeout(timer);
 		}, []);
 
@@ -50,9 +67,9 @@ const ScreenHeader: React.FC<ScreenHeaderProps> = ({ title, navigation }) => {
 
 		return (
 			<Animated.View
-				style={[{zIndex:1, transform: [{ translateY: position }], opacity }]}
+				style={[{ zIndex: 1, transform: [{ translateY: position }], opacity }]}
 			>
-				<WelcomeBanner username={"Placeholder "} />
+				<WelcomeBanner username={checkNames(firstName, lastName)} />
 			</Animated.View>
 		);
 	}
@@ -63,7 +80,7 @@ const ScreenHeader: React.FC<ScreenHeaderProps> = ({ title, navigation }) => {
 				style={[
 					styles.container,
 					{
-						zIndex:2,
+						zIndex: 2,
 						backgroundColor: "lightblue",
 						height: responsiveHeight(8),
 					},
