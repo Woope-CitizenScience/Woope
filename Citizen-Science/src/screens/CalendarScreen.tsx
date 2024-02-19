@@ -5,33 +5,57 @@ import {useIsFocused} from "@react-navigation/native";
 import {AuthContext} from "../util/AuthContext";
 import {Agenda} from 'react-native-calendars'; // Calendar ~EV
 import AsyncStorage from '@react-native-async-storage/async-storage';
-//Styling Imports
 import CustomButton from '../components/CustomButton';
-import Blobs from '../components/Blobs';
+import { Card, Avatar } from 'react-native-paper';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 interface Item {
-	name: string;
-	height: number;
-	day: string;
-  }
-  type Event = {
-	name: string;
-	date: string;
-	height: number;
-  };
+    name: string;
+    height: number;
+    day: Date;
+    startTime: string;
+    endTime: string;
+    location: string;
+}
+type Event = {
+    name: string;
+    date: string;
+    height: number;
+    startTime: string;
+    location: string;
+};
 
-  //reactive styling attempt for blobs in views  
-//   const windowWidth = Dimensions.get('window').width;
-//   const windowHeight = Dimensions.get('window').height;
-//   const widthPercentage = (percentage) => (windowWidth * percentage) / 100;
-//   const heightPercentage = (percentage) => (windowHeight * percentage) / 100;
 
 const CalendarScreen: React.FC = () => {
+	// Todo, remove this after trip
+    const hard_coded_events = {
+        '2024-02-21': [
+            {name: 'Flying out to North Dakota', startTime: '10:00am', endTime: '11:00am', location: 'LAX Airport'}
+        ],
+        '2024-02-24': [
+            {name: 'Flying back to Los Angeles', startTime: '10:00am', endTime: '11:00am', location: 'Bismark Airport'}
+        ],
+        '2024-02-22': [
+            {name: 'Meeting with Dr. Mafany', startTime: '8:00am', endTime: '6:00pm', location: 'Sitting Bull College'}
+        ],
+        '2024-02-23': [
+            {name: 'Demo app for SBC' , startTime: '8:00am', endTime: '3:00pm', location: 'Sitting Bull College'}
+        ]
+
+    };
+
 	const [items, setItems] = useState({});
 	const [modalVisible, setModalVisible] = useState(false);	
 	const [eventName, setEventName] = useState('');	
 	const [eventDate, setEventDate] = useState('');
+	const [showDatePicker, setShowDatePicker] = useState(false);
+	const now = new Date();
+	const localMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+	const [selectedDate, setSelectedDate] = useState(localMidnight);
+	const [startTime, setStartTime] = useState('');
+	const [location, setLocation] = useState('');
 
+	
 	// testing fetchWithToken
 	// useEffect(() => {
 	// 	if (isFocused) {
@@ -49,61 +73,63 @@ const CalendarScreen: React.FC = () => {
 
 	// Calendar ~EV
 	
-    const loadItems = async (day: any) => {	
+	const loadItems = async (day: any) => {	
 		if (!day) {
 			return;
-		  }			    // Load Items for Month View ~EV
+		}	
 		try {
 			const storedEvents = await AsyncStorage.getItem('events');
-			if (storedEvents) {
-				const parsedStoredEvents = JSON.parse(storedEvents);
-				setItems(parsedStoredEvents);
-			}
+			let parsedStoredEvents = storedEvents ? JSON.parse(storedEvents) : {};
+			// Merge hard-coded events with stored events
+			parsedStoredEvents = { ...parsedStoredEvents, ...hard_coded_events };
+			setItems(parsedStoredEvents);
 		} catch (error) {
-		console.error('Error loading events:', error);
+			console.error('Error loading events:', error);
 		}
 	};
-        // setTimeout(() => {
-        //     const newItems = { ...items };      // create a copy of the state to avoid direct mutations to fill with 100 random default events ~EV
-		// 	console.log("Loading items for month:", day);
-		// 	for (let i = -14; i < 85; i++) {    // grants 100 day view (14 past, 85 future) ~EV
-        //         const time = day.timestamp + i * 24 * 60 * 60 * 1000;   //tracking of date+time  ~EV
-        //         const strTime = new Date(time).toISOString().split('T')[0]; // time + string naming convention ~EV
-        //         if (!newItems[strTime]) {
-        //             newItems[strTime] = [{
-        //                 name: 'Default EVO Test Event',
-        //                 height: 50, // Assign a specific default height in this case 50 ~EV
-        //             }];
-        //         }
-        //     }
-        //     setItems(newItems);
-        // }, 1000);
-    
-	const userCreateEvent = async () => { 							// Handle for the User Created Cal Events ~EV
-		const event : Event = { name: eventName, date: eventDate, height: 500,}; 		// Created a new event with the user input ~EV
-		
-		if (eventName === '' || eventDate === '') {			// If the user input is empty force user to input info ~EV
-			alert ('Please enter both a title and date for the event.');
-			return;												
+
+	const userCreateEvent = async () => {
+		// Include startTime and location in the event object
+		const event: Event = {
+			name: eventName,
+			date: eventDate,
+			height: 500, // You might want to reconsider the use of 'height' for dynamic content
+			startTime: startTime,
+			location: location
+		};
+	
+		if (eventName === '' || eventDate === '' || startTime === '' || location === '') {
+			alert('Please enter all details for the event.');
+			return;
 		}
-
+	
 		try {
-			const storedEvents  = await AsyncStorage.getItem('events');	// Get the existing events ~EV
-			const parsedStoredEvents = storedEvents ? JSON.parse(storedEvents) : {};
-
-			const updatedEvents = {...parsedStoredEvents,
-				[event.date]: [...(parsedStoredEvents[event.date] || []), event],
+			const storedEvents = await AsyncStorage.getItem('events');
+			let parsedStoredEvents = storedEvents ? JSON.parse(storedEvents) : {};
+	
+			// No need to merge hard-coded events here if they are only temporary
+			// But if they should be included, ensure they have the same structure
+	
+			const updatedEventsForDate = parsedStoredEvents[event.date]
+				? [...parsedStoredEvents[event.date], event]
+				: [event];
+	
+			const updatedEvents = {
+				...parsedStoredEvents,
+				[event.date]: updatedEventsForDate,
 			};
-	  
+	
 			await AsyncStorage.setItem('events', JSON.stringify(updatedEvents));
-	  
+	
+			// Reset form
 			setEventName('');
 			setEventDate('');
+			setStartTime('');
+			setLocation('');
 			setModalVisible(false);
-	  
-			loadItems(event.date);									
-		}
-		catch (error) {
+	
+			loadItems({ dateString: event.date }); // Make sure to refresh the events
+		} catch (error) {
 			console.log(error, 'error in event creation');
 			alert('Error creating event');
 		}
@@ -126,58 +152,59 @@ const CalendarScreen: React.FC = () => {
 		}
 	};
 
+
+	const handleDateChange = (event: Event, selectedDate: Date) => {
+		if (selectedDate !== undefined) {
+			setShowDatePicker(false);
+			const year = selectedDate.getFullYear();
+			const month = ("0" + (selectedDate.getMonth() + 1)).slice(-2); // Months are 0 indexed so +1 and slice for leading 0
+			const day = ("0" + selectedDate.getDate()).slice(-2);
+			setEventDate(`${year}-${month}-${day}`);
+			setSelectedDate(selectedDate);
+		}
+	};
+
+
     // Render Items
     const renderItem = (item: Item) => {
         return (
-			<TouchableOpacity onPress={() => {setModalVisible(true);}}>
-			<View style={styles.item}>
-				<Text>{item.name}</Text>
-			</View>
-			</TouchableOpacity>
+			<TouchableOpacity style={{marginRight: 10, marginTop: 17}}>
+                <Card>
+                    <Card.Content>
+                        <View
+                            style={{
+                                flexDirection: 'row',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                            }}>
+
+                            <Text style={{fontWeight: 'bold'}}>
+                                {item.name} {'\n'}
+                                <Text style={{fontSize: 12, fontWeight: 'normal'}}>
+                                    {item.startTime} {'\n'}
+                                </Text>
+                                <Text style={{fontSize: 12, fontWeight: 'normal', fontStyle: 'italic'}}>
+                                    {item.location}
+                                </Text>
+                            </Text>
+
+                            <Avatar.Text label="C"/>
+                        </View>
+                    </Card.Content>
+                </Card>
+            </TouchableOpacity>
 		);
     };
 	
 	return (
-		<View style={styles.container}>
+		<View style={[styles.container, {backgroundColor: modalVisible ? 'white' : '#F0F0F0'}]}>
 		  <Agenda
 			items={items}
 			loadItemsForMonth={loadItems}
 			renderItem={renderItem}
-			theme={{
-				agendaDayTextColor: 'blue',
-				agendaDayNumColor: 'blue',
-				agendaTodayColor: 'blue',
-				agendaKnobColor: 'blue'
-			}}
-			renderEmptyData={() => {
-				return (
-				  <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-					<Text>No Items For This Day</Text>
-				  </View>
-				);
-			  }}
+			// Additional props
 		  />
-			
-			{/* <TouchableOpacity onPress={() => handleOpenDeleteModal(item)}>
-				<View style={styles.item}>
-					<Text>{item.name}</Text>
-				</View>
-			</TouchableOpacity>
-
-			<DeleteEventModal
-				visible={deleteModalVisible}
-				event={selectedEvent}
-				onDelete={handleDeleteEvent}
-				onClose={() => setDeleteModalVisible(false)}
-			/> */}
-
-		  <TouchableOpacity
-			style={styles.createButton}
-			onPress={() => setModalVisible(true)}
-		  >
-			<Text style={styles.createButtonText}>Create Event</Text>
-		  </TouchableOpacity>
-		
+		  
 		  <Modal
 			animationType="slide"
 			transparent={true}
@@ -186,19 +213,29 @@ const CalendarScreen: React.FC = () => {
 			  setModalVisible(false);
 			}}
 		  >
+			{/* Modal content */}
 			<View style={styles.centeredView}>
-			  <View style={[styles.modalView, { overflow: 'hidden' }]}>
-			  	<Blobs rotationDeg={'10deg'} widthPercentage={20} heightPercentage={8} position={{ top: 1, left: 15}} />
-				<Blobs rotationDeg={'20deg'} widthPercentage={10} heightPercentage={7} position={{ top: 13, left: 2 }} />
-				<Blobs rotationDeg={'30deg'} widthPercentage={10} heightPercentage={7} position={{ top: 20, left: 8 }} />
-				<Blobs rotationDeg={'10deg'} widthPercentage={17} heightPercentage={12} position={{ top: 19, left: 20 }} />
-    			<Blobs rotationDeg={'20deg'} widthPercentage={15} heightPercentage={13} position={{ top: 30, left: 0 }} />
-    			<Blobs rotationDeg={'30deg'} widthPercentage={15} heightPercentage={8} position={{ top: 5, left: 20 }} />
+			  <View style={styles.modalView}>
 				<TextInput
 				  style={styles.input}
 				  placeholder="Event Name"
 				  value={eventName}
 				  onChangeText={setEventName}
+				  placeholderTextColor={'darkgray'}
+				/>
+	
+				<TextInput
+				  style={styles.input}
+				  placeholder="Start Time (HH:MM AM/PM)"
+				  value={startTime}
+				  onChangeText={setStartTime}
+				  placeholderTextColor="darkgray"
+				/>
+				<TextInput
+				  style={styles.input}
+				  placeholder="Set Location"
+				  value={location}
+				  onChangeText={setLocation}
 				  placeholderTextColor="darkgray"
 				/>
 				<TextInput
@@ -208,6 +245,20 @@ const CalendarScreen: React.FC = () => {
 				  onChangeText={setEventDate}
 				  placeholderTextColor="darkgray"
 				/>
+				<TouchableOpacity onPress={() => setShowDatePicker(true)}>
+						<Text style={styles.datePickerText}>Select Date</Text>
+				</TouchableOpacity>
+				{showDatePicker && (
+					<DateTimePicker
+						testID="dateTimePicker"
+						value={selectedDate}
+						mode="date"
+						is24Hour={true}
+						display="default"
+						onChange={handleDateChange}
+					/>
+					
+				)}
 				<Button title="Create Event" onPress={userCreateEvent} />
 					<TouchableOpacity
 					  style={styles.cancelButton} onPress={() => setModalVisible(false)}>
@@ -216,40 +267,66 @@ const CalendarScreen: React.FC = () => {
 			  </View>
 			</View>
 		  </Modal>
+			{!modalVisible && (
+			<TouchableOpacity
+			style={styles.createButton}
+			onPress={() => setModalVisible(true)}
+			>
+			<Text style={styles.createButtonText}>Create Event</Text>
+			</TouchableOpacity>
+		)}
 		</View>
+
 	  );
 	};
 	
 	const styles = StyleSheet.create({
-	  container: {
-		flex: 1,
-	  },
-	  item: {
-		backgroundColor: 'lightblue',
-		borderRadius: 5,
-		padding: 10,
-		marginVertical: 8,
-		marginHorizontal: 16,
-	  },
-	  createButton: {
-		position: 'absolute',
-		bottom: 20,
-		alignSelf: 'center',
-		backgroundColor: '#1E90FF',
-		paddingHorizontal: 20,
-		paddingVertical: 10,
-		borderRadius: 10,
-		width: 200,
-		boarderWidth: 0,
-		boarderColor: 'transparent',
-	  },
-	  createButtonText: {
-		color: '#FFFFFF',
-		fontSize: 18,
-		textAlign: 'center',
-	  },
+		container: {
+		  flex: 1,
+		},
+		centeredView: {
+		  flex: 1,
+		  justifyContent: 'center',
+		  alignItems: 'center',
+		  marginTop: 22,
+		},
+		modalView: {
+		  margin: 20,
+		  backgroundColor: 'white',
+		  borderRadius: 20,
+		  padding: 35,
+		  alignItems: 'center',
+		  shadowColor: '#000',
+		  shadowOffset: {
+			width: 0,
+			height: 2,
+		  },
+		  shadowOpacity: 0.25,
+		  shadowRadius: 4,
+		  elevation: 5,
+		},
+		input: {
+		  width: 300,
+		  height: 40,
+		  marginBottom: 12,
+		  borderWidth: 1,
+		  padding: 10,
+		},
+		createButton: {
+		  backgroundColor: '#1E90FF',
+		  padding: 10,
+		  borderRadius: 20,
+		  position: 'absolute',
+		  bottom: 20,
+		  alignSelf: 'center',
+		},
+		createButtonText: {
+		  color: 'white',
+		  fontSize: 16,
+		  textAlign: 'center',
+		},
 	  cancelButton: {
-		backgroundColor: '#FF6347',
+		backgroundColor: '#1E90FF',
 		marginTop: 30,
 		marginBottom: -30,
 		paddingHorizontal: 25,
@@ -289,6 +366,11 @@ const CalendarScreen: React.FC = () => {
 		width: 250,
 		backgroundColor: 'white',
 	  },
+	  datePickerText: {
+        marginBottom: 10,
+        color: '#1E90FF',
+        fontSize: 18,
+      },
 	});
 
 export default CalendarScreen;
