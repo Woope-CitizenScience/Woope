@@ -7,6 +7,7 @@ import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import LogoName from "../components/LogoName";
 import BackButton from "../components/BackButton";
 import ScreenTitle from "../components/ScreenTitle";
+import Popup from "../components/Popup";
 import {registerUser} from "../api/auth";
 import {responsiveHeight, responsiveWidth} from "react-native-responsive-dimensions";
 import Blobs from "../components/Blobs";
@@ -43,10 +44,23 @@ const SignupScreen = () => {
 	const [userInfo, setUserInfo] = useState<UserInfo>({
 		firstName: '',
 		lastName: '',
-		email: '',
 		dateOfBirth: '',
+		email: '',
 		password: ''
 	});
+
+	const [isPopupVisible, setIsPopupVisible] = useState(false);
+	const [popupMessage, setPopupMessage] = useState('');
+
+	const showPopup = (messages: string[]) => {
+		const formattedMessages = messages.map(message => `\u2022 ${message}`).join('\n');
+		setPopupMessage(formattedMessages);
+		setIsPopupVisible(true);
+	};
+
+
+
+
 	const [errors, setErrors] = useState<Errors>({});
 	const { setUserToken } = useContext(AuthContext);
 
@@ -57,7 +71,7 @@ const SignupScreen = () => {
     const handleSignUpPress = async () => {
 	    if (validate()) {
 		    try {
-			    const response = await registerUser(userInfo.email, userInfo.password, userInfo.firstName, userInfo.lastName);
+			    const response = await registerUser(userInfo.email, userInfo.password, userInfo.firstName, userInfo.lastName, userInfo.dateOfBirth);
 
 			    await storeToken('accessToken', response.accessToken);
 			    await storeToken('refreshToken', response.refreshToken);
@@ -68,36 +82,57 @@ const SignupScreen = () => {
 		    }
 	    }
     };
-
 	const validate = (): boolean => {
 		let newErrors: Errors = {};
 		let isValid = true;
+		let errorMessages: string[] = [];
 
-		if (!userInfo.email.includes('@') || !userInfo.email.includes('.')) {
+		const emailRegex = /^[^\s@]+@(gmail\.com|icloud\.com|hotmail\.com|yahoo\.com)$/;
+		if (!emailRegex.test(userInfo.email.trim())) {
 			newErrors.email = 'Invalid email';
 			isValid = false;
+			errorMessages.push('Invalid email');
 		}
-		if (userInfo.password.length < 8) {
-			newErrors.password = 'Password must be at least 8 characters';
+
+		//Checks that password has at least one UpperCase, a number, and 8 or more characters.
+		const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+		if (!passwordRegex.test(userInfo.password)) {
+			newErrors.password = 'Password must be at least 8 characters and include uppercase, lowercase, number, and special character';
 			isValid = false;
+			errorMessages.push('Password must be at least 8 characters and include uppercase, lowercase, number, and special character');
 		}
-		if (userInfo.firstName.length === 0) {
+
+		if (userInfo.firstName.trim().length === 0) {
 			newErrors.firstName = 'First name is required';
 			isValid = false;
+			errorMessages.push('First name is required');
 		}
-		if (userInfo.lastName.length === 0) {
+
+		if (userInfo.lastName.trim().length === 0) {
 			newErrors.lastName = 'Last name is required';
 			isValid = false;
+			errorMessages.push('Last name is required');
 		}
-		// for when we add date of birth
-		// if (userInfo.dateOfBirth.length === 0) {
-		// 	newErrors.dateOfBirth = 'Date of birth is required';
-		// 	isValid = false;
-		// }
+
+		const dateOfBirthRegex = /^(0[1-9]|1[0-2])\/(0[1-9]|[12][0-9]|3[01])\/\d\d$/;
+		if (!dateOfBirthRegex.test(userInfo.dateOfBirth.trim())) {
+			newErrors.dateOfBirth = 'Invalid date format';
+			isValid = false;
+			errorMessages.push('Invalid date format');
+		}
+
 
 		setErrors(newErrors);
+
+		if (!isValid) {
+			showPopup(errorMessages);
+		}
+
 		return isValid;
 	};
+
+
+
 
 
 	return(
@@ -125,7 +160,7 @@ const SignupScreen = () => {
                 <LogoName position={'bottomRight'} color={'grey'}/>
 
 
-                <BackButton position={{ top: -25, left: -45 }} />
+				<BackButton position={{ top: -22, left: -45 }} />
 
 
                 {/* 'Create an Account' title on signup */}
@@ -138,27 +173,37 @@ const SignupScreen = () => {
                     position={{top: -10 , left: -20}}
                 />
 
-                <CustomTextField
-                    size={{width: responsiveWidth(30), height: responsiveHeight(5.5)}}
-                    placeholder="First Name"
-                    value={userInfo.firstName}
-                    onChangeText={(value) => handleInputChange('firstName', value)}
-                    borderColor="#5EA1E9"
-                    borderRadius={10}
-                    position={{ top: 14.5, left: -20 }}
-                />
+				<CustomTextField
+					size={{width: responsiveWidth(23.5), height: responsiveHeight(5.5)}}
+					placeholder="First Name"
+					value={userInfo.firstName}
+					onChangeText={(value) => handleInputChange('firstName', value)}
+					borderColor="#5EA1E9"
+					borderRadius={10}
+					position={{ top: 20, left: -23 }}
+				/>
 
-                <CustomTextField
-                    size={{width: responsiveWidth(30), height: responsiveHeight(5.5)}}
-                    placeholder="Last Name"
-                    value={userInfo.lastName}
-                    onChangeText={(value) => handleInputChange('lastName', value)}
-                    borderColor="#5EA1E9"
-                    borderRadius={10}
-                    position={{ top: 9, left: 20 }}
-                />
+				<CustomTextField
+					size={{width: responsiveWidth(23.1), height: responsiveHeight(5.5)}}
+					placeholder="Last Name"
+					value={userInfo.lastName}
+					onChangeText={(value) => handleInputChange('lastName', value)}
+					borderColor="#5EA1E9"
+					borderRadius={10}
+					position={{ top: 14.5, left: 2 }}
+				/>
 
-                <CustomTextField
+				<CustomTextField
+					size={{width: responsiveWidth(19.5), height: responsiveHeight(5.5)}}
+					placeholder="11/14/93"
+					value={userInfo.dateOfBirth}
+					onChangeText={(value) => handleInputChange('dateOfBirth', value)}
+					borderColor="#5EA1E9"
+					borderRadius={10}
+					position={{ top: 9, left: 25 }}
+				/>
+
+				<CustomTextField
                     size={{width: responsiveWidth(70), height: responsiveHeight(5.5)}}
                     // TODO: Add option to signup with phone number
                     placeholder="Email"
@@ -193,7 +238,15 @@ const SignupScreen = () => {
                     position={{ top: 13, left: 0 }}
                 />
 
-            </SafeAreaView>
+
+				<Popup
+					isVisible={isPopupVisible}
+					message={popupMessage}
+					onClose={() => setIsPopupVisible(false)}
+				/>
+
+
+			</SafeAreaView>
 
         </ImageBackground>
         </KeyboardAvoidingView>

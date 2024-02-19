@@ -17,13 +17,13 @@ export const loginUser = async (email: string, password: string) => {
 	return await response.json();
 }
 
-export const registerUser = async (email: string, password: string, firstName: string, lastName: string, phoneNumber?: string) => {
+export const registerUser = async (email: string, password: string, firstName: string, lastName: string, dateOfBirth: string, phoneNumber?: string) => {
 	const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/auth/register`, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
 		},
-		body: JSON.stringify({ email, phoneNumber, password, firstName, lastName }),
+		body: JSON.stringify({ email, phoneNumber, password, firstName, lastName, dateOfBirth}),
 	});
 
 	if (!response.ok) {
