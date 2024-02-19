@@ -95,7 +95,7 @@ const SignupScreen = () => {
 		}
 
 		//Checks that password has at least one UpperCase, a number, and 8 or more characters.
-		const passwordRegex = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
+		const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
 		if (!passwordRegex.test(userInfo.password)) {
 			newErrors.password = 'Password must be at least 8 characters and include uppercase, lowercase, number, and special character';
 			isValid = false;
