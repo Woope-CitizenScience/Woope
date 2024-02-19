@@ -81,7 +81,7 @@ export const getUserByRefreshToken = async (userId: string): Promise<User | null
 };
 
 
-export const createUser = async (email: string, phoneNumber: string, hashedPassword: string, firstName: string, lastName: string) => {
+export const createUser = async (email: string, phoneNumber: string, hashedPassword: string, firstName: string, lastName: string, dateOfBirth: string) => {
 	if (!email && !phoneNumber) {
 		throw new Error("Either an email or a phone number is required.");
 	}
@@ -105,8 +105,8 @@ export const createUser = async (email: string, phoneNumber: string, hashedPassw
 		const userResult = await pool.query(query, values);
 		const user = userResult.rows[0];
 
-		query = 'INSERT INTO profile_information (user_id, first_name, last_name) VALUES ($1, $2, $3)';
-		values = [user.user_id, firstName, lastName];
+		query = 'INSERT INTO profile_information (user_id, first_name, last_name, date_of_birth) VALUES ($1, $2, $3, $4)';
+		values = [user.user_id, firstName, lastName, dateOfBirth];
 		await pool.query(query, values);
 
 		// Additional inserts (like account_verifications) can be handled here

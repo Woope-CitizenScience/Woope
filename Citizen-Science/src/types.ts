@@ -52,3 +52,9 @@ export type TitleProps = {
 export type BackButtonProps = {
     position: {top: number; left: number};
 }
+
+export type PopupProps = {
+    isVisible: boolean;
+    message: string;
+    onClose: () => void;
+};
