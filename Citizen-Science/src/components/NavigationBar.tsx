@@ -6,7 +6,7 @@ import Svg, { Path } from 'react-native-svg';
 import { mdiHome, mdiTestTube, mdiCalendar, mdiBookshelf, mdiMapMarker } from '@mdi/js';
 import HomeScreen from '../screens/HomeScreen';
 import CalendarScreen from '../screens/CalendarScreen';
-import MapScreen from '../screens/MapScreen';
+import {MapHome} from '../screens/Map/MapHomeScreen';
 import ResourceScreen from '../screens/ResourceScreen';
 import CitizenScienceScreen from '../screens/CitizenScience';
 
@@ -86,7 +86,7 @@ const NavigationBar = () => {
                 <Tab.Screen name="Citizen Science" component={CitizenScienceScreen} />
                 <Tab.Screen name="Calendar" component={CalendarScreen} />
                 <Tab.Screen name="Resource" component={ResourceScreen} />
-                <Tab.Screen name="Map" component={MapScreen} />
+                <Tab.Screen name="Map" component={MapHome} />
             </Tab.Navigator>
         </View>
     );
