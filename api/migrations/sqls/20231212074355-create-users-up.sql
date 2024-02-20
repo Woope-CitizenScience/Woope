@@ -17,7 +17,7 @@ CREATE TABLE users
 CREATE TABLE profile_information
 (
     profile_id    SERIAL PRIMARY KEY,
-    user_id       INT UNIQUE REFERENCES users (user_id),
+    user_id       INT UNIQUE REFERENCES users (user_id) ON DELETE CASCADE,
     first_name    VARCHAR(100),
     last_name     VARCHAR(100),
     date_of_birth DATE
