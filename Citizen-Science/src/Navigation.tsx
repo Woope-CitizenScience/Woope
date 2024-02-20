@@ -8,6 +8,8 @@ import SignupScreen from './screens/SignupScreen';
 import SplashScreen from "./screens/SplashScreen";
 import NavigationBar from "./components/NavigationBar";
 import HomeScreen from "./screens/HomeScreen";
+import {MapScreen} from "./screens/Map/MapScreen";
+import {SMapScreen} from "./screens/Map/SMapScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -32,7 +34,10 @@ const AppNavigation = () => {
 			{userToken ? (
 				<>
 					<Stack.Screen name="NavigationBar" component={NavigationBar} />
+					<Stack.Screen name="MapScreen" component={MapScreen} />
+					<Stack.Screen name="SMapScreen" component={SMapScreen} />
 				</>
+
 			) : (
 				// No token found, user is not signed in
 				<>

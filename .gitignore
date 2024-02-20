@@ -37,3 +37,4 @@ yarn-error.*
 /api/.env
 /Citizen-Science/.env
 Citizen-Science/%ProgramData%/Microsoft/Windows/UUS/State/_active.uusver
+.env
