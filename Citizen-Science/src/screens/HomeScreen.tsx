@@ -11,6 +11,7 @@ import * as DocumentPicker from 'expo-document-picker';
 import { MaterialIcons } from '@expo/vector-icons';
 import * as Sharing from 'expo-sharing';
 import Comments from '../components/Comments';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 type PdfFile = {
 	uri: string;
@@ -44,6 +45,7 @@ const HomeScreen = () => {
 	const [selectedPost, setSelectedPost] = useState<Post | null>(null);
 	const [commentsModalVisible, setCommentsModalVisible] = useState(false);
 	const [modalY] = useState(new Animated.Value(0));
+
 
 	const pickImage = async () => {
 		let result = await ImagePicker.launchImageLibraryAsync({
@@ -394,11 +396,11 @@ const styles = StyleSheet.create({
 	postButton: {
 		backgroundColor: '#007AFF',
 		borderRadius: 20,
-		paddingVertical: 10,
-		paddingHorizontal: 30,
 		marginTop: 10,
-		width: '36%',
+		width: wp('30%'),
 		alignSelf: 'flex-end',
+		paddingVertical: hp('1.5%'),
+		paddingHorizontal: wp('8%'),
 	},
 	postButtonText: {
 		color: '#FFFFFF',
@@ -551,7 +553,7 @@ const styles = StyleSheet.create({
 		backgroundColor: 'lightblue',
 		borderRadius: 5,
 		alignSelf: 'flex-start',
-		marginTop: -33,
+		marginTop: -20,
 	},
 });
 
