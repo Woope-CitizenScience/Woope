@@ -4,11 +4,11 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import Svg, { Path } from 'react-native-svg';
 import { mdiHome, mdiTestTube, mdiCalendar, mdiBookshelf, mdiMapMarker } from '@mdi/js';
-import HomeScreen from '../screens/HomeScreen';
 import CalendarScreen from '../screens/CalendarScreen';
 import {MapHome} from '../screens/Map/MapHomeScreen';
 import ResourceScreen from '../screens/ResourceScreen';
 import CitizenScienceScreen from '../screens/CitizenScience';
+import CommunitySideMenu from './CommunitySideMenu';
 
 const Tab = createBottomTabNavigator();
 interface AnimatedTabIconProps {
@@ -82,7 +82,7 @@ const NavigationBar = () => {
                     },
                 })}
             >
-                <Tab.Screen name="Home" component={HomeScreen} />
+                <Tab.Screen name="Home" component={CommunitySideMenu} />
                 <Tab.Screen name="Citizen Science" component={CitizenScienceScreen} />
                 <Tab.Screen name="Calendar" component={CalendarScreen} />
                 <Tab.Screen name="Resource" component={ResourceScreen} />
