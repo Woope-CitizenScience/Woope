@@ -8,9 +8,6 @@ import SignupScreen from './screens/SignupScreen';
 import SplashScreen from "./screens/SplashScreen";
 import NavigationBar from "./components/NavigationBar";
 import HomeScreen from "./screens/HomeScreen";
-import MapScreen from './screens/MapScreen';
-import { SMapScreen } from '../screens/Map/SMap.Screen';
-import { MapHome } from '../screens/MapHome/MapHome.Screen';
 
 const Stack = createNativeStackNavigator();
 
@@ -42,11 +39,6 @@ const AppNavigation = () => {
 					<Stack.Screen name="Welcome" component={WelcomeScreen} options={{ animation: 'fade' }} />
 					<Stack.Screen name="Login" component={LoginScreen} options={{ animation: 'slide_from_bottom' }} />
 					<Stack.Screen name="Signup" component={SignupScreen} options={{ animation: 'slide_from_bottom' }} />
-					<Stack.Screen name="Map" component={MapScreen} options={{ animation: 'slide_from_bottom' }} />
-					<Stack.Screen name="SMap" component={SMapScreen} options={{ animation: 'slide_from_bottom' }} />
-					<Stack.Screen name="MapHome" component={MapHome} options={{ animation: 'slide_from_bottom' }} />
-
-
 				</>
 			)}
 		</Stack.Navigator>
