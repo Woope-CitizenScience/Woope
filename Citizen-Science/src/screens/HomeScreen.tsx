@@ -1,5 +1,5 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { StyleSheet, Image, Text, View, TouchableOpacity, TextInput, Alert, FlatList, Dimensions, Modal, Animated, PanResponder, Button } from 'react-native';
+import React, { useContext, useState } from 'react';
+import { StyleSheet, Image, Text, View, TouchableOpacity, TextInput, Alert, FlatList, Dimensions, Modal, Animated, PanResponder } from 'react-native';
 import { AuthContext } from '../util/AuthContext';
 import { jwtDecode } from 'jwt-decode';
 import "core-js/stable/atob";
@@ -45,7 +45,8 @@ const HomeScreen = () => {
 	const [selectedPost, setSelectedPost] = useState<Post | null>(null);
 	const [commentsModalVisible, setCommentsModalVisible] = useState(false);
 	const [modalY] = useState(new Animated.Value(0));
-
+	const firstName = decodedToken ? decodedToken.firstName : null;
+	const lastName = decodedToken ? decodedToken.lastName : null;
 
 	const pickImage = async () => {
 		let result = await ImagePicker.launchImageLibraryAsync({
@@ -169,6 +170,18 @@ const HomeScreen = () => {
 		}]
 	};
 
+	function checkNames(firstName: string | null, lastName: string | null) {
+		if (firstName === null && lastName === null) {
+			return "Community Forum";
+		} else if (firstName === null) {
+			return "" + lastName;
+		} else if (lastName === null) {
+			return "" + firstName;
+		} else {
+			return firstName + " " + lastName;
+		}
+	}
+
 	const handleLogout = async () => {
 		if (!userId) {
 			console.log("No user ID available for logout.");
@@ -200,7 +213,7 @@ const HomeScreen = () => {
 					<View style={styles.headerRow}>
 						<Image source={{ uri: 'https://wallpapercave.com/wp/wp4008083.jpg' }} style={styles.avatar} />
 						<View style={styles.headerTextContainer}>
-							<Text style={styles.userName}>User Name</Text>
+							<Text style={styles.userName}>{checkNames(firstName, lastName)}</Text>
 							<Text style={styles.timestamp}>
 								{new Date(item.timestamp).toLocaleDateString()} at {new Date(item.timestamp).toLocaleTimeString()}
 							</Text>

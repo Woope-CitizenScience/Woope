@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { AuthContext } from "../util/AuthContext";
+import { jwtDecode } from "jwt-decode";
+import { AccessToken } from "../util/token";
 
 type Comment = {
     author: string;
@@ -15,11 +18,27 @@ interface CommentsProps {
 
 const Comments: React.FC<CommentsProps> = ({ comments, postId, onAddComment }) => {
     const [newCommentText, setNewCommentText] = useState('');
+    const { userToken } = useContext(AuthContext);
+    const decodedToken = userToken ? jwtDecode<AccessToken>(userToken) : null;
+    const firstName = decodedToken ? decodedToken.firstName : null;
+    const lastName = decodedToken ? decodedToken.lastName : null;
+
+    function checkNames(firstName: string | null, lastName: string | null) {
+        if (firstName === null && lastName === null) {
+            return "Community Forum";
+        } else if (firstName === null) {
+            return "" + lastName;
+        } else if (lastName === null) {
+            return "" + firstName;
+        } else {
+            return firstName + " " + lastName;
+        }
+    }
 
     const handleNewCommentSubmit = () => {
         if (newCommentText.trim()) {
             const newComment: Comment = {
-                author: "Current User",
+                author: checkNames(firstName, lastName),
                 text: newCommentText,
             };
             onAddComment(postId, newComment);
