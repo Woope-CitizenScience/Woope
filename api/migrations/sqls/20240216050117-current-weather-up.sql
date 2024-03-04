@@ -12,4 +12,3 @@ CREATE TABLE weather_observations (
     visibility INTEGER,
     relative_humidity DOUBLE PRECISION
 );
-
