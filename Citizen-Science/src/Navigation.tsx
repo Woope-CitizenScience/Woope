@@ -45,7 +45,7 @@ const AppNavigation = () => {
 					<Stack.Screen name="Signup" component={SignupScreen} options={{ animation: 'slide_from_bottom' }} />
 					<Stack.Screen name="MapScreen" component={MapScreen} options={{ animation: 'fade' }} />
 					<Stack.Screen name="MapHome" component={MapHome} options={{ animation: 'slide_from_bottom' }} />
-					<Stack.Screen name="SMapScreen" component={SMapScreen} options={{ animation: 'slide_from_bottom' }} />
+					<Stack.Screen name="SMapScreen" component={SMapScreen} options={{ animation: 'fade' }} />
 				</>
 			)}
 		</Stack.Navigator>
