@@ -26,9 +26,8 @@ export const getPostByUserId = async (user_id: number) =>{
     return response.rows;
 }
 
-export const createPost = async (post: Omit<Post, 'post_id' | 'created_at' | 'is_updated' | 'comments_count' | 'likes_count' | 'is_active'>): Promise<Post> => {
+export const createPost = async (user_id: Number, content: string) => {
     try {
-      const { user_id, content } = post;
       const isActive = true;
       const response = await pool.query(
         'INSERT INTO post (user_id, content, is_active) VALUES ($1, $2, $3) RETURNING *', 
