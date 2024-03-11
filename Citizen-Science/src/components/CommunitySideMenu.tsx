@@ -15,6 +15,7 @@ import {
 	DrawerDescriptorMap,
 } from "@react-navigation/drawer/lib/typescript/src/types";
 import { DrawerNavigationState, ParamListBase } from "@react-navigation/native";
+import Logout from "./Logout";
 
 const Drawer = createDrawerNavigator();
 
@@ -28,7 +29,7 @@ function CustomDrawerSideMenu(
 	return (
 		<DrawerContentScrollView {...props}>
 			<DrawerItemList {...props} />
-			<DrawerItem label="Other" onPress={() => {}} />
+			<Logout />
 		</DrawerContentScrollView>
 	);
 }

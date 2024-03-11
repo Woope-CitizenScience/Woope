@@ -3,8 +3,7 @@ import { StyleSheet, Image, Text, View, TouchableOpacity, TextInput, Alert, Flat
 import { AuthContext } from '../util/AuthContext';
 import { jwtDecode } from 'jwt-decode';
 import "core-js/stable/atob";
-import {AccessToken, deleteToken} from "../util/token";
-import {logoutUser} from "../api/auth";
+import {AccessToken} from "../util/token";
 import * as ImagePicker from 'expo-image-picker';
 import { KeyboardAwareFlatList } from 'react-native-keyboard-aware-scroll-view';
 import * as DocumentPicker from 'expo-document-picker';
@@ -26,14 +25,14 @@ type Post = {
 	timestamp: number;
 };
 type Comment = {
+	id: string;
 	author: string;
 	text: string;
+	replies?: Comment[];
 };
 const HomeScreen = () => {
 	const { userToken, setUserToken } = useContext(AuthContext);
-	const [data, setData] = useState(null);
 	const decodedToken = userToken ? jwtDecode<AccessToken>(userToken) : null;
-	const userId = decodedToken ? decodedToken.user_id : null;
 	const [isPosting, setIsPosting] = useState(false);
 	const [postText, setPostText] = useState('');
 	const [postImages, setPostImages] = useState<string[]>([]);
@@ -182,29 +181,27 @@ const HomeScreen = () => {
 		}
 	}
 
-	const handleLogout = async () => {
-		if (!userId) {
-			console.log("No user ID available for logout.");
-			return;
-		}
-
-		try {
-			const response = await logoutUser(userId)
-
-			await deleteToken('accessToken');
-			setUserToken(null);
-		} catch (error) {
-			console.error('Logout error:', error);
-		}
+	const onAddReply = (postId: string, commentId: string, newReply: Comment) => {
+		setPosts(currentPosts => currentPosts.map(post => {
+			if (post.id === postId) {
+				return { ...post, comments: addReplyToComments(post.comments, commentId, newReply) };
+			}
+			return post;
+		}));
 	};
-
+	function addReplyToComments(comments: Comment[], targetCommentId: string, reply: Comment): Comment[] {
+		return comments.map(comment => {
+			if (comment.id === targetCommentId) {
+				return { ...comment, replies: [...(comment.replies || []), reply] };
+			} else if (comment.replies) {
+				return { ...comment, replies: addReplyToComments(comment.replies, targetCommentId, reply) };
+			}
+			return comment;
+		});
+	}
 
 	return (
 	<View style={styles.flexContainer}>
-		{data && <Text>{JSON.stringify(data, null, 2)}</Text>}
-		<TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
-			<MaterialIcons name="logout" size={24} color="black" />
-		</TouchableOpacity>
 		<KeyboardAwareFlatList
 			data={posts}
 			keyExtractor={(item) => item.id}
@@ -323,7 +320,12 @@ const HomeScreen = () => {
 					style={[styles.modalView, modalStyle]}
 					{...panResponder.panHandlers}>
 					{selectedPost && (
-						<Comments comments={selectedPost.comments} postId={selectedPost.id} onAddComment={onAddComment} />
+						<Comments
+							comments={selectedPost.comments}
+							postId={selectedPost.id}
+							onAddComment={onAddComment}
+							onAddReply={onAddReply}
+						/>
 					)}
 				</Animated.View>
 			</View>
@@ -354,7 +356,6 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.2,
 		shadowRadius: 6,
 		elevation: 5,
-		marginTop: 6,
 	},
 	postBoxInner: {
 		borderRadius: 20,
@@ -560,13 +561,6 @@ const styles = StyleSheet.create({
 	timestamp: {
 		fontSize: 12,
 		color: '#999',
-	},
-	logoutButton: {
-		padding: 5,
-		backgroundColor: 'lightblue',
-		borderRadius: 5,
-		alignSelf: 'flex-start',
-		marginTop: -20,
 	},
 });
 
