@@ -11,6 +11,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import * as Sharing from 'expo-sharing';
 import Comments from '../components/Comments';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import LikeButton from '../components/LikeButton';
 
 type PdfFile = {
 	uri: string;
@@ -243,6 +244,7 @@ const HomeScreen = () => {
 					<TouchableOpacity onPress={() => toggleCommentsModal(item)} style={styles.commentButton}>
 						<MaterialIcons name="comment" size={24} color="#007AFF" />
 						<Text style={{ color: '#007AFF', marginLeft: 4 }}>{item.comments.length}</Text>
+						<LikeButton/>
 					</TouchableOpacity>
 				</View>
 			)}
