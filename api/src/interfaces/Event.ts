@@ -6,4 +6,5 @@ export interface Event {
     location: string;
     startTime: Date;
     endTime: Date;
+    is_active: boolean;
 }
