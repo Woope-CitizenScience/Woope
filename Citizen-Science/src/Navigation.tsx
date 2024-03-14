@@ -10,6 +10,7 @@ import NavigationBar from "./components/NavigationBar";
 import HomeScreen from "./screens/HomeScreen";
 import {MapScreen} from "./screens/Map/MapScreen";
 import {SMapScreen} from "./screens/Map/SMapScreen";
+import CommunitySideMenu from './components/CommunitySideMenu';
 
 const Stack = createNativeStackNavigator();
 
@@ -36,6 +37,7 @@ const AppNavigation = () => {
 					<Stack.Screen name="NavigationBar" component={NavigationBar} />
 					<Stack.Screen name="MapScreen" component={MapScreen} />
 					<Stack.Screen name="SMapScreen" component={SMapScreen} />
+					<Stack.Screen name="CommunityHome" component={CommunitySideMenu}/>
 				</>
 
 			) : (

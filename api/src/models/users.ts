@@ -128,7 +128,53 @@ export const createUser = async (email: string, phoneNumber: string, hashedPassw
 	}
 };
 
+export const updateName = async (userId: string, firstName: string, lastName: string) => {
+	try {
+		await pool.query('BEGIN');
+
+		const query = 'UPDATE profile_information SET first_name = $1, last_name = $2 WHERE user_id = $3';
+		const values = [firstName, lastName, userId];
+
+		await pool.query(query, values);
+
+		await pool.query('COMMIT');
+
+		return {
+			user_id: userId,
+			first_name: firstName,
+			last_name: lastName,
+		};
+
+	} catch (error) {
+		await pool.query('ROLLBACK');
+		throw new Error("Error updating user name: " + (error as Error).message);
+	}
+};
+
+export const getUserFullNameByID = async (userId: string) => {
+	try {
+		await pool.query('BEGIN');
+
+		const query = 'SELECT first_name, last_name FROM profile_information WHERE user_id = $1';
+		const values = [userId];
+
+		const result = await pool.query(query, values);
+
+		if (result.rows.length === 0) {
+			return null;
+		}
+		const userINFO = result.rows[0];
+		if(!userINFO){
+			return result.status(404).json({ error: "User not found" });
+		}
+		
+		return userINFO;
+		
+	} catch (error) {
+		throw new Error("Error getting user's name " + (error as Error).message);
+	}
+}
 
 
 
-module.exports = { getUser, createUser, getUserByRefreshToken };
+module.exports = { getUser, createUser, getUserByRefreshToken, updateName, getUserFullNameByID };
