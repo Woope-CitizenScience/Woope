@@ -27,6 +27,27 @@ CREATE TABLE comments (
     FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
+-- Create media_type Table
+CREATE TABLE post_media (
+    media_id SERIAL PRIMARY KEY,
+    post_id INTEGER NOT NULL,
+    media_type ENUM('PDF', 'Image') NOT NULL,
+    media_url VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
+);
+
+-- Create post_likes Table
+CREATE TABLE post_likes (
+    like_id SERIAL PRIMARY KEY,
+    post_id INTEGER NOT NULL,
+    user_id INTEGER NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (post_id) REFERENCES posts(post_id),
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
 -- Create comment_likes Table
 CREATE TABLE comment_likes (
     like_id SERIAL PRIMARY KEY,
@@ -70,19 +91,8 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Create trigger that calls the update_comments_count function after user inserts a comment
-CREATE TRIGGER comments_count_trigger
-AFTER INSERT ON comments
-FOR EACH ROW EXECUTE FUNCTION update_comments_count();
-
--- Create trigger that calls soft_delete_comment function after user deletes a comment
-CREATE TRIGGER before_comment_delete
-BEFORE DELETE ON comments
-FOR EACH ROW
-EXECUTE FUNCTION soft_delete_comment();
-
 -- Create function to update the likes_count when a like is added to or removed from a comment
-CREATE OR REPLACE FUNCTION update_likes_count()
+CREATE OR REPLACE FUNCTION update_comment_likes_count()
 RETURNS TRIGGER AS $$
 BEGIN
     -- Check the operation type: INSERT or DELETE
@@ -97,11 +107,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Create trigger that calls the update_likes_count function after insert or delete on comment_likes
-CREATE TRIGGER likes_count_trigger
-AFTER INSERT OR DELETE ON comment_likes
-FOR EACH ROW EXECUTE FUNCTION update_likes_count();
-
 -- Create function to set is_updated to true if a post has been updated
 CREATE OR REPLACE FUNCTION set_post_is_updated()
 RETURNS TRIGGER AS $$
@@ -113,8 +118,68 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+
+-- Create function to update the likes_count when a like is added to or removed from a post
+CREATE OR REPLACE FUNCTION update_post_likes_count()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Check the operation type: INSERT or DELETE
+    IF TG_OP = 'INSERT' THEN
+        -- If a new like is added, increment the likes_count of the respective post
+        UPDATE posts SET likes_count = likes_count + 1 WHERE post_id = NEW.post_id;
+    ELSIF TG_OP = 'DELETE' THEN
+        -- If a like is removed, decrement the likes_count
+        UPDATE posts SET likes_count = likes_count - 1 WHERE post_id = OLD.post_id;
+    END IF;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create function to update the modified_at column on post_media table whenever a row is updated or deleted.
+CREATE OR REPLACE FUNCTION update_modified_column()
+RETURNS TRIGGER AS $$
+BEGIN
+   NEW.updated_at = now();
+   RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+-- Create trigger that calls the update_modified_column function before updating or deleting a row in the post_media table.
+CREATE TRIGGER update_post_media_modtime
+BEFORE UPDATE ON post_media
+FOR EACH ROW
+EXECUTE FUNCTION update_modified_column();
+
+
+-- Create trigger that calls the update_comments_count function after user inserts a comment
+CREATE TRIGGER comments_count_trigger
+AFTER INSERT ON comments
+FOR EACH ROW EXECUTE FUNCTION update_comments_count();
+
+-- Create trigger that calls soft_delete_comment function after user deletes a comment
+CREATE TRIGGER before_comment_delete
+BEFORE DELETE ON comments
+FOR EACH ROW
+EXECUTE FUNCTION soft_delete_comment();
+
+-- Create trigger that calls the update_likes_count function after insert or delete on comment_likes
+CREATE TRIGGER likes_count_trigger
+AFTER INSERT OR DELETE ON comment_likes
+FOR EACH ROW EXECUTE FUNCTION update_comment_likes_count();
+
 -- Create trigger that calls the set_post_is_updated function after a post has been updated
 CREATE TRIGGER post_update_trigger
 BEFORE UPDATE ON posts
 FOR EACH ROW
 EXECUTE FUNCTION set_post_is_updated();
+
+CREATE TRIGGER post_likes_count_trigger
+AFTER INSERT OR DELETE ON post_likes
+FOR EACH ROW
+EXECUTE FUNCTION update_post_likes_count();
+
+-- Profile Picture
+-- User Type 
+-- Add Location to Posts
+-- Add Location coordinates to Events
+-- Add PDFs and Images to Posts

@@ -1,18 +1,7 @@
+import { Comment } from "../interfaces/post";
 const pool = require('../db');
 
-export interface Comment{
-    id: number;
-    comment: string;
-    user_id: number;
-    post_id: number;
-    parent_id: number;
-    created_at: Date;
-    is_active: boolean;
-    deleted_at: Date;
-    likes_count: number;
-}
-
-export const createComment = async (comment: string, user_id: number, post_id: number, parent_id: number) => {
+export const createComment = async (comment: string, user_id: number, post_id: number, parent_id: number): Promise<Comment> => {
     const { rows } = await pool.query(
         'INSERT INTO comments (comment, user_id, post_id, parent_id) VALUES ($1, $2, $3, $4) RETURNING *',
         [comment, user_id, post_id, parent_id]
@@ -20,7 +9,7 @@ export const createComment = async (comment: string, user_id: number, post_id: n
     return rows[0];
 }
 
-export const getComments = async (post_id: number) => {
+export const getComments = async (post_id: number): Promise<Comment[]> => {
     const { rows } = await pool.query(
         'SELECT * FROM comments WHERE post_id = $1',
         [post_id]
@@ -28,7 +17,7 @@ export const getComments = async (post_id: number) => {
     return rows;
 }
 
-export const updateComment = async (comment_id: number, comment: string) => {
+export const updateComment = async (comment_id: number, comment: string): Promise<Comment> => {
     const { rows } = await pool.query(
         'UPDATE comments SET comment = $1 WHERE comment_id = $2 RETURNING *',
         [comment, comment_id]
@@ -36,14 +25,14 @@ export const updateComment = async (comment_id: number, comment: string) => {
     return rows[0];
 }
 
-export const deleteComment = async (comment_id: number) => {
+export const deleteComment = async (comment_id: number): Promise<void> => {
     await pool.query(
         'DELETE FROM comments WHERE comment_id = $1',
         [comment_id]
     );
 }
 
-export const addLike = async (comment_id: number) => {
+export const addCommentLike = async (comment_id: number): Promise<Comment> => {
     const { rows } = await pool.query(
         'UPDATE comments SET likes_count = likes_count + 1 WHERE comment_id = $1 RETURNING *',
         [comment_id]
@@ -51,7 +40,7 @@ export const addLike = async (comment_id: number) => {
     return rows[0];
 }
 
-export const removeLike  = async (comment_id: number) => {
+export const removeCommentLike  = async (comment_id: number): Promise<Comment> => {
     const { rows } = await pool.query(
         'UPDATE comments SET likes_count = likes_count - 1 WHERE comment_id = $1 RETURNING *',
         [comment_id]

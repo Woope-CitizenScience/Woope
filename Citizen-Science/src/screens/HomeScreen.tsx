@@ -13,22 +13,9 @@ import * as Sharing from 'expo-sharing';
 import Comments from '../components/Comments';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
-type PdfFile = {
-	uri: string;
-	name: string;
-};
-type Post = {
-	image: string[];
-	text: string;
-	id: string;
-	pdfs: PdfFile[];
-	comments: Comment[];
-	timestamp: number;
-};
-type Comment = {
-	author: string;
-	text: string;
-};
+import { createPost,getAllPosts, updatePost, deletePost, likePost, unlikePost, PdfFile, Post, Comment } from '../api/posts';
+
+
 const HomeScreen = () => {
 	const { userToken, setUserToken } = useContext(AuthContext);
 	const [data, setData] = useState(null);
@@ -46,6 +33,19 @@ const HomeScreen = () => {
 	const [commentsModalVisible, setCommentsModalVisible] = useState(false);
 	const [modalY] = useState(new Animated.Value(0));
 
+	useEffect(() => {
+		const fetchPosts = async () => {
+			try {
+				const posts = await getAllPosts();
+				setPosts(posts);
+			} catch (error) {
+				console.error(error);
+				setError("Failed to fetch posts.");
+			}
+		};
+	
+		fetchPosts();
+	}, []);
 
 	const pickImage = async () => {
 		let result = await ImagePicker.launchImageLibraryAsync({
@@ -119,27 +119,52 @@ const HomeScreen = () => {
 		setPosts(updatedPosts);
 	};
 
-	const handleSubmit = () => {
+	const handleSubmit = async () => {
 		setError("");
-		if (postText || postImages.length || postPdfs.length) {
-			const uniqueId = Date.now().toString();
-			const newPost: Post = {
-				id: uniqueId,
-				text: postText,
-				image: postImages,
-				pdfs: postPdfs,
-				comments: [],
-				timestamp: Date.now(),
-			};
-			setPosts(prevPosts => [newPost, ...prevPosts]);
+		if (!postText.trim()) {
+			setError("Please provide text for your post.");
+			return;
+		} else if (userId === null){
+			setError("Please login to post.");
+			return;
+		}
+		
+		try {
+			const newPostData = await createPost(postText, postImages, postPdfs);
+			
+			setPosts(prevPosts => [newPostData, ...prevPosts]);
+			
+			// Clear the form
 			setPostText('');
 			setPostImages([]);
 			setPostPdfs([]);
-			setIsPosting(false);
-		} else {
-			setError("Please provide text, an image, or a PDF.");
+		} catch (error) {
+			console.error(error);
+			setError("Failed to create post. Please try again.");
 		}
 	};
+	
+	// const handleSubmit = () => {
+	// 	setError("");
+	// 	if (postText || postImages.length || postPdfs.length) {
+	// 		const uniqueId = Date.now().toString();
+	// 		const newPost: Post = {
+	// 			id: uniqueId,
+	// 			text: postText,
+	// 			image: postImages,
+	// 			pdfs: postPdfs,
+	// 			comments: [],
+	// 			timestamp: Date.now(),
+	// 		};
+	// 		setPosts(prevPosts => [newPost, ...prevPosts]);
+	// 		setPostText('');
+	// 		setPostImages([]);
+	// 		setPostPdfs([]);
+	// 		setIsPosting(false);
+	// 	} else {
+	// 		setError("Please provide text, an image, or a PDF.");
+	// 	}
+	// };
 
 	const panResponder = PanResponder.create({
 		onStartShouldSetPanResponder: () => true,

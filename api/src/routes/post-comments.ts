@@ -1,18 +1,17 @@
-import {config} from '../config/config'
 import express from 'express';
 import {
     getComments,
     createComment,
     deleteComment,
     updateComment,
-    addLike,
-    removeLike,
+    addCommentLike,
+    removeCommentLike,
 } from '../models/comments';
 
 const router = express.Router();
 
 // Get comments for post ID
-router.get('/comments/:id', async (req: express.Request, res: express.Response) => {
+router.get('/comment/:id', async (req: express.Request, res: express.Response) => {
     try {
         const comments = await getComments(Number(req.params.id));
         res.status(200).json(comments);
@@ -26,13 +25,11 @@ router.get('/comments/:id', async (req: express.Request, res: express.Response) 
 });
 
 // Create a new comment
-router.post('/comments/create', async (req: express.Request, res: express.Response) => {
+router.post('/comment', async (req: express.Request, res: express.Response) => {
     try {
-        const comment = await createComment(req.params.comment,
-            Number(req.params.user_id),
-            Number(req.params.post_id), 
-            Number(req.params.parent_id));
-        res.status(201).json(comment);
+        const { comment, user_id, post_id, parent_id } = req.body;
+        const newComment = await createComment(comment, user_id, post_id, parent_id);
+        res.status(201).json(newComment);
     } catch (error) {
         if (error instanceof Error) {
             res.status(500).json(`Internal server error: ${error.message}`);
@@ -43,9 +40,9 @@ router.post('/comments/create', async (req: express.Request, res: express.Respon
 });
 
 // Update comment content
-router.put('/comments/update', async (req: express.Request, res: express.Response) => {
+router.put('/comment/:id', async (req: express.Request, res: express.Response) => {
     try {
-        const comment = await updateComment(Number(req.params.id), req.params.comment);
+        const comment = await updateComment(Number(req.params.id), req.body.comment);
         res.status(200).json(comment);
     } catch (error) {
         if (error instanceof Error) {
@@ -57,7 +54,7 @@ router.put('/comments/update', async (req: express.Request, res: express.Respons
 });
 
 // Delete comment
-router.delete('/comments/:id', async (req: express.Request, res: express.Response) => {
+router.delete('/comment/:id', async (req: express.Request, res: express.Response) => {
     try {
         const comment = await deleteComment(Number(req.params.id));
         res.status(204).json(comment);
@@ -71,10 +68,10 @@ router.delete('/comments/:id', async (req: express.Request, res: express.Respons
 });
 
 // Add like to comment
-router.put('/comments/like', async (req: express.Request, res: express.Response) => {
+router.post('/comment/:id/like', async (req: express.Request, res: express.Response) => {
     try {
-        const comment = await addLike(Number(req.params.id));
-        res.status(200).json(comment);
+        const comment = await addCommentLike(Number(req.params.id));
+        res.status(201).json(comment);
     } catch (error) {
         if (error instanceof Error) {
             res.status(500).json(`Internal server error: ${error.message}`);
@@ -85,10 +82,10 @@ router.put('/comments/like', async (req: express.Request, res: express.Response)
 });
 
 // Remove like to comment
-router.put('/comments/unlike', async (req: express.Request, res: express.Response) => {
+router.delete('/comment/:id/unlike', async (req: express.Request, res: express.Response) => {
     try {
-        const comment = await removeLike(Number(req.params.id));
-        res.status(200).json(comment);
+        await removeCommentLike(Number(req.params.id));
+        res.status(204).end();
     } catch (error) {
         if (error instanceof Error) {
             res.status(500).json(`Internal server error: ${error.message}`);

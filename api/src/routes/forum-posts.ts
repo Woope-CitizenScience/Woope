@@ -1,4 +1,3 @@
-import {config} from '../config/config'
 import express from 'express';
 import { 
     getPost,
@@ -8,6 +7,8 @@ import {
     updatePost,
     deletePost,
     softDeletePost,
+    addPostLike,
+    removePostLike
  } from '../models/posts';
 
 const router = require('express').Router();
@@ -29,8 +30,8 @@ router.get('/posts', async (req: express.Request, res: express.Response) =>{
 // Get a post by ID
 router.get('/posts/:id', async (req: express.Request, res: express.Response) => {
     try {
-        const post = await getPostById(req.params.id);
-        if (post.length === 0) {
+        const post = await getPostById(Number(req.params.id));
+        if (!post || post.length === 0) {
             return res.status(404).json('Post not found');
         }
         res.status(200).json(post);
@@ -77,7 +78,7 @@ router.post('/posts', async (req: express.Request, res: express.Response) => {
 // Update a post
 router.put('/posts/:id', async (req: express.Request, res: express.Response) => {
     try {
-        const updatedPost = await updatePost(req.body.post_id, req.body.content);
+        const updatedPost = await updatePost(Number(req.params.id), req.body.content);
         res.status(200).json(updatedPost);
     } catch (error) {
         if (error instanceof Error) {
@@ -115,5 +116,35 @@ router.delete('/posts/soft/:id', async (req: express.Request, res: express.Respo
         }
     }
 });
+
+router.post('/posts/:id/like', async (req: express.Request, res: express.Response) => {
+    try {
+        const postId = Number(req.params.id);
+        const userId = Number(req.body.user_id);
+        const like = await addPostLike(postId, userId);
+        res.status(201).json(like);
+    } catch (error) {
+        if (error instanceof Error) {
+            res.status(500).json(`Internal server error: ${error.message}`);
+        } else {
+            res.status(500).json('Internal server error: An unknown error occurred');
+        }
+    }
+})
+
+router.delete('/posts/:id/like', async (req: express.Request, res: express.Response) => {
+    try {
+        const postId = Number(req.params.id);
+        const userId = Number(req.body.user_id);
+        const like = await removePostLike(postId, userId);
+        res.status(200).json(like);
+    } catch (error) {
+        if (error instanceof Error) {
+            res.status(500).json(`Internal server error: ${error.message}`);
+        } else {
+            res.status(500).json('Internal server error: An unknown error occurred');
+        }
+    }
+})
 
 module.exports = router;
