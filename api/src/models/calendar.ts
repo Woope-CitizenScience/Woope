@@ -41,26 +41,29 @@ export const modifyEvent = async (event_id: number, user_id: number, title: stri
             throw new Error("Problem in modifying event!");
         }
     } catch(error) {
-            throw new Error("Error in moifying event: " + (error as Error).message);
+            throw new Error("Error in modifying event: " + (error as Error).message);
         }
 }
 
-export const getEvent = async (event_id: number,  user_id: number): Promise<void> => {
-    const query = `SELECT * FROM event_id = $1 AND user_id = $2`;
+
+export const getEvent = async (event_id: number, user_id: number): Promise<Event> => {
+    const query = `SELECT * FROM events WHERE event_id = $1 AND user_id = $2`;
     const values = [event_id, user_id];
 
     try {
         const result = await pool.query(query, values);
         if (result.rowCount === 0) {
-             throw new Error("Problem in getting event");
+            throw new Error("Event not found");
         }
+        return result.rows[0];
     } catch (error) {
-        throw new Error("Error in deleting event: " + (error as Error).message);
+        throw new Error("Error in getting event: " + (error as Error).message);
     }
 }
 
 
-export const getEventOnDate = async (selectedDate: string): Promise<void> => {
+
+export const getEventOnDate = async (selectedDate: string): Promise<Event[]> => {
     //selectedDate must be of format: YYYY-MM-DD for query to properly execute
     const query =
         `
@@ -73,6 +76,7 @@ export const getEventOnDate = async (selectedDate: string): Promise<void> => {
         if (result.rowCount === 0) {
             throw new Error(`Problem in getting event(s) on ${selectedDate}`);
         }
+        return result.rows;
     } catch (error) {
         throw new Error(`Error in getting events on ${selectedDate}: ` + (error as Error).message);
     }
@@ -80,22 +84,20 @@ export const getEventOnDate = async (selectedDate: string): Promise<void> => {
 
 
 // TODO do we need to validate user_id to current user
-export const deleteEvent = async (eventId: number, userId: number): Promise<void> => {
-    // TODO instead of deleting event, we can set_Active as false so that the event does not render
-    const query = 'DELETE FROM events WHERE event_id =  $1 AND user_id = $2';
+
+export const deleteEvent = async (eventId: number, userId: number): Promise<boolean> => {
+    const query = 'DELETE FROM events WHERE event_id = $1 AND user_id = $2';
     const values = [eventId, userId];
 
-    try{
+    try {
         const result = await pool.query(query, values);
-        if (result.rowCount === 0) {
-             throw new Error("Problem in deleting event!");
-        }
-
-        }catch (error){
+        return result.rowCount > 0;
+    } catch (error) {
         throw new Error("Error in deleting event: " + (error as Error).message);
     }
+};
 
-}
+
 
 
 
