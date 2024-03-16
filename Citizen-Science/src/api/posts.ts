@@ -1,89 +1,20 @@
-import mime from "mime";
+import { fetchAPI } from "./fetch";
 
-export type PdfFile = {
-	uri: string;
-	name: string;
-};
-
-export type Post = {
-	image: string[];
-	text: string;
-	id: string;
-	pdfs: PdfFile[];
-	comments: Comment[];
-	timestamp: number;
-};
-
-export type Comment = {
-	author: string;
-	text: string;
-};
-
-async function fetchAPIWithFiles(endpoint: string, method: string = 'POST', data: { text: string, images: string[], pdfs: PdfFile[] }) {
-    const formData = new FormData();
-    formData.append('text', data.text);
-    
-    data.images.forEach((imageUri, index) => {
-        formData.append(`image${index}`, {
-            uri : imageUri,
-            type: mime.getType(imageUri),
-            name: imageUri.split("/").pop()
-        } as unknown as Blob);
-    });
-    
-    data.pdfs.forEach((pdf, index) => {
-        formData.append(`pdf${index}`, { 
-            uri: pdf.uri, 
-            name: pdf.name, 
-            type: 'application/pdf' 
-        } as unknown as Blob);
-    });
-
-    const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}${endpoint}`, {
-        method,
-        body: formData,
-    });
-
-    if (!response.ok) {
-        const errorResponse = await response.json();
-        throw new Error(errorResponse.error || response.statusText);
-    }
-
-    return await response.json();
-}
-
-async function fetchAPI(endpoint: string, method: string = 'GET', body: any = null) {
-    const config: RequestInit = { 
-        method,
-        headers: { 'Content-Type': 'application/json' },
-    };
-
-    if (body) config.body = JSON.stringify(body);
-
-    const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}${endpoint}`, config);
-
-    if (!response.ok) {
-        const errorResponse = await response.json();
-        throw new Error(errorResponse.error || response.statusText);
-    }
-
-    return await response.json();
-}
-
-export const createPost = async (content: string, images: string[], pdfs: PdfFile[]) => {
-    return fetchAPIWithFiles('/posts', 'POST', { text: content, images, pdfs } as any);
+export const createPost = async (user_id: number, content: string) => {
+    console.log(user_id, content);
+    return fetchAPI('/forum/posts', 'POST', { user_id, content });
 }
 
 export const getAllPosts = async () => {
-    return fetchAPI('/posts', 'GET');
+    return fetchAPI('/forum/posts', 'GET');
 }
 
 export const getPostById = async (id: number) => {
-    return fetchAPI(`/posts/${id}`, 'GET');
+    return fetchAPI(`/forum/posts/${id}`, 'GET');
 }
 
 export const getPostByUserId = async (userId: number) => {
-    return fetchAPI(`/posts/user/${userId}`, 'GET');
+    return fetchAPI(`/forum/posts/user/${userId}`, 'GET');
 }
 
 export const deletePost = async (id: number) => {
@@ -91,13 +22,13 @@ export const deletePost = async (id: number) => {
 }
 
 export const updatePost = async (id: number, content: string) => {
-    return fetchAPI(`/posts/${id}`, 'PUT', { content });
+    return fetchAPI(`/forum/posts/${id}`, 'PUT', { content });
 }
 
 export const likePost = async (id: number) => {
-    return fetchAPI(`/posts/${id}/like`, 'POST');
+    return fetchAPI(`/forum/posts/${id}/like`, 'POST');
 }
 
 export const unlikePost = async (id: number) => {
-    return fetchAPI(`/posts/${id}/like`, 'DELETE');
+    return fetchAPI(`/forum/posts/${id}/like`, 'DELETE');
 }

@@ -13,13 +13,15 @@ import * as Sharing from 'expo-sharing';
 import Comments from '../components/Comments';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
-import { createPost,getAllPosts, updatePost, deletePost, likePost, unlikePost, PdfFile, Post, Comment } from '../api/posts';
+import { createPost,getAllPosts, updatePost, deletePost, likePost, unlikePost  } from '../api/posts';
+import { PdfFile, Post, Comment } from '../api/types';
 
 
 const HomeScreen = () => {
 	const { userToken, setUserToken } = useContext(AuthContext);
 	const [data, setData] = useState(null);
 	const decodedToken = userToken ? jwtDecode<AccessToken>(userToken) : null;
+	const userName = decodedToken ? (decodedToken.firstName + " " + decodedToken.lastName) : null;
 	const userId = decodedToken ? decodedToken.user_id : null;
 	const [isPosting, setIsPosting] = useState(false);
 	const [postText, setPostText] = useState('');
@@ -130,7 +132,7 @@ const HomeScreen = () => {
 		}
 		
 		try {
-			const newPostData = await createPost(postText, postImages, postPdfs);
+			const newPostData = await createPost(Number(userId), postText);
 			
 			setPosts(prevPosts => [newPostData, ...prevPosts]);
 			
@@ -219,45 +221,47 @@ const HomeScreen = () => {
 		</TouchableOpacity>
 		<KeyboardAwareFlatList
 			data={posts}
-			keyExtractor={(item) => item.id}
+			keyExtractor={(item) => item.post_id.toString()}
 			renderItem={({ item }) => (
 				<View style={styles.post}>
 					<View style={styles.headerRow}>
 						<Image source={{ uri: 'https://wallpapercave.com/wp/wp4008083.jpg' }} style={styles.avatar} />
 						<View style={styles.headerTextContainer}>
-							<Text style={styles.userName}>User Name</Text>
+							<Text style={styles.userName}>{userName}</Text>
 							<Text style={styles.timestamp}>
-								{new Date(item.timestamp).toLocaleDateString()} at {new Date(item.timestamp).toLocaleTimeString()}
+								{new Date(item.created_at).toLocaleDateString()} at {new Date(item.created_at).toLocaleTimeString()}
 							</Text>
 						</View>
 					</View>
-					{item.text && <Text style={styles.postText}>{item.text}</Text>}
-					{item.image.length > 0 && (
-						<FlatList
-							data={item.image}
-							renderItem={({ item: uri }) => (
-								<TouchableOpacity onPress={() => handleImagePress(uri)}>
-									<Image source={{ uri }} style={styles.fullWidthImage} />
-								</TouchableOpacity>
-							)}
-							horizontal
-							pagingEnabled={true}
-							showsHorizontalScrollIndicator={false}
-							snapToAlignment="center"
-							snapToInterval={Dimensions.get('window').width}
-						/>
+					{item.content && <Text style={styles.postText}>{item.content}</Text>}
+					{item.image?.length > 0 && (
+					<FlatList
+						data={item.image}
+						keyExtractor={(item, index) => index.toString()} // Add a keyExtractor here
+						renderItem={({ item: uri }) => (
+						<TouchableOpacity onPress={() => handleImagePress(uri)}>
+							<Image source={{ uri }} style={styles.fullWidthImage} />
+						</TouchableOpacity>
+						)}
+						horizontal
+						pagingEnabled={true}
+						showsHorizontalScrollIndicator={false}
+						snapToAlignment="center"
+						snapToInterval={Dimensions.get('window').width}
+					/>
 					)}
-					{item.pdfs.map((pdf: PdfFile, index: number) => (
-						<View key={index} style={styles.pdfItem}>
-							<TouchableOpacity onPress={() => handleOpenPdf(pdf.uri)}>
-								<MaterialIcons name="picture-as-pdf" size={24} color="red" />
-								<Text style={styles.pdfName}>{pdf.name}</Text>
-							</TouchableOpacity>
-						</View>
-					))}
+					{item.pdfs?.map((pdf: PdfFile, index: number) => (
+					  <View key={pdf.uri} style={styles.pdfItem}> // Make sure pdf.uri is unique
+					  <TouchableOpacity onPress={() => handleOpenPdf(pdf.uri)}>
+						<MaterialIcons name="picture-as-pdf" size={24} color="red" />
+						<Text style={styles.pdfName}>{pdf.name}</Text>
+					  </TouchableOpacity>
+					</View>
+				  ))}
+
 					<TouchableOpacity onPress={() => toggleCommentsModal(item)} style={styles.commentButton}>
 						<MaterialIcons name="comment" size={24} color="#007AFF" />
-						<Text style={{ color: '#007AFF', marginLeft: 4 }}>{item.comments.length}</Text>
+						<Text style={{ color: '#007AFF', marginLeft: 4 }}>{item.comments?.length ?? 0}</Text>
 					</TouchableOpacity>
 				</View>
 			)}

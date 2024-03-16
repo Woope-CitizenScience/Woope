@@ -1,5 +1,5 @@
 -- Create Posts Table
-CREATE TABLE posts (
+CREATE TABLE IF NOT EXISTS posts (
     post_id SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL,
     content TEXT NOT NULL,
@@ -12,7 +12,7 @@ CREATE TABLE posts (
 );
 
 -- Create Comments Table
-CREATE TABLE comments (
+CREATE TABLE IF NOT EXISTS comments (
     comment_id SERIAL PRIMARY KEY,
     post_id INTEGER NOT NULL,
     parent_comment_id INTEGER,
@@ -27,19 +27,22 @@ CREATE TABLE comments (
     FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
+-- Create enum for accepted media types
+CREATE TYPE media_type_enum AS ENUM ('PDF', 'Image');
+
 -- Create media_type Table
-CREATE TABLE post_media (
+CREATE TABLE IF NOT EXISTS post_media (
     media_id SERIAL PRIMARY KEY,
     post_id INTEGER NOT NULL,
-    media_type ENUM('PDF', 'Image') NOT NULL,
+    media_type media_type_enum NOT NULL,
     media_url VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (post_id) REFERENCES posts(post_id) ON DELETE CASCADE
 );
 
 -- Create post_likes Table
-CREATE TABLE post_likes (
+CREATE TABLE IF NOT EXISTS post_likes (
     like_id SERIAL PRIMARY KEY,
     post_id INTEGER NOT NULL,
     user_id INTEGER NOT NULL,
@@ -49,7 +52,7 @@ CREATE TABLE post_likes (
 );
 
 -- Create comment_likes Table
-CREATE TABLE comment_likes (
+CREATE TABLE IF NOT EXISTS comment_likes (
     like_id SERIAL PRIMARY KEY,
     comment_id INTEGER NOT NULL,
     user_id INTEGER NOT NULL,
@@ -177,9 +180,3 @@ CREATE TRIGGER post_likes_count_trigger
 AFTER INSERT OR DELETE ON post_likes
 FOR EACH ROW
 EXECUTE FUNCTION update_post_likes_count();
-
--- Profile Picture
--- User Type 
--- Add Location to Posts
--- Add Location coordinates to Events
--- Add PDFs and Images to Posts

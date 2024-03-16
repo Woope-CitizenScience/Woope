@@ -11,7 +11,7 @@ import {
 const router = express.Router();
 
 // Get comments for post ID
-router.get('/comment/:id', async (req: express.Request, res: express.Response) => {
+router.get('/:id', async (req: express.Request, res: express.Response) => {
     try {
         const comments = await getComments(Number(req.params.id));
         res.status(200).json(comments);
@@ -25,7 +25,7 @@ router.get('/comment/:id', async (req: express.Request, res: express.Response) =
 });
 
 // Create a new comment
-router.post('/comment', async (req: express.Request, res: express.Response) => {
+router.post('/', async (req: express.Request, res: express.Response) => {
     try {
         const { comment, user_id, post_id, parent_id } = req.body;
         const newComment = await createComment(comment, user_id, post_id, parent_id);
@@ -40,7 +40,7 @@ router.post('/comment', async (req: express.Request, res: express.Response) => {
 });
 
 // Update comment content
-router.put('/comment/:id', async (req: express.Request, res: express.Response) => {
+router.put('/:id', async (req: express.Request, res: express.Response) => {
     try {
         const comment = await updateComment(Number(req.params.id), req.body.comment);
         res.status(200).json(comment);
@@ -54,7 +54,7 @@ router.put('/comment/:id', async (req: express.Request, res: express.Response) =
 });
 
 // Delete comment
-router.delete('/comment/:id', async (req: express.Request, res: express.Response) => {
+router.delete('/:id', async (req: express.Request, res: express.Response) => {
     try {
         const comment = await deleteComment(Number(req.params.id));
         res.status(204).json(comment);
@@ -68,7 +68,7 @@ router.delete('/comment/:id', async (req: express.Request, res: express.Response
 });
 
 // Add like to comment
-router.post('/comment/:id/like', async (req: express.Request, res: express.Response) => {
+router.post('/:id/like', async (req: express.Request, res: express.Response) => {
     try {
         const comment = await addCommentLike(Number(req.params.id));
         res.status(201).json(comment);
@@ -82,7 +82,7 @@ router.post('/comment/:id/like', async (req: express.Request, res: express.Respo
 });
 
 // Remove like to comment
-router.delete('/comment/:id/unlike', async (req: express.Request, res: express.Response) => {
+router.delete('/:id/unlike', async (req: express.Request, res: express.Response) => {
     try {
         await removeCommentLike(Number(req.params.id));
         res.status(204).end();
