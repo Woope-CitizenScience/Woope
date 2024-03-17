@@ -4,7 +4,6 @@ import {
 	StyleSheet,
 	TouchableOpacity,
 	FlatList,
-	ScrollView,
 	RefreshControl,
 } from "react-native";
 import {
@@ -19,6 +18,7 @@ import IconButton from "../components/IconButton";
 import { jwtDecode } from "jwt-decode";
 import { AccessToken } from "../util/token";
 import { AuthContext } from "../util/AuthContext";
+import { useFocusEffect } from "@react-navigation/native";
 
 interface ProfileScreenProps {
 	route: any;
@@ -52,11 +52,9 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ route, navigation }) => {
 			.catch((error) => {
 				console.error("Error: ", error);
 			});
-	}, []);
+	}, [userID, currentUserID]);
 
-	useEffect(() => {
-		fetchProfile();
-	}, [fetchProfile]);
+	useFocusEffect(fetchProfile);
 
 	const posts = [
 		{ id: "1", content: "|||First post|||" },
@@ -82,9 +80,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ route, navigation }) => {
 				keyExtractor={(item) => item.id}
 				numColumns={3}
 				showsVerticalScrollIndicator={false}
-				refreshControl={
-					<RefreshControl refreshing={!fullyLoaded} onRefresh={fetchProfile} />
-				}
+				refreshControl={<RefreshControl refreshing={!fullyLoaded} onRefresh={fetchProfile} />}
 				ListHeaderComponent={
 					<>
 						<View style={styles.profileUser}>
