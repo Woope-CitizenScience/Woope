@@ -84,7 +84,6 @@ export const getEventOnDate = async (selectedDate: string): Promise<Event[]> => 
 
 
 // TODO do we need to validate user_id to current user
-
 export const deleteEvent = async (eventId: number, userId: number): Promise<boolean> => {
     const query = 'DELETE FROM events WHERE event_id = $1 AND user_id = $2';
     const values = [eventId, userId];

@@ -4,7 +4,7 @@ const router = require('express').Router();
 import {createEvent, modifyEvent, getEvent, getEventOnDate, deleteEvent} from "../models/calendar";
 
 //createEvent
-router.post('/events', authenticateToken, async (req: express.Request, res: express.Response) => {
+router.post('/events/create', authenticateToken, async (req: express.Request, res: express.Response) => {
     const { event_id, user_id, title, description, location, startTime, endTime, isActive } = req.body;
 
     if (!event_id || !user_id || !title || !description || !location || !startTime || !endTime || isActive === undefined) {
@@ -84,6 +84,25 @@ router.delete('events/event_id',authenticateToken, async (req: express.Request, 
 
 });
 
+// get event on specific date
+
+router.get('/events/date/:selectedDate', authenticateToken, async (req: express.Request, res: express.Response) => {
+        const selectedDate = req.params.date;
+
+        if(!selectedDate)
+                return res.status(400).json({ error: 'You need to select a specific date.'})
+
+        try {
+            const retrievedEvents = await getEventOnDate(selectedDate);
+            if (retrievedEvents) {
+                res.status(202).json({message: `Event(s) successfully retrieved on ${selectedDate}`});
+            } else {
+                res.status(204).json({message: `No events found on ${selectedDate}`});
+            }
+        } catch (error) {
+            res.status(500).json( { error: `${ (error as Error).message }`})
+        }
+});
 
 
 
