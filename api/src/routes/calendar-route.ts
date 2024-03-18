@@ -4,15 +4,15 @@ const router = require('express').Router();
 import {createEvent, modifyEvent, getEvent, getEventOnDate, deleteEvent} from "../models/calendar";
 
 //createEvent
-router.post('/events/create', authenticateToken, async (req: express.Request, res: express.Response) => {
-    const { event_id, user_id, title, description, location, startTime, endTime, isActive } = req.body;
+router.post('/create', async (req: express.Request, res: express.Response) => {
+    const { user_id, title, description, location, startTime, endTime} = req.body;
 
-    if (!event_id || !user_id || !title || !description || !location || !startTime || !endTime || isActive === undefined) {
+    if (!user_id || !title || !description || !location || !startTime || !endTime) {
         return res.status(400).json({ error: 'All fields are required' });
     }
 
     try {
-        const event = await createEvent(event_id, user_id, title, description, location, new Date(startTime), new Date(endTime), isActive);
+        const event = await createEvent(user_id, title, description, location, new Date(startTime), new Date(endTime));
         res.status(201).json(event);
     } catch (error) {
         res.status(500).json({ error: `Error creating event: ${(error as Error).message}` });
@@ -20,16 +20,16 @@ router.post('/events/create', authenticateToken, async (req: express.Request, re
 });
 
 //getEvent
-router.get('/events/:eventId', authenticateToken, async (req: express.Request, res: express.Response) => {
+router.get('/:eventId', async (req: express.Request, res: express.Response) => {
     const eventId = parseInt(req.params.eventId);
-    const userId = parseInt(req.body.user_id);
 
-    if (!eventId || !userId) {
-        return res.status(400).json({ error: 'Event ID and User ID are required' });
+
+    if (!eventId) {
+        return res.status(400).json({ error: 'Event ID required' });
     }
 
     try {
-        const event = await getEvent(eventId, userId);
+        const event = await getEvent(eventId);
         if (event) {
             res.status(200).json(event);
         } else {
@@ -44,7 +44,7 @@ router.get('/events/:eventId', authenticateToken, async (req: express.Request, r
 
 
 //modify
-router.put('/events/:eventId',authenticateToken, async (req: express.Request, res: express.Response) => {
+router.put('/:eventId',authenticateToken, async (req: express.Request, res: express.Response) => {
     const eventId = parseInt(req.params.eventId);
     const userId = parseInt(req.body.user_id);
     const { title, description, location, startTime, endTime } = req.body;
@@ -62,9 +62,9 @@ router.put('/events/:eventId',authenticateToken, async (req: express.Request, re
 });
 
 //delete
-router.delete('events/event_id',authenticateToken, async (req: express.Request, res: express.Response) => {
+router.delete('/:event_id/:user_id',async (req: express.Request, res: express.Response) => {
     const eventId = parseInt(req.params.event_id);
-    const userId = parseInt(req.body.user_id);
+    const userId = parseInt(req.params.user_id);
 
     if (!eventId || !userId) {
         return res.status(400).json({ error: 'Event ID and User ID are required' });
@@ -86,8 +86,8 @@ router.delete('events/event_id',authenticateToken, async (req: express.Request, 
 
 // get event on specific date
 
-router.get('/events/date/:selectedDate', authenticateToken, async (req: express.Request, res: express.Response) => {
-        const selectedDate = req.params.date;
+router.get('/:selectedDate', async (req: express.Request, res: express.Response) => {
+        const selectedDate = req.params.selectedDate;
 
         if(!selectedDate)
                 return res.status(400).json({ error: 'You need to select a specific date.'})
