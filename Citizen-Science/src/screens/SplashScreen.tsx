@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { View, ImageBackground, Dimensions } from 'react-native';
 import { useNavigation, NavigationContainerRef, CommonActions } from '@react-navigation/native';
 
+
 // Get full width and height of the device's screen
 const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
@@ -10,6 +11,7 @@ function SplashScreen() {
     const navigation = useNavigation<NavigationContainerRef<any>>();
 
     useEffect(() => {
+
         // Splash screen for 2 seconds
         const splashTimer = setTimeout(() => {
             navigation.dispatch(
