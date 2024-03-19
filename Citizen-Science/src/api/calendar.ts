@@ -1,4 +1,3 @@
-
 export const createEvent = async (userId: number, title: string, description: string, location: string, startTime: Date, endTime: Date) => {
     const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/calendar/create`, {
         method: 'POST',
@@ -77,7 +76,7 @@ export const getEvent = async (eventId: number) => {
 }
 
 export const getEventsOnDate = async (selectedDate: string) => {
-    const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/calendar/${selectedDate}`, {
+    const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/calendar/onDate/${selectedDate}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -92,6 +91,24 @@ export const getEventsOnDate = async (selectedDate: string) => {
     }
 
     return await response.json();
+};
+
+export const getAllEvents = async () => {
+  const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/calendar/getAllEvents`, {
+      method: 'GET',
+      headers: {
+          'Content-Type': 'application/json',
+      }
+  });
+
+  if (!response.ok) {
+      const errorResponse = await response.json();
+      const error = new Error(errorResponse.error || response.statusText);
+      error.name = `HTTP Error ${response.status}`;
+      throw error;
+  }
+
+  return await response.json();
 };
 
 

@@ -1,7 +1,7 @@
 import express from 'express';
 import { authenticateToken } from '../middleware/authMiddleware';
 const router = require('express').Router();
-import {createEvent, modifyEvent, getEvent, getEventOnDate, deleteEvent} from "../models/calendar";
+import {createEvent, modifyEvent, getEvent, getEventOnDate, deleteEvent, getAllEvents} from "../models/calendar";
 
 //createEvent
 router.post('/create', async (req: express.Request, res: express.Response) => {
@@ -13,11 +13,22 @@ router.post('/create', async (req: express.Request, res: express.Response) => {
 
     try {
         const event = await createEvent(user_id, title, description, location, new Date(startTime), new Date(endTime));
-        res.status(201).json(event);
+        res.status(201).json({message: "Event created successfully!"});
     } catch (error) {
         res.status(500).json({ error: `Error creating event: ${(error as Error).message}` });
     }
 });
+
+// get all events
+router.get('/getAllEvents', async (req: express.Request, res: express.Response) => {
+    try {
+        const allEvents = await getAllEvents();
+        res.status(200).json(allEvents);
+    } catch (error) {
+        res.status(500).json({ message: (error as Error).message});
+    }
+});
+
 
 //getEvent
 router.get('/:eventId', async (req: express.Request, res: express.Response) => {
@@ -36,15 +47,12 @@ router.get('/:eventId', async (req: express.Request, res: express.Response) => {
             res.status(404).json({ error: 'Event not found' });
         }
     } catch (error) {
-        res.status(500).json({ error: `Error getting event: ${(error as Error).message}` });
+        res.status(500).json({ error: (error as Error).message} );
     }
 });
 
-
-
-
 //modify
-router.put('/:eventId',authenticateToken, async (req: express.Request, res: express.Response) => {
+router.put('/:eventId', authenticateToken, async (req: express.Request, res: express.Response) => {
     const eventId = parseInt(req.params.eventId);
     const userId = parseInt(req.body.user_id);
     const { title, description, location, startTime, endTime } = req.body;
@@ -84,9 +92,10 @@ router.delete('/:event_id/:user_id',async (req: express.Request, res: express.Re
 
 });
 
-// get event on specific date
 
-router.get('/:selectedDate', async (req: express.Request, res: express.Response) => {
+
+// get event on specific date
+router.get('/onDate/:selectedDate', async (req: express.Request, res: express.Response) => {
         const selectedDate = req.params.selectedDate;
 
         if(!selectedDate)
@@ -103,8 +112,4 @@ router.get('/:selectedDate', async (req: express.Request, res: express.Response)
             res.status(500).json( { error: `${ (error as Error).message }`})
         }
 });
-
-
-
-
 module.exports = router;

@@ -17,7 +17,7 @@ export const createEvent = async (user_id: number, title: string, description: s
             throw new Error("Problem in creating event!");
         }
     } catch (error) {
-        throw new Error("Error in creating event: " + (error as Error).message)
+        throw new Error((error as Error).message)
     }
 };
 
@@ -41,7 +41,7 @@ export const modifyEvent = async (event_id: number, user_id: number, title: stri
             throw new Error("Problem in modifying event!");
         }
     } catch(error) {
-            throw new Error("Error in modifying event: " + (error as Error).message);
+            throw new Error((error as Error).message);
         }
 }
 
@@ -57,18 +57,16 @@ export const getEvent = async (event_id: number): Promise<Event> => {
         }
         return result.rows[0];
     } catch (error) {
-        throw new Error("Error in getting event: " + (error as Error).message);
+        throw new Error((error as Error).message);
     }
 }
-
-
 
 export const getEventOnDate = async (selectedDate: string): Promise<Event[]> => {
     //selectedDate must be of format: YYYY-MM-DD for query to properly execute
     const query =
         `
             SELECT * FROM events
-            WHERE DATE $1 BETWEEN start_time::Date AND end_time::Date;
+            WHERE DATE $1 BETWEEN start_time::date AND end_time::date;
         `
     const value = [selectedDate]
     try {
@@ -78,13 +76,12 @@ export const getEventOnDate = async (selectedDate: string): Promise<Event[]> => 
         }
         return result.rows;
     } catch (error) {
-        throw new Error(`Error in getting events on ${selectedDate}: ` );
+        throw new Error((error as Error).message);
     }
 }
 
 
 // TODO do we need to validate user_id to current user
-
 export const deleteEvent = async (eventId: number, userId: number): Promise<boolean> => {
     const query = 'DELETE FROM events WHERE event_id = $1 AND user_id = $2';
     const values = [eventId, userId];
@@ -93,28 +90,22 @@ export const deleteEvent = async (eventId: number, userId: number): Promise<bool
         const result = await pool.query(query, values);
         return result.rowCount > 0;
     } catch (error) {
-        throw new Error("Error in deleting event: " + (error as Error).message);
+        throw new Error((error as Error).message);
     }
 };
 
+export const getAllEvents = async (): Promise<Event[]> => {
+    const query = `SELECT * FROM events`;
 
+    try {
+        const result = await pool.query(query);
+        if (result.rowCount === 0)
+            return [];
+        return result.rows;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        } catch (error) {
+            throw new Error( (error as Error).message );
+        }
+    };
 //-------------------------------------------------
 
