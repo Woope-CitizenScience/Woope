@@ -52,7 +52,7 @@ router.get('/:eventId', async (req: express.Request, res: express.Response) => {
 });
 
 //modify
-router.put('/:eventId', authenticateToken, async (req: express.Request, res: express.Response) => {
+router.put('/:eventId', async (req: express.Request, res: express.Response) => {
     const eventId = parseInt(req.params.eventId);
     const userId = parseInt(req.body.user_id);
     const { title, description, location, startTime, endTime } = req.body;
@@ -96,15 +96,19 @@ router.delete('/:event_id/:user_id',async (req: express.Request, res: express.Re
 
 // get event on specific date
 router.get('/onDate/:selectedDate', async (req: express.Request, res: express.Response) => {
+        // validates that the user's input is in YYYY-MM-DD format
+        const validateDateFormat = /^\d{4}-\d{2}-\d{2}$/;
         const selectedDate = req.params.selectedDate;
 
         if(!selectedDate)
                 return res.status(400).json({ error: 'You need to select a specific date.'})
+        else if(!validateDateFormat.test(selectedDate))
+                return res.status(400).json({ error: 'Invalid date format. Please use YYYY-MM-DD format.'})
 
         try {
             const retrievedEvents = await getEventOnDate(selectedDate);
             if (retrievedEvents) {
-                res.status(202).json({message: `Event(s) successfully retrieved on ${selectedDate}`});
+                res.status(202).json(retrievedEvents);
             } else {
                 res.status(204).json({message: `No events found on ${selectedDate}`});
             }

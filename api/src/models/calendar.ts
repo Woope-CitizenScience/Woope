@@ -35,6 +35,7 @@ export const modifyEvent = async (event_id: number, user_id: number, title: stri
         `;
     const values = [title, description, location, start_time, end_time, event_id, user_id];
 
+
     try {
         const result = await pool.query(query, values);
         if (result.rowCount === 0) {
@@ -66,7 +67,7 @@ export const getEventOnDate = async (selectedDate: string): Promise<Event[]> => 
     const query =
         `
             SELECT * FROM events
-            WHERE DATE $1 BETWEEN start_time::date AND end_time::date;
+            WHERE $1::date BETWEEN start_time::date AND end_time::date;
         `
     const value = [selectedDate]
     try {

@@ -44,7 +44,7 @@ export const modifyEvent = async (eventId: number, userId: number, title: string
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({eventId, userId, title, description, location, startTime, endTime}),
+        body: JSON.stringify({eventId ,userId, title, description, location, startTime, endTime}),
     });
 
     if (!response.ok) {
