@@ -47,6 +47,10 @@ const HomeScreen = () => {
 	const [modalY] = useState(new Animated.Value(0));
 	const firstName = decodedToken ? decodedToken.firstName : null;
 	const lastName = decodedToken ? decodedToken.lastName : null;
+	const [visibleDropdown, setVisibleDropdown] = useState<string | null>(null);
+	const [isEditing, setIsEditing] = useState(false);
+	const [editingPostId, setEditingPostId] = useState<string | null>(null);
+
 
 	const pickImage = async () => {
 		let result = await ImagePicker.launchImageLibraryAsync({
@@ -119,20 +123,45 @@ const HomeScreen = () => {
 		});
 		setPosts(updatedPosts);
 	};
+	
+	const startEditingPost = (postId: string) => {
+		const postToEdit = posts.find(post => post.id === postId);
+		if (postToEdit) {
+			setPostText(postToEdit.text);
+			setPostImages(postToEdit.image);
+			setPostPdfs(postToEdit.pdfs);
+			setIsEditing(true);
+			setEditingPostId(postId);
+			setVisibleDropdown(null);
+		}
+	};
 
 	const handleSubmit = () => {
 		setError("");
+
 		if (postText || postImages.length || postPdfs.length) {
-			const uniqueId = Date.now().toString();
-			const newPost: Post = {
-				id: uniqueId,
-				text: postText,
-				image: postImages,
-				pdfs: postPdfs,
-				comments: [],
-				timestamp: Date.now(),
-			};
-			setPosts(prevPosts => [newPost, ...prevPosts]);
+			if (isEditing && editingPostId) {
+				setPosts(prevPosts =>
+					prevPosts.map(post =>
+						post.id === editingPostId
+							? { ...post, text: postText, image: postImages, pdfs: postPdfs }
+							: post
+					)
+				);
+				setIsEditing(false);
+				setEditingPostId(null);
+			} else {
+				const uniqueId = Date.now().toString();
+				const newPost: Post = {
+					id: uniqueId,
+					text: postText,
+					image: postImages,
+					pdfs: postPdfs,
+					comments: [],
+					timestamp: Date.now(),
+				};
+				setPosts(prevPosts => [newPost, ...prevPosts]);
+			}
 			setPostText('');
 			setPostImages([]);
 			setPostPdfs([]);
@@ -141,6 +170,7 @@ const HomeScreen = () => {
 			setError("Please provide text, an image, or a PDF.");
 		}
 	};
+
 
 	const panResponder = PanResponder.create({
 		onStartShouldSetPanResponder: () => true,
@@ -201,6 +231,23 @@ const HomeScreen = () => {
 		});
 	}
 
+
+	const deletePost = (postId: string) => {
+		Alert.alert(
+			"Delete Post",
+			"Are you sure you want to delete this post?",
+			[
+				{
+					text: "Cancel",
+					style: "cancel"
+				},
+				{
+					text: "Yes", onPress: () => setPosts(currentPosts => currentPosts.filter(post => post.id !== postId)) }
+			]
+		);
+	};
+
+
 	return (
 	<View style={styles.flexContainer}>
 		<KeyboardAwareFlatList
@@ -242,10 +289,26 @@ const HomeScreen = () => {
 						</View>
 					))}
 					<TouchableOpacity onPress={() => toggleCommentsModal(item)} style={styles.commentButton}>
+						<LikeButton/>
 						<MaterialIcons name="comment" size={24} color="#007AFF" />
 						<Text style={{ color: '#007AFF', marginLeft: 4 }}>{item.comments.length}</Text>
-						<LikeButton/>
 					</TouchableOpacity>
+					<TouchableOpacity
+						onPress={() => setVisibleDropdown(visibleDropdown === item.id ? null : item.id)}
+						style={styles.dropdownIcon}
+					>
+						<Text>...</Text>
+					</TouchableOpacity>
+					{visibleDropdown === item.id && (
+						<View style={styles.dropdownMenu}>
+							<TouchableOpacity  onPress={() => startEditingPost(item.id)}>
+								<Text style={styles.dropdownItem}>Edit</Text>
+							</TouchableOpacity>
+							<TouchableOpacity onPress={() => deletePost(item.id)}>
+								<Text style={styles.dropdownItems}>Delete</Text>
+							</TouchableOpacity>
+						</View>
+					)}
 				</View>
 			)}
 			ListHeaderComponent={
@@ -564,6 +627,44 @@ const styles = StyleSheet.create({
 		fontSize: 12,
 		color: '#999',
 	},
+	dropdownIcon: {
+		padding: 10,
+		fontSize: 20,
+		color: '#007AFF',
+		position: 'absolute',
+		top: 10,
+		right: 20,
+		zIndex: 1,
+	},
+	dropdownMenu: {
+		position: 'absolute',
+		top: 40,
+		right: 10,
+		backgroundColor: '#E7F6FF',
+		borderRadius: 5,
+		padding: 8,
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.1,
+		shadowRadius: 4,
+		elevation: 3,
+		zIndex: 2
+	},
+
+	dropdownItem: {
+		padding: 8,
+		fontSize: 14,
+		color: '#007AFF',
+		fontWeight: '500',
+	},
+	dropdownItems: {
+		padding: 8,
+		fontSize: 14,
+		color: '#ff0000',
+		fontWeight: '500',
+	},
+
+
 });
 
 export default HomeScreen;

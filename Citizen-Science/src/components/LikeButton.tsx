@@ -13,7 +13,7 @@ const LikeButton = () => {
     };
 
     return (
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', paddingRight: 12 }}>
             <Pressable onPress={toggleLike} style={styles.LikeButton}>
                 <MaterialCommunityIcons
                     name={liked ? "heart" : "heart-outline"}
@@ -21,13 +21,13 @@ const LikeButton = () => {
                     color={liked ? "red" : "black"}
                 />
             </Pressable>
-            <Text style={{ marginLeft: 8 }}>{likesCount}</Text>
+            <Text style={{ marginLeft: 5 }}>{likesCount}</Text>
         </View>
     );
 };
 const styles = StyleSheet.create({
     LikeButton: {
-    marginLeft: 10,
+        marginLeft: 7,
     },
 
 });
