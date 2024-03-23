@@ -123,18 +123,29 @@ const HomeScreen = () => {
 		});
 		setPosts(updatedPosts);
 	};
-	
+
 	const startEditingPost = (postId: string) => {
 		const postToEdit = posts.find(post => post.id === postId);
 		if (postToEdit) {
+			console.log("Editing post:", postToEdit);
 			setPostText(postToEdit.text);
 			setPostImages(postToEdit.image);
 			setPostPdfs(postToEdit.pdfs);
 			setIsEditing(true);
 			setEditingPostId(postId);
 			setVisibleDropdown(null);
+			setIsPosting(true);
 		}
 	};
+
+	const removeImage = (uri: string) => {
+		setPostImages(currentImages => {
+			const updatedImages = currentImages.filter(image => image !== uri);
+			console.log("Images after removal:", updatedImages);
+			return updatedImages;
+		});
+	};
+
 
 	const handleSubmit = () => {
 		setError("");
@@ -347,7 +358,12 @@ const HomeScreen = () => {
 								))}
 							</View>
 							{postImages.map((uri, index) => (
-								<Image key={index} source={{ uri }} style={styles.previewImage} />
+								<View key={index}>
+									<Image source={{ uri }} style={styles.previewImage} />
+									<TouchableOpacity onPress={() => removeImage(uri)}>
+										<Text style={styles.removeImageText}>Remove</Text>
+									</TouchableOpacity>
+								</View>
 							))}
 							<TouchableOpacity style={styles.postButton} onPress={handleSubmit}>
 								<Text style={styles.postButtonText}>POST</Text>
@@ -663,8 +679,14 @@ const styles = StyleSheet.create({
 		color: '#ff0000',
 		fontWeight: '500',
 	},
-
-
+	removeImageText: {
+		color: 'red',
+		textAlign: 'center',
+		padding: 5,
+	},
+	dropdownItemDelete: {
+		color: 'red',
+		padding: 10,
+	},
 });
-
 export default HomeScreen;
