@@ -1,10 +1,9 @@
-import { Comment } from "../interfaces/post";
 const pool = require('../db');
 
-export const createComment = async (comment: string, user_id: number, post_id: number, parent_id: number): Promise<Comment> => {
+export const createComment = async (content: string, user_id: number, post_id: number, parent_comment_id: number): Promise<Comment> => {
     const { rows } = await pool.query(
-        'INSERT INTO comments (comment, user_id, post_id, parent_id) VALUES ($1, $2, $3, $4) RETURNING *',
-        [comment, user_id, post_id, parent_id]
+        'INSERT INTO comments (content, user_id, post_id, parent_comment_id) VALUES ($1, $2, $3, $4) RETURNING *',
+        [content, user_id, post_id, parent_comment_id]
     );
     return rows[0];
 }
@@ -17,15 +16,16 @@ export const getComments = async (post_id: number): Promise<Comment[]> => {
     return rows;
 }
 
-export const updateComment = async (comment_id: number, comment: string): Promise<Comment> => {
+export const updateComment = async (comment_id: number, content: string): Promise<Comment> => {
     const { rows } = await pool.query(
-        'UPDATE comments SET comment = $1 WHERE comment_id = $2 RETURNING *',
-        [comment, comment_id]
+        'UPDATE comments SET content = $1 WHERE comment_id = $2 RETURNING *',
+        [content, comment_id]
     );
     return rows[0];
 }
 
 export const deleteComment = async (comment_id: number): Promise<void> => {
+    console.log("Delete comment called");
     await pool.query(
         'DELETE FROM comments WHERE comment_id = $1',
         [comment_id]

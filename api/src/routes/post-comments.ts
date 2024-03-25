@@ -27,8 +27,8 @@ router.get('/:id', async (req: express.Request, res: express.Response) => {
 // Create a new comment
 router.post('/', async (req: express.Request, res: express.Response) => {
     try {
-        const { comment, user_id, post_id, parent_id } = req.body;
-        const newComment = await createComment(comment, user_id, post_id, parent_id);
+        const { content, user_id, post_id, parent_id } = req.body;
+        const newComment = await createComment(content, user_id, post_id, parent_id);
         res.status(201).json(newComment);
     } catch (error) {
         if (error instanceof Error) {
@@ -40,9 +40,9 @@ router.post('/', async (req: express.Request, res: express.Response) => {
 });
 
 // Update comment content
-router.put('/:id', async (req: express.Request, res: express.Response) => {
+router.put('/:comment_id', async (req: express.Request, res: express.Response) => {
     try {
-        const comment = await updateComment(Number(req.params.id), req.body.comment);
+        const comment = await updateComment(Number(req.params.comment_id), req.body.content);
         res.status(200).json(comment);
     } catch (error) {
         if (error instanceof Error) {

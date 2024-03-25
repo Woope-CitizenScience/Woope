@@ -22,7 +22,7 @@ const HomeScreen = () => {
 	const [data, setData] = useState(null);
 	const decodedToken = userToken ? jwtDecode<AccessToken>(userToken) : null;
 	const userName = decodedToken ? (decodedToken.firstName + " " + decodedToken.lastName) : null;
-	const userId = decodedToken ? decodedToken.user_id : null;
+	const userId = decodedToken ? decodedToken.user_id : NaN;
 	const [isPosting, setIsPosting] = useState(false);
 	const [postText, setPostText] = useState('');
 	const [postImages, setPostImages] = useState<string[]>([]);
@@ -33,6 +33,7 @@ const HomeScreen = () => {
 	const [selectedImageUri, setSelectedImageUri] = useState('');
 	const [selectedPost, setSelectedPost] = useState<Post | null>(null);
 	const [commentsModalVisible, setCommentsModalVisible] = useState(false);
+	const [comments, setComments] = useState([]);
 	const [modalY] = useState(new Animated.Value(0));
 
 	useEffect(() => {
@@ -111,15 +112,32 @@ const HomeScreen = () => {
 		setSelectedPost(post || null);
 		setCommentsModalVisible(!commentsModalVisible);
 	};
-	const onAddComment = (postId: string, newComment: Comment) => {
-		const updatedPosts = posts.map(post => {
-			if (post.id === postId) {
-				return { ...post, comments: [...post.comments, newComment] };
-			}
-			return post;
-		});
-		setPosts(updatedPosts);
+	const handleAddComment = (postId: number, newComment: Comment) => {
+		setPosts(posts => posts.map(post => {
+		  if (post.post_id === postId) {
+			return { ...post, comments: [...post.comments, newComment] };
+		  }
+		  return post;
+		}));
 	};
+	
+	const handleDeleteComment = (commentId: number) => {
+		setPosts(posts => posts.map(post => {
+		  return {
+			...post,
+			comments: post.comments.filter(comment => comment.comment_id !== commentId)
+		  };
+		}));
+	};
+	
+	  const handleLikeComment = async (commentId: number) => {
+		// Implement logic to like a comment
+	  };
+	
+	  const handleUnlikeComment = async (commentId: number) => {
+		// Implement logic to unlike a comment
+	  };
+	
 
 	const handleSubmit = async () => {
 		setError("");
@@ -237,7 +255,7 @@ const HomeScreen = () => {
 					{item.image?.length > 0 && (
 					<FlatList
 						data={item.image}
-						keyExtractor={(item, index) => index.toString()} // Add a keyExtractor here
+						keyExtractor={(item, index) => index.toString()}
 						renderItem={({ item: uri }) => (
 						<TouchableOpacity onPress={() => handleImagePress(uri)}>
 							<Image source={{ uri }} style={styles.fullWidthImage} />
@@ -276,7 +294,7 @@ const HomeScreen = () => {
 						<View style={styles.inputContainer}>
 							<TextInput
 								style={styles.input}
-								placeholder="Describe here the details of your post"
+								placeholder="What's on your mind?"
 								value={postText}
 								onChangeText={setPostText}
 								multiline
@@ -339,7 +357,15 @@ const HomeScreen = () => {
 					style={[styles.modalView, modalStyle]}
 					{...panResponder.panHandlers}>
 					{selectedPost && (
-						<Comments comments={selectedPost.comments} postId={selectedPost.id} onAddComment={onAddComment} />
+						<Comments
+							comments={selectedPost.comments}
+							postId={selectedPost.post_id}
+							userId={userId}
+							onAddComment={handleAddComment}
+							onDeleteComment={handleDeleteComment}
+							onLikeComment={handleLikeComment}
+							onUnlikeComment={handleUnlikeComment}
+					  	/>
 					)}
 				</Animated.View>
 			</View>
@@ -558,7 +584,7 @@ const styles = StyleSheet.create({
 		padding: 35,
 		elevation: 5,
 		width: '100%',
-		height: '60%',
+		height: '20%',
 	},
 	headerRow: {
 		flexDirection: 'row',

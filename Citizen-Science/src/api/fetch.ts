@@ -37,7 +37,7 @@ async function fetchAPIWithFiles(endpoint: string, method: string = 'POST', data
 export async function fetchAPI(endpoint: string, method: string = 'GET', body: any = null) {
     const config: RequestInit = { 
         method,
-        headers: { 'Content-Type': 'application/json' } // Add Content-Type header for JSON
+        headers: { 'Content-Type': 'application/json' }
     };
 
     if (body) {

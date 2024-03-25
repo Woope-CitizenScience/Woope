@@ -23,7 +23,6 @@ CREATE TABLE IF NOT EXISTS comments (
     deleted_at TIMESTAMP,
     likes_count INTEGER DEFAULT 0,
     FOREIGN KEY (post_id) REFERENCES posts(post_id) ON DELETE CASCADE,
-    FOREIGN KEY (parent_comment_id) REFERENCES comments(comment_id),
     FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 

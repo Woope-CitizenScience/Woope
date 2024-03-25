@@ -22,7 +22,7 @@ Addressing environmental and socio-economic challenges in Standing Rock’s Lako
 - `npm install` to install dependencies
 - `npx expo start` to start the Expo server
 - Download the Expo app on your phone and scan the QR code to run the app on your phone
-- Install Docker Desktop
+- Install Docker Desktopn
 - Now `cd` into the `api` directory
 - `npm install`
 - Run `docker compose build` to build the API and PostgreSQL image
