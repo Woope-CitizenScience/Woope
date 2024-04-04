@@ -41,3 +41,25 @@ export const getProfile = async (user_id: number) => {
 		console.error(error);
 	}
 };
+
+export const searchProfile = async (name: string) => {
+	try {
+		const response = await fetch(
+			`${process.env.EXPO_PUBLIC_API_URL}/community/search-profile/${name}`,
+			{
+				method: "GET",
+				headers: {
+					"Content-Type": "application/json",
+				},
+			}
+		);
+		if (!response.ok) {
+			return null
+		} else {
+			const data = await response.json();
+			return data;
+		}
+	} catch (error) {
+		console.error(error);
+	}
+};
