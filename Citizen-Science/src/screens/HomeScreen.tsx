@@ -12,6 +12,7 @@ import * as Sharing from 'expo-sharing';
 import Comments from '../components/Comments';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import LikeButton from '../components/LikeButton';
+import Weather from "../components/Weather";
 
 type PdfFile = {
 	uri: string;
@@ -324,6 +325,7 @@ const HomeScreen = () => {
 			)}
 			ListHeaderComponent={
 				<>
+                 <Weather/>
 					<TouchableOpacity style={styles.postBox} onPress={() => setIsPosting(true)}>
 						<View style={styles.postBoxInner}>
 							<Text style={styles.postBoxText}>What's on your mind?</Text>
