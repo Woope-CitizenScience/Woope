@@ -1,3 +1,8 @@
+export type PdfFile = {
+	uri: string;
+	name: string;
+};
+
 export interface Post{
     post_id: number,
     user_id: number,
@@ -7,6 +12,30 @@ export interface Post{
     comments_count: number, 
     likes_count: number,
     is_active: boolean,
+}
+
+export interface PostWithUsername{
+    post_id: number,
+    user_id: number,
+    username: string,
+    content: string,
+    created_at: Date,
+    is_updated: boolean,
+    comments_count: number,
+    likes_count: number,
+    is_active: boolean,
+}
+
+export interface UserLikedPosts{
+    post_id: number;
+	image: string[];
+	content: string;
+	pdfs: PdfFile[];
+	comments: Comment[];
+	timestamp: number;
+	username: string;
+	likes_count: number;
+	likedPost: boolean;
 }
 
 export interface Comment {

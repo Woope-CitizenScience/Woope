@@ -1,62 +1,42 @@
-import React, { useContext, useEffect, useState, useRef  } from 'react';
-import { StyleSheet, Image, Text, View, TouchableOpacity, TextInput, Alert, FlatList, Dimensions, Modal, Animated, PanResponder, Button } from 'react-native';
+import React, { useContext, useState } from 'react';
+import { StyleSheet, Image, Text, View, TouchableOpacity, TextInput, Alert, FlatList, Dimensions, Modal, Animated, PanResponder } from 'react-native';
 import { AuthContext } from '../util/AuthContext';
 import { jwtDecode } from 'jwt-decode';
 import "core-js/stable/atob";
-import {AccessToken, deleteToken} from "../util/token";
-import {logoutUser} from "../api/auth";
+import {AccessToken} from "../util/token";
 import * as ImagePicker from 'expo-image-picker';
 import { KeyboardAwareFlatList } from 'react-native-keyboard-aware-scroll-view';
 import * as DocumentPicker from 'expo-document-picker';
 import { MaterialIcons } from '@expo/vector-icons';
 import * as Sharing from 'expo-sharing';
 import Comments from '../components/Comments';
-import LikeButton from '../components/LikeButton';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-
-import { createPost,getAllPosts, updatePost, deletePost, likePost, unlikePost, getPostLikes, getUserLikedPosts } from '../api/posts';
-import { createComment, deleteComment, updateComment, likeComment, unlikeComment } from '../api/comments';
-import { PdfFile, Post, Comment, PostWithUsername } from '../api/types';
-
+import LikeButton from '../components/LikeButton';
+import { PdfFile, Post, Comment } from '../api/types';
 
 const HomeScreen = () => {
 	const { userToken, setUserToken } = useContext(AuthContext);
-	const [data, setData] = useState(null);
 	const decodedToken = userToken ? jwtDecode<AccessToken>(userToken) : null;
-	const userName = decodedToken ? (decodedToken.firstName + " " + decodedToken.lastName) : null;
+    const userName = decodedToken ? (decodedToken.firstName + " " + decodedToken.lastName) : null;
 	const userId = decodedToken ? decodedToken.user_id : NaN;
 	const [isPosting, setIsPosting] = useState(false);
 	const [postText, setPostText] = useState('');
 	const [postImages, setPostImages] = useState<string[]>([]);
-	const [posts, setPosts] = useState<PostWithUsername[]>([]);
+	const [posts, setPosts] = useState<Post[]>([]);
 	const [error, setError] = useState("");
 	const [postPdfs, setPostPdfs] = useState<PdfFile[]>([]);
 	const [isImageViewVisible, setImageViewVisible] = useState(false);
 	const [selectedImageUri, setSelectedImageUri] = useState('');
 	const [selectedPost, setSelectedPost] = useState<Post | null>(null);
 	const [commentsModalVisible, setCommentsModalVisible] = useState(false);
-	const [comments, setComments] = useState([]);
-    const [visibleDropdown, setVisibleDropdown] = useState<string | null>(null);
-    const [isEditing, setIsEditing] = useState(false);
-    const [editingPostId, setEditingPostId] = useState<number | null>(null);
 	const [modalY] = useState(new Animated.Value(0));
-	const postTextInputRef = useRef<TextInput>(null);
+	const firstName = decodedToken ? decodedToken.firstName : null;
+	const lastName = decodedToken ? decodedToken.lastName : null;
+	const [visibleDropdown, setVisibleDropdown] = useState<string | null>(null);
+	const [isEditing, setIsEditing] = useState(false);
+	const [editingPostId, setEditingPostId] = useState<number | null>(null);
 
 
-	useEffect(() => {
-		fetchPosts();
-	}, []);
-
-    const fetchPosts = async () => {
-        try {
-            const posts = await getAllPosts(userId);
-            setPosts(posts);
-        } catch (error) {
-            console.error(error);
-            setError("Failed to fetch posts.");
-        }
-    };
-    
 	const pickImage = async () => {
 		let result = await ImagePicker.launchImageLibraryAsync({
 			mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -96,7 +76,6 @@ const HomeScreen = () => {
 			console.error('Error picking PDFs:', error);
 		}
 	};
-
 	const handleOpenPdf = async (pdfUri: string) => {
 		try {
 			const isAvailable = await Sharing.isAvailableAsync();
@@ -121,7 +100,7 @@ const HomeScreen = () => {
 		setCommentsModalVisible(!commentsModalVisible);
 	};
 
-	const handleAddComment = (postId: number, newComment: Comment) => {
+    const handleAddComment = (postId: number, newComment: Comment) => {
 		setPosts(posts => posts.map(post => {
 		  if (post.post_id === postId) {
 			return { ...post, comments: [...post.comments, newComment] };
@@ -131,132 +110,88 @@ const HomeScreen = () => {
 	};
 	
 	const handleDeleteComment = (commentId: number) => {
-        try {
-            const response = deleteComment(commentId);
-            console.log("Delete response:", response);
-            fetchPosts();
-        } catch (error) {
-            console.error(error);
-            setError("Failed to delete post. Please try again.");
-        }
-    };
+		setPosts(posts => posts.map(post => {
+		  return {
+			...post,
+			comments: post.comments.filter(comment => comment.comment_id !== commentId)
+		  };
+		}));
+	};
 	
-    const handleLikeComment = async (commentId: number) => {
-        try {
-            const response = await likeComment(commentId);
-            console.log("Like response:", response);
-            setPosts(posts => posts.map(post => {
-                return {
-                    ...post,
-                    comments: post.comments.map(comment => {
-                        if (comment.comment_id === commentId) {
-                            return { ...comment, likes: comment.likes_count + 1 };
-                        }
-                        return comment;
-                    })
-                };
-            }))
-        } catch (error) {
-            console.error(error);
-            setError("Failed to like post. Please try again.");
-        }
-    };
+	  const handleLikeComment = async (commentId: number) => {
+		// Implement logic to like a comment
+	  };
+	
+	  const handleUnlikeComment = async (commentId: number) => {
+		// Implement logic to unlike a comment
+	  };
+	const onAddComment = (postId: number, newComment: Comment) => {
+		const updatedPosts = posts.map(post => {
+			if (post.post_id === postId) {
+				return { ...post, comments: [...post.comments, newComment] };
+			}
+			return post;
+		});
+		setPosts(updatedPosts);
+	};
 
-    const handleUnlikeComment = async (commentId: number) => {
-        try {
-            const response = await unlikeComment(commentId);
-            console.log("Unlike response:", response);
-            setPosts(posts => posts.map(post => {
-                return {
-                    ...post,
-                    comments: post.comments.map(comment => {
-                        if (comment.comment_id === commentId) {
-                            return { ...comment, likes: comment.likes_count - 1 };
-                        }
-                        return comment;
-                    })
-                };
-            }))
-        } catch (error) {
-            console.error(error);
-            setError("Failed to unlike post. Please try again.");
-        }
-    };
-
-    const startEditingPost = (postId: number) => {
+	const startEditingPost = (postId: number) => {
 		const postToEdit = posts.find(post => post.post_id === postId);
 		if (postToEdit) {
 			console.log("Editing post:", postToEdit);
-			setPostText(postToEdit.content || ''); 
-			setPostImages(postToEdit.image || []);
-			setPostPdfs(postToEdit.pdfs || []); 
-			
-			setIsEditing(true); 
-			setEditingPostId(postId); 
+			setPostText(postToEdit.text);
+			setPostImages(postToEdit.image);
+			setPostPdfs(postToEdit.pdfs);
+			setIsEditing(true);
+			setEditingPostId(postId);
 			setVisibleDropdown(null);
-			if (postTextInputRef.current) {
-				postTextInputRef.current.focus();
-			}
-			
-		} else {
-			console.log("No post found with ID:", postId);
+			setIsPosting(true);
 		}
 	};
 
-    const handleUpdatePost = async () => {
-        if (!editingPostId || !postText.trim()) {
-			alert("Post text cannot be empty.");
-			return;
-		}
-		
-		try {
-			const updatedPost = await updatePost(editingPostId, postText); // Adjust parameters as needed
-			fetchPosts();			
+	const removeImage = (uri: string) => {
+		setPostImages(currentImages => {
+			const updatedImages = currentImages.filter(image => image !== uri);
+			console.log("Images after removal:", updatedImages);
+			return updatedImages;
+		});
+	};
 
-			// Reset the form and editing state
-			setIsEditing(false);
-			setEditingPostId(null);
-			setPostText('');
-			setPostImages([]);
-			setPostPdfs([]);
-		} catch (error) {
-			console.error("Failed to update the post:", error);
-		}
-    };
 
-	const handleCreatePost = async () => {
+	const handleSubmit = () => {
 		setError("");
-		if (!postText.trim()) {
-			setError("Please provide text for your post.");
-			return;
-		} else if (userId === null){
-			setError("Please login to post.");
-			return;
-		}
-		try {
-			await createPost(Number(userId), postText);
-			fetchPosts();
-			
-			// Clear the form
+
+		if (postText || postImages.length || postPdfs.length) {
+			if (isEditing && editingPostId) {
+				setPosts(prevPosts =>
+					prevPosts.map(post =>
+						post.post_id === editingPostId
+							? { ...post, text: postText, image: postImages, pdfs: postPdfs }
+							: post
+					)
+				);
+				setIsEditing(false);
+				setEditingPostId(null);
+			} else {
+				const newPost: Post = {
+                    post_id: 100,
+					text: postText,
+					image: postImages,
+					pdfs: postPdfs,
+					comments: [],
+					timestamp: Date.now(),
+				};
+				setPosts(prevPosts => [newPost, ...prevPosts]);
+			}
 			setPostText('');
 			setPostImages([]);
 			setPostPdfs([]);
-		} catch (error) {
-			console.error(error);
-			setError("Failed to create post. Please try again.");
+			setIsPosting(false);
+		} else {
+			setError("Please provide text, an image, or a PDF.");
 		}
 	};
 
-	// const handleLikePost = async () => {
-	// 	try {
-	// 		const response = await likePost(selectedPost?.post_id || 0);
-	// 		console.log("Like response:", response);
-	// 		fetchPosts();
-	// 	} catch (error) {
-	// 		console.error(error);
-	// 		setError("Failed to like post. Please try again.");
-	// 	}
-	// };
 
 	const panResponder = PanResponder.create({
 		onStartShouldSetPanResponder: () => true,
@@ -286,72 +221,112 @@ const HomeScreen = () => {
 		}]
 	};
 
+	function checkNames(firstName: string | null, lastName: string | null) {
+		if (firstName === null && lastName === null) {
+			return "Community Forum";
+		} else if (firstName === null) {
+			return "" + lastName;
+		} else if (lastName === null) {
+			return "" + firstName;
+		} else {
+			return firstName + " " + lastName;
+		}
+	}
+
+	// const onAddReply = (postId: number, commentId: number, newReply: Comment) => {
+	// 	setPosts(currentPosts => currentPosts.map(post => {
+	// 		if (post.post_id === postId) {
+	// 			return { ...post, comments: addReplyToComments(post.comments, commentId, newReply) };
+	// 		}
+	// 		return post;
+	// 	}));
+	// };
+	// function addReplyToComments(comments: Comment[], targetCommentId: number, reply: Comment): Comment[] {
+	// 	return comments.map(comment => {
+	// 		if (comment.comment_id === targetCommentId) {
+	// 			return { ...comment, replies: [...(comment.replies || []), reply] };
+	// 		} else if (comment.replies) {
+	// 			return { ...comment, replies: addReplyToComments(comment.replies, targetCommentId, reply) };
+	// 		}
+	// 		return comment;
+	// 	});
+	// }
+
+
+	const deletePost = (postId: number) => {
+		Alert.alert(
+			"Delete Post",
+			"Are you sure you want to delete this post?",
+			[
+				{
+					text: "Cancel",
+					style: "cancel"
+				},
+				{
+					text: "Yes", onPress: () => setPosts(currentPosts => currentPosts.filter(post => post.post_id !== postId)) }
+			]
+		);
+	};
+
+
 	return (
 	<View style={styles.flexContainer}>
-		{data && <Text>{JSON.stringify(data, null, 2)}</Text>}
 		<KeyboardAwareFlatList
 			data={posts}
-			keyExtractor={(item) => item.post_id.toString()}
+			keyExtractor={(item) => item.id}
 			renderItem={({ item }) => (
 				<View style={styles.post}>
 					<View style={styles.headerRow}>
 						<Image source={{ uri: 'https://wallpapercave.com/wp/wp4008083.jpg' }} style={styles.avatar} />
 						<View style={styles.headerTextContainer}>
-							<Text style={styles.userName}>{item.userName}</Text>
+							<Text style={styles.userName}>{checkNames(firstName, lastName)}</Text>
 							<Text style={styles.timestamp}>
-								{new Date(item.created_at).toLocaleDateString()} at {new Date(item.created_at).toLocaleTimeString()}
+								{new Date(item.timestamp).toLocaleDateString()} at {new Date(item.timestamp).toLocaleTimeString()}
 							</Text>
 						</View>
 					</View>
-					{item.content && <Text style={styles.postText}>{item.content}</Text>}
-					{item.image?.length > 0 && (
-					<FlatList
-						data={item.image}
-						keyExtractor={(item, index) => index.toString()}
-						renderItem={({ item: uri }) => (
-						<TouchableOpacity onPress={() => handleImagePress(uri)}>
-							<Image source={{ uri }} style={styles.fullWidthImage} />
-						</TouchableOpacity>
-						)}
-						horizontal
-						pagingEnabled={true}
-						showsHorizontalScrollIndicator={false}
-						snapToAlignment="center"
-						snapToInterval={Dimensions.get('window').width}
-					/>
-					)}
-					{item.pdfs?.map((pdf: PdfFile, index: number) => (
-					  <View key={pdf.uri} style={styles.pdfItem}> // Make sure pdf.uri is unique
-					  <TouchableOpacity onPress={() => handleOpenPdf(pdf.uri)}>
-						<MaterialIcons name="picture-as-pdf" size={24} color="red" />
-						<Text style={styles.pdfName}>{pdf.name}</Text>
-					  </TouchableOpacity>
-					</View>
-				  ))}
-
-					<TouchableOpacity onPress={() => toggleCommentsModal(item)} style={styles.commentButton}>
-                        <LikeButton
-							postId={item.post_id}
-							user_id={userId}
-							initialLikesCount={item.likes_count}
-							likedPost={item.user_liked}
+					{item.text && <Text style={styles.postText}>{item.text}</Text>}
+					{item.image.length > 0 && (
+						<FlatList
+							data={item.image}
+							renderItem={({ item: uri }) => (
+								<TouchableOpacity onPress={() => handleImagePress(uri)}>
+									<Image source={{ uri }} style={styles.fullWidthImage} />
+								</TouchableOpacity>
+							)}
+							horizontal
+							pagingEnabled={true}
+							showsHorizontalScrollIndicator={false}
+							snapToAlignment="center"
+							snapToInterval={Dimensions.get('window').width}
 						/>
+					)}
+					{item.pdfs.map((pdf: PdfFile, index: number) => (
+						<View key={index} style={styles.pdfItem}>
+							<TouchableOpacity onPress={() => handleOpenPdf(pdf.uri)}>
+								<MaterialIcons name="picture-as-pdf" size={24} color="red" />
+								<Text style={styles.pdfName}>{pdf.name}</Text>
+							</TouchableOpacity>
+						</View>
+					))}
+					<TouchableOpacity onPress={() => toggleCommentsModal(item)} style={styles.commentButton}>
+						<LikeButton/>
 						<MaterialIcons name="comment" size={24} color="#007AFF" />
-						<Text style={{ color: '#007AFF', marginLeft: 4 }}>{item.comments?.length ?? 0}</Text>
+						<Text style={{ color: '#007AFF', marginLeft: 4 }}>{item.comments.length}</Text>
 					</TouchableOpacity>
-                    <TouchableOpacity
-						onPress={() => setVisibleDropdown(visibleDropdown === item.post_id ? null : item.post_id)}
+					<TouchableOpacity
+						onPress={() => setVisibleDropdown(visibleDropdown === item.id ? null : item.id)}
 						style={styles.dropdownIcon}
 					>
 						<Text>...</Text>
 					</TouchableOpacity>
-					{visibleDropdown === item.post_id && (
+					{visibleDropdown === item.id && (
 						<View style={styles.dropdownMenu}>
-							<TouchableOpacity onPress={() => startEditingPost(item.post_id)}>
-							<Text style={styles.dropdownItem}>Edit</Text>
+							<TouchableOpacity  onPress={() => startEditingPost(item.id)}>
+								<Text style={styles.dropdownItem}>Edit</Text>
 							</TouchableOpacity>
-							<TouchableOpacity onPress={() => {/* Function to delete post */}}>
-							<Text style={styles.dropdownItem}>Delete</Text>
+							<TouchableOpacity onPress={() => deletePost(item.id)}>
+								<Text style={styles.dropdownItems}>Delete</Text>
 							</TouchableOpacity>
 						</View>
 					)}
@@ -367,9 +342,8 @@ const HomeScreen = () => {
 					{isPosting && (
 						<View style={styles.inputContainer}>
 							<TextInput
-								ref={postTextInputRef}
 								style={styles.input}
-								placeholder="What's on your mind?"
+								placeholder="Describe here the details of your post"
 								value={postText}
 								onChangeText={setPostText}
 								multiline
@@ -394,10 +368,15 @@ const HomeScreen = () => {
 								))}
 							</View>
 							{postImages.map((uri, index) => (
-								<Image key={index} source={{ uri }} style={styles.previewImage} />
+								<View key={index}>
+									<Image source={{ uri }} style={styles.previewImage} />
+									<TouchableOpacity onPress={() => removeImage(uri)}>
+										<Text style={styles.removeImageText}>Remove</Text>
+									</TouchableOpacity>
+								</View>
 							))}
-							<TouchableOpacity style={styles.postButton} onPress={isEditing ? handleUpdatePost : handleCreatePost}>
-								<Text style={styles.postButtonText}>{isEditing ? 'UPDATE' : 'POST'}</Text>
+							<TouchableOpacity style={styles.postButton} onPress={handleSubmit}>
+								<Text style={styles.postButtonText}>POST</Text>
 							</TouchableOpacity>
 							{error ? <Text style={styles.errorText}>{error}</Text> : null}
 						</View>
@@ -433,14 +412,14 @@ const HomeScreen = () => {
 					{...panResponder.panHandlers}>
 					{selectedPost && (
 						<Comments
-							comments={selectedPost.comments}
-							postId={selectedPost.post_id}
-							userId={userId}
-							onAddComment={handleAddComment}
-							onDeleteComment={handleDeleteComment}
-							onLikeComment={handleLikeComment}
-							onUnlikeComment={handleUnlikeComment}
-					  	/>
+                        comments={selectedPost.comments}
+                        postId={selectedPost.post_id}
+                        userId={userId}
+                        onAddComment={handleAddComment}
+                        onDeleteComment={handleDeleteComment}
+                        onLikeComment={handleLikeComment}
+                        onUnlikeComment={handleUnlikeComment}
+                      />
 					)}
 				</Animated.View>
 			</View>
@@ -471,7 +450,6 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.2,
 		shadowRadius: 6,
 		elevation: 5,
-		marginTop: 6,
 	},
 	postBoxInner: {
 		borderRadius: 20,
@@ -659,7 +637,7 @@ const styles = StyleSheet.create({
 		padding: 35,
 		elevation: 5,
 		width: '100%',
-		height: '20%',
+		height: '60%',
 	},
 	headerRow: {
 		flexDirection: 'row',
@@ -678,7 +656,7 @@ const styles = StyleSheet.create({
 		fontSize: 12,
 		color: '#999',
 	},
-    dropdownIcon: {
+	dropdownIcon: {
 		padding: 10,
 		fontSize: 20,
 		color: '#007AFF',
@@ -714,13 +692,14 @@ const styles = StyleSheet.create({
 		color: '#ff0000',
 		fontWeight: '500',
 	},
-	logoutButton: {
+	removeImageText: {
+		color: 'red',
+		textAlign: 'center',
 		padding: 5,
-		backgroundColor: 'lightblue',
-		borderRadius: 5,
-		alignSelf: 'flex-start',
-		marginTop: -20,
+	},
+	dropdownItemDelete: {
+		color: 'red',
+		padding: 10,
 	},
 });
-
 export default HomeScreen;

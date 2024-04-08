@@ -12,6 +12,18 @@ export type Post = {
 	timestamp: number;
 };
 
+export type PostWithUsername = {
+	post_id: number;
+	image: string[];
+	content: string;
+	pdfs: PdfFile[];
+	comments: Comment[];
+	timestamp: number;
+	username: string;
+	likes_count: number;
+	likedPost: boolean;
+}
+
 export type Comment = {
 	comment_id: number;
 	post_id: number;

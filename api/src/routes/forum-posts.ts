@@ -8,15 +8,17 @@ import {
     deletePost,
     softDeletePost,
     addPostLike,
-    removePostLike
+    removePostLike,
+    getPostLikes
  } from '../models/posts';
 
 const router = require('express').Router();
 
 // Get all posts
-router.get('/posts', async (req: express.Request, res: express.Response) =>{
+router.get('/posts/:id', async (req: express.Request, res: express.Response) =>{
     try {
-        const posts = await getPost();
+        const userId = Number(req.params.id);
+        const posts = await getPost(userId);
         res.status(200).json(posts);
     } catch (error) {
         if (error instanceof Error) {
@@ -28,7 +30,7 @@ router.get('/posts', async (req: express.Request, res: express.Response) =>{
 });
 
 // Get a post by ID
-router.get('/posts/:id', async (req: express.Request, res: express.Response) => {
+router.get('/:id/posts', async (req: express.Request, res: express.Response) => {
     try {
         const post = await getPostById(Number(req.params.id));
         if (!post || post.length === 0) {
@@ -122,10 +124,10 @@ router.post('/posts/:id/like', async (req: express.Request, res: express.Respons
         const postId = Number(req.params.id);
         const userId = Number(req.body.user_id);
         const like = await addPostLike(postId, userId);
-        res.status(201).json(like);
+        res.status(201).json({ message: "Like added successfully" });
     } catch (error) {
         if (error instanceof Error) {
-            res.status(500).json(`Internal server error: ${error.message}`);
+            res.status(500).json({ error: `Internal server error: ${error.message}` });
         } else {
             res.status(500).json('Internal server error: An unknown error occurred');
         }
@@ -137,7 +139,21 @@ router.delete('/posts/:id/like', async (req: express.Request, res: express.Respo
         const postId = Number(req.params.id);
         const userId = Number(req.body.user_id);
         const like = await removePostLike(postId, userId);
-        res.status(200).json(like);
+        res.status(200).json({ message: "Like removed successfully" });
+    } catch (error) {
+        if (error instanceof Error) {
+            res.status(500).json({ error: `Internal server error: ${error.message}` });
+        } else {
+            res.status(500).json('Internal server error: An unknown error occurred');
+        }
+    }
+})
+
+router.get('/posts/:id/like', async (req: express.Request, res: express.Response) => {
+    try {
+        const postId = Number(req.params.id);
+        const likes = await getPostLikes(postId);
+        res.status(200).json(likes);
     } catch (error) {
         if (error instanceof Error) {
             res.status(500).json(`Internal server error: ${error.message}`);
@@ -145,6 +161,21 @@ router.delete('/posts/:id/like', async (req: express.Request, res: express.Respo
             res.status(500).json('Internal server error: An unknown error occurred');
         }
     }
+})
+
+router.get('/posts/user/:id/likes', async (req: express.Request, res: express.Response) =>{
+    try {
+        const userId = Number(req.params.id);
+        const likes = await getPostLikes(userId);
+        res.status(200).json(likes);
+    } catch (error) {
+        if (error instanceof Error) {
+            res.status(500).json(`Internal server error: ${error.message}`);
+        } else {
+            res.status(500).json('Internal server error: An unknown error occurred');
+        }
+    } 
+    return; 
 })
 
 module.exports = router;
