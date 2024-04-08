@@ -27,8 +27,8 @@ const Weather: React.FC = () => {
         const fetchWeatherData = async () => {
             try {
                 const response = await axios.get<WeatherData[]>('http://192.168.1.169:3000/weather/forecast');
-                const threeDayForecast = response.data.slice(0, 7);
-                setWeatherData(threeDayForecast);
+                const sevenDayForecast = response.data.slice(0, 7);
+                setWeatherData(sevenDayForecast);
             } catch (err) {
                 console.error(err);
                 setError('Failed to fetch weather data');

@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { StyleSheet, Image, Text, View, TouchableOpacity, TextInput, Alert, FlatList, Dimensions, Modal, Animated, PanResponder } from 'react-native';
+import { StyleSheet, Image, Text, View, TouchableOpacity, TextInput, Alert, FlatList, Dimensions, Modal, Animated, PanResponder, SafeAreaView} from 'react-native';
 import { AuthContext } from '../util/AuthContext';
 import { jwtDecode } from 'jwt-decode';
 import "core-js/stable/atob";
@@ -261,7 +261,7 @@ const HomeScreen = () => {
 
 
 	return (
-	<View style={styles.flexContainer}>
+	<SafeAreaView style={styles.flexContainer}>
 		<KeyboardAwareFlatList
 			data={posts}
 			keyExtractor={(item) => item.id}
@@ -377,7 +377,7 @@ const HomeScreen = () => {
 			}
 			showsVerticalScrollIndicator={false}
 		/>
-		<Modal
+		  <Modal
 			animationType="slide"
 			transparent={true}
 			visible={isImageViewVisible}
@@ -392,8 +392,8 @@ const HomeScreen = () => {
 				</TouchableOpacity>
 				<Image source={{ uri: selectedImageUri }} style={styles.fullScreenImage} />
 			</View>
-		</Modal>
-		<Modal
+		  </Modal>
+		  <Modal
 			animationType="slide"
 			transparent={true}
 			visible={commentsModalVisible}
@@ -411,9 +411,9 @@ const HomeScreen = () => {
 						/>
 					)}
 				</Animated.View>
-			</View>
-		</Modal>
-	</View>
+			 </View>
+		    </Modal>
+   	</SafeAreaView>
 	);
 };
 
