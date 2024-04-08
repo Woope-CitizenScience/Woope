@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState, useRef  } from 'react';
-import { StyleSheet, Image, Text, View, TouchableOpacity, TextInput, Alert, FlatList, Dimensions, Modal, Animated, PanResponder, Button } from 'react-native';
+import { StyleSheet, Image, Text, View, TouchableOpacity, TextInput, Alert, FlatList, Dimensions, Modal, Animated, PanResponder, Button, SafeAreaView } from 'react-native';
 import { AuthContext } from '../util/AuthContext';
 import { jwtDecode } from 'jwt-decode';
 import "core-js/stable/atob";
@@ -15,9 +15,8 @@ import LikeButton from '../components/LikeButton';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 import { createPost,getAllPosts, updatePost, deletePost, likePost, unlikePost, getPostLikes, getUserLikedPosts } from '../api/posts';
-import { createComment, deleteComment, updateComment, likeComment, unlikeComment } from '../api/comments';
+import { createComment, deleteComment, updateComment, likeComment, unlikeComment, getComments } from '../api/comments';
 import { PdfFile, Post, Comment, PostWithUsername } from '../api/types';
-
 
 const HomeScreen = () => {
 	const { userToken, setUserToken } = useContext(AuthContext);
@@ -33,7 +32,7 @@ const HomeScreen = () => {
 	const [postPdfs, setPostPdfs] = useState<PdfFile[]>([]);
 	const [isImageViewVisible, setImageViewVisible] = useState(false);
 	const [selectedImageUri, setSelectedImageUri] = useState('');
-	const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+	const [selectedPost, setSelectedPost] = useState<PostWithUsername | null>(null);
 	const [commentsModalVisible, setCommentsModalVisible] = useState(false);
 	const [comments, setComments] = useState([]);
     const [visibleDropdown, setVisibleDropdown] = useState<string | null>(null);
@@ -51,6 +50,9 @@ const HomeScreen = () => {
         try {
             const posts = await getAllPosts(userId);
             setPosts(posts);
+			for (const post of posts) {
+				getComments(post);
+			}
         } catch (error) {
             console.error(error);
             setError("Failed to fetch posts.");
@@ -116,7 +118,7 @@ const HomeScreen = () => {
 		setImageViewVisible(true);
 	};
 
-	const toggleCommentsModal = (post?: Post) => {
+	const toggleCommentsModal = (post?: PostWithUsername) => {
 		setSelectedPost(post || null);
 		setCommentsModalVisible(!commentsModalVisible);
 	};
@@ -124,7 +126,7 @@ const HomeScreen = () => {
 	const handleAddComment = (postId: number, newComment: Comment) => {
 		setPosts(posts => posts.map(post => {
 		  if (post.post_id === postId) {
-			return { ...post, comments: [...post.comments, newComment] };
+		   return { ...post, comments: [...post.comments, newComment] };
 		  }
 		  return post;
 		}));
@@ -247,17 +249,6 @@ const HomeScreen = () => {
 		}
 	};
 
-	// const handleLikePost = async () => {
-	// 	try {
-	// 		const response = await likePost(selectedPost?.post_id || 0);
-	// 		console.log("Like response:", response);
-	// 		fetchPosts();
-	// 	} catch (error) {
-	// 		console.error(error);
-	// 		setError("Failed to like post. Please try again.");
-	// 	}
-	// };
-
 	const panResponder = PanResponder.create({
 		onStartShouldSetPanResponder: () => true,
 		onMoveShouldSetPanResponder: () => true,
@@ -287,7 +278,7 @@ const HomeScreen = () => {
 	};
 
 	return (
-	<View style={styles.flexContainer}>
+	<SafeAreaView style={styles.flexContainer}>
 		{data && <Text>{JSON.stringify(data, null, 2)}</Text>}
 		<KeyboardAwareFlatList
 			data={posts}
@@ -445,7 +436,7 @@ const HomeScreen = () => {
 				</Animated.View>
 			</View>
 		</Modal>
-	</View>
+	</SafeAreaView>
 	);
 };
 
