@@ -30,7 +30,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ route, navigation }) => {
 
 	let { userToken } = useContext(AuthContext);
 	const decodedToken = userToken ? jwtDecode<AccessToken>(userToken) : null;
-	const currentUserID = decodedToken ? decodedToken.user_id : NaN;
+	const currentUserID = decodedToken ? decodedToken.user_id : null;
 
 	const [profileOwner, setProfileOwner] = useState(false);
 
@@ -40,9 +40,8 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ route, navigation }) => {
 	const [editLastName, setLastName] = useState("");
 
 	const fetchProfile = useCallback(() => {
-		getProfile(Number(currentUserID))
+		getProfile(userID)
 			.then((data) => {
-				console.log("data: ", data);
 				setFirstName(data.first_name);
 				setLastName(data.last_name);
 				if (userID === currentUserID) {

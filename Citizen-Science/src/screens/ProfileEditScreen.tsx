@@ -55,8 +55,8 @@ const ProfileEditScreen: React.FC<ProfileEditProps> = ({navigation}) => {
 			) {
 				const user = await updateName(
 					user_id,
-					editFirstName,
-					editLastName,
+					editFirstName.trim(),
+					editLastName.trim(),
 					userToken
 				);
 				console.log("User name updated for USER: " + user.user_id);

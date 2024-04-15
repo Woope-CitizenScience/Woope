@@ -1,6 +1,6 @@
 import { config } from "../config/config";
 import express from "express";
-import { updateName, getUserFullNameByID } from "../models/users";
+import { updateName, getUserFullNameByID, searchUsersWithName } from "../models/users";
 import jwt from "jsonwebtoken";
 const router = require("express").Router();
 
@@ -46,7 +46,7 @@ router.get(
 	"/get-profile/:user_id",
 	async (req: express.Request, res: express.Response) => {
 		try {
-			const user_id = Number(req.params.user_id);
+			const { user_id } = req.params;
 			if (!user_id) {
 				return res.status(405).json("No user ID");
 			}
@@ -63,4 +63,24 @@ router.get(
 	}
 );
 
+router.get(
+	"/search-profile/:name",
+	async (req: express.Request, res: express.Response) => {
+		try {
+			const {name} = req.params;
+			if(!name){
+				return res.status(405).json("Empty search query")
+			}
+			const users = await searchUsersWithName(name);
+			{/*Goal is to return name + profile image*/}
+			if (!users) {
+				return res.status(404).json("No users found");
+			}
+
+			res.json(users);
+		} catch (error) {
+			return res.status(500).json(`Error Router: ${(error as Error).message}`);
+		}
+	}
+);
 module.exports = router;
