@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { StyleSheet, Image, Text, View, TouchableOpacity, TextInput, Alert, FlatList, Dimensions, Modal, Animated, PanResponder, SafeAreaView} from 'react-native';
+import { StyleSheet, Image, Text, View, TouchableOpacity, TextInput, Alert, FlatList, Dimensions, Modal, Animated, PanResponder} from 'react-native';
 import { AuthContext } from '../util/AuthContext';
 import { jwtDecode } from 'jwt-decode';
 import "core-js/stable/atob";
@@ -261,7 +261,7 @@ const HomeScreen = () => {
 
 
 	return (
-	<SafeAreaView style={styles.flexContainer}>
+	<View style={styles.flexContainer}>
 		<KeyboardAwareFlatList
 			data={posts}
 			keyExtractor={(item) => item.id}
@@ -377,6 +377,7 @@ const HomeScreen = () => {
 			}
 			showsVerticalScrollIndicator={false}
 		/>
+
 		  <Modal
 			animationType="slide"
 			transparent={true}
@@ -393,15 +394,18 @@ const HomeScreen = () => {
 				<Image source={{ uri: selectedImageUri }} style={styles.fullScreenImage} />
 			</View>
 		  </Modal>
-		  <Modal
+		<Modal
 			animationType="slide"
-			transparent={true}
+			transparent={false}
 			visible={commentsModalVisible}
-			onRequestClose={() => toggleCommentsModal()}>
+			onRequestClose={() => toggleCommentsModal()}
+			style={styles.modalContainer}
+		>
 			<View style={styles.centeredViews}>
 				<Animated.View
 					style={[styles.modalView, modalStyle]}
-					{...panResponder.panHandlers}>
+					{...panResponder.panHandlers}
+				>
 					{selectedPost && (
 						<Comments
 							comments={selectedPost.comments}
@@ -411,9 +415,9 @@ const HomeScreen = () => {
 						/>
 					)}
 				</Animated.View>
-			 </View>
-		    </Modal>
-   	</SafeAreaView>
+			</View>
+		</Modal>
+   	</View>
 	);
 };
 
@@ -616,17 +620,17 @@ const styles = StyleSheet.create({
 	},
 	centeredViews: {
 		flex: 1,
-		justifyContent: "flex-end",
-		backgroundColor: 'rgba(0, 0, 0, 0.5)',
+		justifyContent: 'center',
+		alignItems: 'center',
+		marginTop: 22,
 	},
 	modalView: {
 		backgroundColor: "white",
 		borderTopLeftRadius: 20,
 		borderTopRightRadius: 20,
 		padding: 35,
-		elevation: 5,
 		width: '100%',
-		height: '60%',
+		height: '100%',
 	},
 	headerRow: {
 		flexDirection: 'row',
@@ -689,6 +693,10 @@ const styles = StyleSheet.create({
 	dropdownItemDelete: {
 		color: 'red',
 		padding: 10,
+	},
+	modalContainer: {
+		flex: 1,
+		justifyContent: 'flex-end',
 	},
 });
 export default HomeScreen;
