@@ -9,10 +9,25 @@ import {
     softDeletePost,
     addPostLike,
     removePostLike,
-    getPostLikes
+    getPostLikes,
+    getPostWithMedia
  } from '../models/posts';
 
 const router = require('express').Router();
+
+router.get('/postswithmedia/:id/', async (req: express.Request, res: express.Response) =>{
+    try {
+        const userId = Number(req.params.id);
+        const posts = await getPostWithMedia(userId);
+        res.status(200).json(posts);
+    } catch (error) {
+        if (error instanceof Error) {
+            res.status(500).json(`Internal server error: ${error.message}`);
+        } else {
+            res.status(500).json('Internal server error: An unknown error occurred');
+        }
+    }
+})
 
 // Get all posts
 router.get('/posts/:id', async (req: express.Request, res: express.Response) =>{

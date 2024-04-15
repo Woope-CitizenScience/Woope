@@ -26,6 +26,19 @@ export interface PostWithUsername{
     is_active: boolean,
 }
 
+export interface PostWithMedia {
+    post_id: number;
+    user_id: number;
+    username: string;
+    content: string;
+    created_at: Date;
+    is_updated: boolean;
+    comments_count: number;
+    likes_count: number;
+    is_active: boolean;
+    media: PostMedia[];
+}
+
 export interface UserLikedPosts{
     post_id: number;
 	image: string[];
