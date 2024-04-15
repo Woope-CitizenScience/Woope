@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { StyleSheet, Image, Text, View, TouchableOpacity, TextInput, Alert, FlatList, Dimensions, Modal, Animated, PanResponder} from 'react-native';
+import { StyleSheet, Image, Text, View, TouchableOpacity, TextInput, Alert, FlatList, Dimensions, ScrollView, Animated, Modal, PanResponder} from 'react-native';
 import { AuthContext } from '../util/AuthContext';
 import { jwtDecode } from 'jwt-decode';
 import "core-js/stable/atob";
@@ -13,6 +13,7 @@ import Comments from '../components/Comments';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import LikeButton from '../components/LikeButton';
 import Weather from "../components/Weather";
+
 
 type PdfFile = {
 	uri: string;
@@ -51,7 +52,6 @@ const HomeScreen = () => {
 	const [visibleDropdown, setVisibleDropdown] = useState<string | null>(null);
 	const [isEditing, setIsEditing] = useState(false);
 	const [editingPostId, setEditingPostId] = useState<string | null>(null);
-
 
 	const pickImage = async () => {
 		let result = await ImagePicker.launchImageLibraryAsync({
@@ -115,6 +115,8 @@ const HomeScreen = () => {
 		setSelectedPost(post || null);
 		setCommentsModalVisible(!commentsModalVisible);
 	};
+
+
 	const onAddComment = (postId: string, newComment: Comment) => {
 		const updatedPosts = posts.map(post => {
 			if (post.id === postId) {
@@ -377,7 +379,6 @@ const HomeScreen = () => {
 			}
 			showsVerticalScrollIndicator={false}
 		/>
-
 		  <Modal
 			animationType="slide"
 			transparent={true}
@@ -395,26 +396,28 @@ const HomeScreen = () => {
 			</View>
 		  </Modal>
 		<Modal
-			animationType="slide"
-			transparent={false}
 			visible={commentsModalVisible}
+			animationType="slide"
+			transparent={true}
 			onRequestClose={() => toggleCommentsModal()}
 			style={styles.modalContainer}
 		>
-			<View style={styles.centeredViews}>
-				<Animated.View
-					style={[styles.modalView, modalStyle]}
-					{...panResponder.panHandlers}
-				>
-					{selectedPost && (
-						<Comments
-							comments={selectedPost.comments}
-							postId={selectedPost.id}
-							onAddComment={onAddComment}
-							onAddReply={onAddReply}
-						/>
-					)}
-				</Animated.View>
+			<View style={styles.centeredView}>
+				<View style={styles.modalView}>
+					<TouchableOpacity
+						style={styles.closeButton}
+						onPress={() => toggleCommentsModal()}>
+						<Text style={styles.closeButtonText}>X</Text>
+					</TouchableOpacity>
+						{selectedPost && (
+							<Comments
+								comments={selectedPost.comments}
+								postId={selectedPost.id}
+								onAddComment={onAddComment}
+								onAddReply={onAddReply}
+							/>
+						)}
+				</View>
 			</View>
 		</Modal>
    	</View>
@@ -587,28 +590,10 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		resizeMode: 'contain',
 	},
-	centeredView: {
-		flex: 1,
-		justifyContent: "center",
-		alignItems: "center",
-		backgroundColor: 'rgba(0, 0, 0, 0.8)',
-	},
 	fullScreenImage: {
 		width: '90%',
 		height: '80%',
 		resizeMode: 'contain',
-	},
-	closeButton: {
-		position: 'absolute',
-		top: 50,
-		right: 20,
-		backgroundColor: 'red',
-		padding: 10,
-		borderRadius: 10,
-	},
-	closeButtonText: {
-		color: '#fff',
-		fontWeight: 'bold',
 	},
 	commentButton: {
 		marginTop: 10,
@@ -623,14 +608,6 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		alignItems: 'center',
 		marginTop: 22,
-	},
-	modalView: {
-		backgroundColor: "white",
-		borderTopLeftRadius: 20,
-		borderTopRightRadius: 20,
-		padding: 35,
-		width: '100%',
-		height: '100%',
 	},
 	headerRow: {
 		flexDirection: 'row',
@@ -697,6 +674,33 @@ const styles = StyleSheet.create({
 	modalContainer: {
 		flex: 1,
 		justifyContent: 'flex-end',
+	},
+	modalView: {
+		backgroundColor: "white",
+		borderTopLeftRadius: 20,
+		borderTopRightRadius: 20,
+		padding: 35,
+		paddingTop: 120,
+		width: '100%',
+		height: '100%',
+	},
+	closeButton: {
+		position: 'absolute',
+		top: 60,
+		right: 20,
+		backgroundColor: 'red',
+		padding: 10,
+		borderRadius: 10,
+	},
+	closeButtonText: {
+		color: '#fff',
+		fontWeight: 'bold',
+	},
+	centeredView: {
+		flex: 1,
+		justifyContent: "center",
+		alignItems: "center",
+		backgroundColor: 'rgba(0, 0, 0, 0.8)',
 	},
 });
 export default HomeScreen;
