@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { StyleSheet, Image, Text, View, TouchableOpacity, TextInput, Alert, FlatList, Dimensions, ScrollView, Animated, Modal, PanResponder} from 'react-native';
+import { StyleSheet, Image, Text, View, TouchableOpacity, TextInput, Alert, FlatList, Dimensions, Modal} from 'react-native';
 import { AuthContext } from '../util/AuthContext';
 import { jwtDecode } from 'jwt-decode';
 import "core-js/stable/atob";
@@ -31,10 +31,9 @@ type Comment = {
 	id: string;
 	author: string;
 	text: string;
-	replies?: Comment[];
 };
 const HomeScreen = () => {
-	const { userToken, setUserToken } = useContext(AuthContext);
+	const { userToken} = useContext(AuthContext);
 	const decodedToken = userToken ? jwtDecode<AccessToken>(userToken) : null;
 	const [isPosting, setIsPosting] = useState(false);
 	const [postText, setPostText] = useState('');
@@ -46,7 +45,6 @@ const HomeScreen = () => {
 	const [selectedImageUri, setSelectedImageUri] = useState('');
 	const [selectedPost, setSelectedPost] = useState<Post | null>(null);
 	const [commentsModalVisible, setCommentsModalVisible] = useState(false);
-	const [modalY] = useState(new Animated.Value(0));
 	const firstName = decodedToken ? decodedToken.firstName : null;
 	const lastName = decodedToken ? decodedToken.lastName : null;
 	const [visibleDropdown, setVisibleDropdown] = useState<string | null>(null);
@@ -125,6 +123,7 @@ const HomeScreen = () => {
 			return post;
 		});
 		setPosts(updatedPosts);
+		setSelectedPost(updatedPosts.find(p => p.id === postId) || null);
 	};
 
 	const startEditingPost = (postId: string) => {
@@ -148,8 +147,6 @@ const HomeScreen = () => {
 			return updatedImages;
 		});
 	};
-
-
 	const handleSubmit = () => {
 		setError("");
 
@@ -185,35 +182,6 @@ const HomeScreen = () => {
 		}
 	};
 
-
-	const panResponder = PanResponder.create({
-		onStartShouldSetPanResponder: () => true,
-		onMoveShouldSetPanResponder: () => true,
-		onPanResponderMove: Animated.event([null, {
-			dy: modalY,
-		}], { useNativeDriver: false }),
-		onPanResponderRelease: (e, gestureState) => {
-			if (gestureState.dy > 100) {
-				toggleCommentsModal();
-			} else {
-				Animated.spring(modalY, {
-					toValue: 0,
-					useNativeDriver: true,
-				}).start();
-			}
-		},
-	});
-
-	const modalStyle = {
-		transform: [{
-			translateY: modalY.interpolate({
-				inputRange: [0, 100],
-				outputRange: [0, 100],
-				extrapolate: 'clamp',
-			})
-		}]
-	};
-
 	function checkNames(firstName: string | null, lastName: string | null) {
 		if (firstName === null && lastName === null) {
 			return "Community Forum";
@@ -225,27 +193,6 @@ const HomeScreen = () => {
 			return firstName + " " + lastName;
 		}
 	}
-
-	const onAddReply = (postId: string, commentId: string, newReply: Comment) => {
-		setPosts(currentPosts => currentPosts.map(post => {
-			if (post.id === postId) {
-				return { ...post, comments: addReplyToComments(post.comments, commentId, newReply) };
-			}
-			return post;
-		}));
-	};
-	function addReplyToComments(comments: Comment[], targetCommentId: string, reply: Comment): Comment[] {
-		return comments.map(comment => {
-			if (comment.id === targetCommentId) {
-				return { ...comment, replies: [...(comment.replies || []), reply] };
-			} else if (comment.replies) {
-				return { ...comment, replies: addReplyToComments(comment.replies, targetCommentId, reply) };
-			}
-			return comment;
-		});
-	}
-
-
 	const deletePost = (postId: string) => {
 		Alert.alert(
 			"Delete Post",
@@ -347,7 +294,7 @@ const HomeScreen = () => {
 								<TouchableOpacity onPress={pickImage}>
 									<Text>🖼️</Text>
 								</TouchableOpacity>
-								{postImages.map((uri, index) => (
+								{postImages.map(( index) => (
 									<View key={index}>
 										<Text>Image {index + 1}</Text>
 									</View>
@@ -414,7 +361,6 @@ const HomeScreen = () => {
 								comments={selectedPost.comments}
 								postId={selectedPost.id}
 								onAddComment={onAddComment}
-								onAddReply={onAddReply}
 							/>
 						)}
 				</View>

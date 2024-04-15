@@ -2,21 +2,19 @@ import React, { useState, useContext } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { AuthContext } from "../util/AuthContext";
-import { jwtDecode } from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
 import { AccessToken } from "../util/token";
 
 type Comment = {
     id: string;
     author: string;
     text: string;
-    replies?: Comment[];
 };
 
 interface CommentsProps {
     comments: Comment[];
     postId: string;
     onAddComment: (postId: string, comment: Comment) => void;
-    onAddReply: (postId: string, commentId: string, reply: Comment) => void;
 }
 
 const Comments: React.FC<CommentsProps> = ({ comments, postId, onAddComment }) => {
@@ -43,8 +41,7 @@ const Comments: React.FC<CommentsProps> = ({ comments, postId, onAddComment }) =
             const newComment: Comment = {
                 id: Math.random().toString(36).substring(2, 9),
                 author: checkNames(firstName, lastName),
-                text: newCommentText,
-                replies: [],
+                text: newCommentText
             };
             onAddComment(postId, newComment);
             setNewCommentText('');
