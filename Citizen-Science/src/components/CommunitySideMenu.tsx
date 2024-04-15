@@ -55,7 +55,7 @@ const SearchStackNavigator = ({ ...props }) => {
 				component={ProfileSearchScreen}
 			></Stack.Screen>
 			<Stack.Screen
-				name={"ProfilePage"}
+				name={"ProfileScreenSearchNav"}
 				initialParams={{headerShown: false}}
 				component={ProfileStackNavigator}
 			></Stack.Screen>

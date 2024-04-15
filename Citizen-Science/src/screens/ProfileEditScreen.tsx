@@ -38,8 +38,8 @@ const ProfileEditScreen: React.FC<ProfileEditProps> = ({navigation}) => {
 		getProfile(user_id)
 			.then((data) => {
 				getProfile(data);
-				setEditFirstName(data.first_name);
-				setEditLastName(data.last_name);
+				setEditFirstName(data.user.first_name);
+				setEditLastName(data.user.last_name);
 			})
 			.catch((error) => {
 				console.error("Error: ", error);
