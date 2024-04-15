@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { StyleSheet, Image, Text, View, TouchableOpacity, TextInput, Alert, FlatList, Dimensions, ScrollView, Animated, Modal, PanResponder} from 'react-native';
+import { StyleSheet, Image, Text, View, TouchableOpacity, TextInput, Alert, FlatList, Dimensions, Modal} from 'react-native';
 import { AuthContext } from '../util/AuthContext';
 import { jwtDecode } from 'jwt-decode';
 import "core-js/stable/atob";
@@ -14,11 +14,11 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 import LikeButton from '../components/LikeButton';
 import Weather from "../components/Weather";
 
-
 type PdfFile = {
 	uri: string;
 	name: string;
 };
+
 type Post = {
 	image: string[];
 	text: string;
@@ -27,14 +27,16 @@ type Post = {
 	comments: Comment[];
 	timestamp: number;
 };
+
 type Comment = {
 	id: string;
 	author: string;
 	text: string;
 	replies?: Comment[];
 };
+
 const HomeScreen = () => {
-	const { userToken, setUserToken } = useContext(AuthContext);
+	const { userToken } = useContext(AuthContext);
 	const decodedToken = userToken ? jwtDecode<AccessToken>(userToken) : null;
 	const [isPosting, setIsPosting] = useState(false);
 	const [postText, setPostText] = useState('');
@@ -46,13 +48,13 @@ const HomeScreen = () => {
 	const [selectedImageUri, setSelectedImageUri] = useState('');
 	const [selectedPost, setSelectedPost] = useState<Post | null>(null);
 	const [commentsModalVisible, setCommentsModalVisible] = useState(false);
-	const [modalY] = useState(new Animated.Value(0));
 	const firstName = decodedToken ? decodedToken.firstName : null;
 	const lastName = decodedToken ? decodedToken.lastName : null;
 	const [visibleDropdown, setVisibleDropdown] = useState<string | null>(null);
 	const [isEditing, setIsEditing] = useState(false);
 	const [editingPostId, setEditingPostId] = useState<string | null>(null);
 
+	// Image picker handler
 	const pickImage = async () => {
 		let result = await ImagePicker.launchImageLibraryAsync({
 			mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -66,6 +68,7 @@ const HomeScreen = () => {
 		}
 	};
 
+	// PDF picker handler
 	const pickPdf = async () => {
 		try {
 			if (postPdfs.length < 10) {
@@ -92,6 +95,8 @@ const HomeScreen = () => {
 			console.error('Error picking PDFs:', error);
 		}
 	};
+
+	// Open PDF for sharing
 	const handleOpenPdf = async (pdfUri: string) => {
 		try {
 			const isAvailable = await Sharing.isAvailableAsync();
@@ -106,17 +111,19 @@ const HomeScreen = () => {
 		}
 	};
 
+	// Image press handler
 	const handleImagePress = (uri: string) => {
 		setSelectedImageUri(uri);
 		setImageViewVisible(true);
 	};
 
+	// Toggle comments modal
 	const toggleCommentsModal = (post?: Post) => {
 		setSelectedPost(post || null);
 		setCommentsModalVisible(!commentsModalVisible);
 	};
 
-
+	// Add comment handler
 	const onAddComment = (postId: string, newComment: Comment) => {
 		const updatedPosts = posts.map(post => {
 			if (post.id === postId) {
@@ -125,12 +132,13 @@ const HomeScreen = () => {
 			return post;
 		});
 		setPosts(updatedPosts);
+		setSelectedPost(updatedPosts.find(p => p.id === postId) || null); // Update selected post to immediately reflect new comment in the modal
 	};
 
+	// Start editing post
 	const startEditingPost = (postId: string) => {
 		const postToEdit = posts.find(post => post.id === postId);
 		if (postToEdit) {
-			console.log("Editing post:", postToEdit);
 			setPostText(postToEdit.text);
 			setPostImages(postToEdit.image);
 			setPostPdfs(postToEdit.pdfs);
@@ -141,18 +149,14 @@ const HomeScreen = () => {
 		}
 	};
 
+	// Remove image from post
 	const removeImage = (uri: string) => {
-		setPostImages(currentImages => {
-			const updatedImages = currentImages.filter(image => image !== uri);
-			console.log("Images after removal:", updatedImages);
-			return updatedImages;
-		});
+		setPostImages(currentImages => currentImages.filter(image => image !== uri));
 	};
 
-
+	// Submit post handler
 	const handleSubmit = () => {
 		setError("");
-
 		if (postText || postImages.length || postPdfs.length) {
 			if (isEditing && editingPostId) {
 				setPosts(prevPosts =>
@@ -185,35 +189,7 @@ const HomeScreen = () => {
 		}
 	};
 
-
-	const panResponder = PanResponder.create({
-		onStartShouldSetPanResponder: () => true,
-		onMoveShouldSetPanResponder: () => true,
-		onPanResponderMove: Animated.event([null, {
-			dy: modalY,
-		}], { useNativeDriver: false }),
-		onPanResponderRelease: (e, gestureState) => {
-			if (gestureState.dy > 100) {
-				toggleCommentsModal();
-			} else {
-				Animated.spring(modalY, {
-					toValue: 0,
-					useNativeDriver: true,
-				}).start();
-			}
-		},
-	});
-
-	const modalStyle = {
-		transform: [{
-			translateY: modalY.interpolate({
-				inputRange: [0, 100],
-				outputRange: [0, 100],
-				extrapolate: 'clamp',
-			})
-		}]
-	};
-
+	// Check names function
 	function checkNames(firstName: string | null, lastName: string | null) {
 		if (firstName === null && lastName === null) {
 			return "Community Forum";
@@ -226,6 +202,7 @@ const HomeScreen = () => {
 		}
 	}
 
+	// Add reply to comment
 	const onAddReply = (postId: string, commentId: string, newReply: Comment) => {
 		setPosts(currentPosts => currentPosts.map(post => {
 			if (post.id === postId) {
@@ -234,6 +211,8 @@ const HomeScreen = () => {
 			return post;
 		}));
 	};
+
+	// Helper function to recursively add replies to comments
 	function addReplyToComments(comments: Comment[], targetCommentId: string, reply: Comment): Comment[] {
 		return comments.map(comment => {
 			if (comment.id === targetCommentId) {
@@ -245,7 +224,7 @@ const HomeScreen = () => {
 		});
 	}
 
-
+	// Delete post handler
 	const deletePost = (postId: string) => {
 		Alert.alert(
 			"Delete Post",
@@ -261,154 +240,153 @@ const HomeScreen = () => {
 		);
 	};
 
-
 	return (
-	<View style={styles.flexContainer}>
-		<KeyboardAwareFlatList
-			data={posts}
-			keyExtractor={(item) => item.id}
-			renderItem={({ item }) => (
-				<View style={styles.post}>
-					<View style={styles.headerRow}>
-						<Image source={{ uri: 'https://wallpapercave.com/wp/wp4008083.jpg' }} style={styles.avatar} />
-						<View style={styles.headerTextContainer}>
-							<Text style={styles.userName}>{checkNames(firstName, lastName)}</Text>
-							<Text style={styles.timestamp}>
-								{new Date(item.timestamp).toLocaleDateString()} at {new Date(item.timestamp).toLocaleTimeString()}
-							</Text>
+		<View style={styles.flexContainer}>
+			<KeyboardAwareFlatList
+				data={posts}
+				keyExtractor={(item) => item.id}
+				renderItem={({ item }) => (
+					<View style={styles.post}>
+						<View style={styles.headerRow}>
+							<Image source={{ uri: 'https://wallpapercave.com/wp/wp4008083.jpg' }} style={styles.avatar} />
+							<View style={styles.headerTextContainer}>
+								<Text style={styles.userName}>{checkNames(firstName, lastName)}</Text>
+								<Text style={styles.timestamp}>
+									{new Date(item.timestamp).toLocaleDateString()} at {new Date(item.timestamp).toLocaleTimeString()}
+								</Text>
+							</View>
 						</View>
-					</View>
-					{item.text && <Text style={styles.postText}>{item.text}</Text>}
-					{item.image.length > 0 && (
-						<FlatList
-							data={item.image}
-							renderItem={({ item: uri }) => (
-								<TouchableOpacity onPress={() => handleImagePress(uri)}>
-									<Image source={{ uri }} style={styles.fullWidthImage} />
-								</TouchableOpacity>
-							)}
-							horizontal
-							pagingEnabled={true}
-							showsHorizontalScrollIndicator={false}
-							snapToAlignment="center"
-							snapToInterval={Dimensions.get('window').width}
-						/>
-					)}
-					{item.pdfs.map((pdf: PdfFile, index: number) => (
-						<View key={index} style={styles.pdfItem}>
-							<TouchableOpacity onPress={() => handleOpenPdf(pdf.uri)}>
-								<MaterialIcons name="picture-as-pdf" size={24} color="red" />
-								<Text style={styles.pdfName}>{pdf.name}</Text>
-							</TouchableOpacity>
-						</View>
-					))}
-					<TouchableOpacity onPress={() => toggleCommentsModal(item)} style={styles.commentButton}>
-						<LikeButton/>
-						<MaterialIcons name="comment" size={24} color="#007AFF" />
-						<Text style={{ color: '#007AFF', marginLeft: 4 }}>{item.comments.length}</Text>
-					</TouchableOpacity>
-					<TouchableOpacity
-						onPress={() => setVisibleDropdown(visibleDropdown === item.id ? null : item.id)}
-						style={styles.dropdownIcon}
-					>
-						<Text>...</Text>
-					</TouchableOpacity>
-					{visibleDropdown === item.id && (
-						<View style={styles.dropdownMenu}>
-							<TouchableOpacity  onPress={() => startEditingPost(item.id)}>
-								<Text style={styles.dropdownItem}>Edit</Text>
-							</TouchableOpacity>
-							<TouchableOpacity onPress={() => deletePost(item.id)}>
-								<Text style={styles.dropdownItems}>Delete</Text>
-							</TouchableOpacity>
-						</View>
-					)}
-				</View>
-			)}
-			ListHeaderComponent={
-				<>
-                 <Weather/>
-					<TouchableOpacity style={styles.postBox} onPress={() => setIsPosting(true)}>
-						<View style={styles.postBoxInner}>
-							<Text style={styles.postBoxText}>What's on your mind?</Text>
-						</View>
-					</TouchableOpacity>
-					{isPosting && (
-						<View style={styles.inputContainer}>
-							<TextInput
-								style={styles.input}
-								placeholder="Describe here the details of your post"
-								value={postText}
-								onChangeText={setPostText}
-								multiline
-								numberOfLines={4}
+						{item.text && <Text style={styles.postText}>{item.text}</Text>}
+						{item.image.length > 0 && (
+							<FlatList
+								data={item.image}
+								renderItem={({ item: uri }) => (
+									<TouchableOpacity onPress={() => handleImagePress(uri)}>
+										<Image source={{ uri }} style={styles.fullWidthImage} />
+									</TouchableOpacity>
+								)}
+								horizontal
+								pagingEnabled={true}
+								showsHorizontalScrollIndicator={false}
+								snapToAlignment="center"
+								snapToInterval={Dimensions.get('window').width}
 							/>
-							<View style={styles.iconsContainer}>
-								<TouchableOpacity onPress={pickImage}>
-									<Text>🖼️</Text>
+						)}
+						{item.pdfs.map((pdf: PdfFile, index: number) => (
+							<View key={index} style={styles.pdfItem}>
+								<TouchableOpacity onPress={() => handleOpenPdf(pdf.uri)}>
+									<MaterialIcons name="picture-as-pdf" size={24} color="red" />
+									<Text style={styles.pdfName}>{pdf.name}</Text>
 								</TouchableOpacity>
+							</View>
+						))}
+						<TouchableOpacity onPress={() => toggleCommentsModal(item)} style={styles.commentButton}>
+							<LikeButton />
+							<MaterialIcons name="comment" size={24} color="#007AFF" />
+							<Text style={{ color: '#007AFF', marginLeft: 4 }}>{item.comments.length}</Text>
+						</TouchableOpacity>
+						<TouchableOpacity
+							onPress={() => setVisibleDropdown(visibleDropdown === item.id ? null : item.id)}
+							style={styles.dropdownIcon}
+						>
+							<Text>...</Text>
+						</TouchableOpacity>
+						{visibleDropdown === item.id && (
+							<View style={styles.dropdownMenu}>
+								<TouchableOpacity onPress={() => startEditingPost(item.id)}>
+									<Text style={styles.dropdownItem}>Edit</Text>
+								</TouchableOpacity>
+								<TouchableOpacity onPress={() => deletePost(item.id)}>
+									<Text style={styles.dropdownItem}>Delete</Text>
+								</TouchableOpacity>
+							</View>
+						)}
+					</View>
+				)}
+				ListHeaderComponent={
+					<>
+						<Weather />
+						<TouchableOpacity style={styles.postBox} onPress={() => setIsPosting(true)}>
+							<View style={styles.postBoxInner}>
+								<Text style={styles.postBoxText}>What's on your mind?</Text>
+							</View>
+						</TouchableOpacity>
+						{isPosting && (
+							<View style={styles.inputContainer}>
+								<TextInput
+									style={styles.input}
+									placeholder="Describe here the details of your post"
+									value={postText}
+									onChangeText={setPostText}
+									multiline
+									numberOfLines={4}
+								/>
+								<View style={styles.iconsContainer}>
+									<TouchableOpacity onPress={pickImage}>
+										<Text>🖼️</Text>
+									</TouchableOpacity>
+									{postImages.map((uri, index) => (
+										<View key={index}>
+											<Text>Image {index + 1}</Text>
+										</View>
+									))}
+									<TouchableOpacity onPress={pickPdf}>
+										<Text>📄</Text>
+									</TouchableOpacity>
+									{postPdfs.map((pdf, index) => (
+										<View key={index}>
+											<Text>PDF {index + 1}: {pdf.name}</Text>
+										</View>
+									))}
+								</View>
 								{postImages.map((uri, index) => (
 									<View key={index}>
-										<Text>Image {index + 1}</Text>
+										<Image source={{ uri }} style={styles.previewImage} />
+										<TouchableOpacity onPress={() => removeImage(uri)}>
+											<Text style={styles.removeImageText}>Remove</Text>
+										</TouchableOpacity>
 									</View>
 								))}
-								<TouchableOpacity onPress={pickPdf}>
-									<Text>📄</Text>
+								<TouchableOpacity style={styles.postButton} onPress={handleSubmit}>
+									<Text style={styles.postButtonText}>POST</Text>
 								</TouchableOpacity>
-								{postPdfs.map((pdf, index) => (
-									<View key={index}>
-										<Text>PDF {index + 1}: {pdf.name}</Text>
-									</View>
-								))}
+								{error ? <Text style={styles.errorText}>{error}</Text> : null}
 							</View>
-							{postImages.map((uri, index) => (
-								<View key={index}>
-									<Image source={{ uri }} style={styles.previewImage} />
-									<TouchableOpacity onPress={() => removeImage(uri)}>
-										<Text style={styles.removeImageText}>Remove</Text>
-									</TouchableOpacity>
-								</View>
-							))}
-							<TouchableOpacity style={styles.postButton} onPress={handleSubmit}>
-								<Text style={styles.postButtonText}>POST</Text>
-							</TouchableOpacity>
-							{error ? <Text style={styles.errorText}>{error}</Text> : null}
-						</View>
-					)}
-				</>
-			}
-			showsVerticalScrollIndicator={false}
-		/>
-		  <Modal
-			animationType="slide"
-			transparent={true}
-			visible={isImageViewVisible}
-			onRequestClose={() => {
-				setImageViewVisible(!isImageViewVisible);
-			}}>
-			<View style={styles.centeredView}>
-				<TouchableOpacity
-					style={styles.closeButton}
-					onPress={() => setImageViewVisible(false)}>
-					<Text style={styles.closeButtonText}>X</Text>
-				</TouchableOpacity>
-				<Image source={{ uri: selectedImageUri }} style={styles.fullScreenImage} />
-			</View>
-		  </Modal>
-		<Modal
-			visible={commentsModalVisible}
-			animationType="slide"
-			transparent={true}
-			onRequestClose={() => toggleCommentsModal()}
-			style={styles.modalContainer}
-		>
-			<View style={styles.centeredView}>
-				<View style={styles.modalView}>
+						)}
+					</>
+				}
+				showsVerticalScrollIndicator={false}
+			/>
+			<Modal
+				animationType="slide"
+				transparent={true}
+				visible={isImageViewVisible}
+				onRequestClose={() => {
+					setImageViewVisible(!isImageViewVisible);
+				}}>
+				<View style={styles.centeredView}>
 					<TouchableOpacity
 						style={styles.closeButton}
-						onPress={() => toggleCommentsModal()}>
+						onPress={() => setImageViewVisible(false)}>
 						<Text style={styles.closeButtonText}>X</Text>
 					</TouchableOpacity>
+					<Image source={{ uri: selectedImageUri }} style={styles.fullScreenImage} />
+				</View>
+			</Modal>
+			<Modal
+				visible={commentsModalVisible}
+				animationType="slide"
+				transparent={true}
+				onRequestClose={() => toggleCommentsModal()}
+				style={styles.modalContainer}
+			>
+				<View style={styles.centeredView}>
+					<View style={styles.modalView}>
+						<TouchableOpacity
+							style={styles.closeButton}
+							onPress={() => toggleCommentsModal()}>
+							<Text style={styles.closeButtonText}>X</Text>
+						</TouchableOpacity>
 						{selectedPost && (
 							<Comments
 								comments={selectedPost.comments}
@@ -417,10 +395,10 @@ const HomeScreen = () => {
 								onAddReply={onAddReply}
 							/>
 						)}
+					</View>
 				</View>
-			</View>
-		</Modal>
-   	</View>
+			</Modal>
+		</View>
 	);
 };
 
