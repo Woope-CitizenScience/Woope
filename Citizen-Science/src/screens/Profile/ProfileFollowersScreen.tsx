@@ -2,7 +2,6 @@ import {
 	View,
 	StyleSheet,
 	FlatList,
-	TextInput,
 	Text,
 	Pressable,
 	ActivityIndicator,
@@ -16,7 +15,7 @@ import {
 } from "react-native-responsive-dimensions";
 import React, { useCallback, useState } from "react";
 import Icon from "react-native-vector-icons/MaterialIcons";
-import { getFollowers } from "../api/community";
+import { getFollowers } from "../../api/community";
 import { useFocusEffect } from "@react-navigation/native";
 
 interface ProfileFollowersScreenProps {
@@ -34,14 +33,19 @@ const ProfileFollowersScreen: React.FC<ProfileFollowersScreenProps> = ({
 	const [searchResults, setSearchResults] = useState([]);
 	const [renderSearch, setRenderSearch] = useState(false);
 
+	{
+		/* Pushes a profile to the current screen stack takes a number to specify the profile */
+	}
 	const navigateToProfile = (user_id: number) => {
 		navigation.push("ProfileScreen", { userID: user_id });
 	};
 
+	{
+		/* Calls the getFollowers api which will return a list of users that follow the profile */
+	}
 	const fetchFollowers = useCallback(() => {
 		getFollowers(userID)
 			.then((data) => {
-				console.log(data);
 				if (!data) {
 					setRenderSearch(false);
 					setFullyLoaded(true);
@@ -56,6 +60,10 @@ const ProfileFollowersScreen: React.FC<ProfileFollowersScreenProps> = ({
 				console.error("Error: ", error);
 			});
 	}, [userID]);
+
+	{
+		/* Reload list upon each focus of screen */
+	}
 	useFocusEffect(fetchFollowers);
 
 	if (!fullyLoaded) {
@@ -72,6 +80,7 @@ const ProfileFollowersScreen: React.FC<ProfileFollowersScreenProps> = ({
 	}
 	return (
 		<View style={styles.container}>
+			{/* Screen title and back button */}
 			<View
 				style={{
 					height: responsiveHeight(5),
@@ -108,6 +117,7 @@ const ProfileFollowersScreen: React.FC<ProfileFollowersScreenProps> = ({
 					Followers
 				</Text>
 			</View>
+			{/* List of followers */}
 			<View style={{}}>
 				{renderSearch && (
 					<FlatList

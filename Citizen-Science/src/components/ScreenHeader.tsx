@@ -36,8 +36,8 @@ const ScreenHeader: React.FC<ScreenHeaderProps> = ({ title, navigation }) => {
 					}}
 					iconSize={responsiveHeight(4.5)}
 					iconColor={"black"}
-					paddingVertical={3}
-					paddingHorizontal={3}
+					paddingVertical={responsiveHeight(1)}
+					paddingHorizontal={responsiveHeight(1)}
 				></IconButton>
 
 				<IconButton
@@ -45,8 +45,8 @@ const ScreenHeader: React.FC<ScreenHeaderProps> = ({ title, navigation }) => {
 					onPress={function (): void {}}
 					iconSize={responsiveHeight(4.5)}
 					iconColor={"black"}
-					paddingVertical={3}
-					paddingHorizontal={3}
+					paddingVertical={responsiveHeight(1)}
+					paddingHorizontal={responsiveHeight(1)}
 				/>
 
 				{/* Maybe Add title */}

@@ -18,10 +18,10 @@ import {
 	followProfile,
 	getProfile,
 	unfollowProfile,
-} from "../api/community";
+} from "../../api/community";
 import { jwtDecode } from "jwt-decode";
-import { AccessToken } from "../util/token";
-import { AuthContext } from "../util/AuthContext";
+import { AccessToken } from "../../util/token";
+import { AuthContext } from "../../util/AuthContext";
 import { useFocusEffect } from "@react-navigation/native";
 
 interface ProfileScreenProps {
@@ -47,11 +47,14 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ route, navigation }) => {
 	const [followerCount, setFollowerCount] = useState("");
 	const [followingCount, setFollowingCount] = useState("");
 
+	{
+		/* Loads profile */
+	}
 	const fetchProfile = useCallback(() => {
 		setFullyLoaded(false);
 		if (userID === currentUserID) {
 			setProfileOwner(true);
-		}else {
+		} else {
 			setProfileOwner(false);
 		}
 		getProfile(userID)
@@ -66,6 +69,9 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ route, navigation }) => {
 			.catch((error) => {
 				console.error("Error: ", error);
 			});
+		{
+			/* Un-needed api calls if looking at own profile */
+		}
 		if (!profileOwner) {
 			checkFollowStatus(userID, userToken)
 				.then((data) => {
@@ -83,8 +89,12 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ route, navigation }) => {
 		}
 	}, [userID, currentUserID]);
 
+	{
+		/* Reload profile upon focusing screen */
+	}
 	useFocusEffect(fetchProfile);
 
+	{/* Call followProfile api and client side update screen */}
 	const handleFollowProfile = async () => {
 		try {
 			if (!following) {
@@ -96,6 +106,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ route, navigation }) => {
 		}
 	};
 
+	{/* Call unfollowProfile api and client side update screen */}
 	const handleUnfollowProfile = async () => {
 		try {
 			if (following) {
@@ -154,6 +165,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ route, navigation }) => {
 									backgroundColor: "lightblue",
 								}}
 							></View>
+							{/* Posts, Followers, Following */}
 							<View style={styles.attributes}>
 								<TouchableOpacity
 									onPress={void 0}
@@ -177,7 +189,8 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ route, navigation }) => {
 									onPress={() =>
 										navigation.navigate("ProfileFollowingScreen", {
 											userID: userID,
-										})}
+										})
+									}
 									style={styles.textAttributes}
 								>
 									<Text style={styles.textUserInfo}>{"Following "}</Text>
@@ -185,6 +198,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ route, navigation }) => {
 								</TouchableOpacity>
 							</View>
 						</View>
+						{/* Name */}
 						<Text
 							style={{
 								fontSize: responsiveFontSize(1.8),

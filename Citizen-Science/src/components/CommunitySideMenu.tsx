@@ -83,7 +83,6 @@ function CommunitySideMenu() {
 				}}
 				drawerContent={(props) => <CustomDrawerSideMenu {...props} />}
 			>
-				{/*place holder	*/}
 				<Drawer.Screen name="Community Home" component={HomeScreen} />
 				<Drawer.Screen
 					name="Profile"

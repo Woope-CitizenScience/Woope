@@ -1,3 +1,10 @@
+/**
+	Updates the name of a user
+	@param user_id Unique identifier of the user
+	@param firstName First name of user
+	@param lastName Last name of user
+	@param accessToken The access token for authentication 
+*/
 export const updateName = async (
 	user_id: number,
 	firstName: string,
@@ -24,6 +31,10 @@ export const updateName = async (
 	return await response.json();
 };
 
+/**
+	Returns the profile content of a user
+	@param user_id Unique identifier of the user
+*/
 export const getProfile = async (user_id: number) => {
 	try {
 		const response = await fetch(
@@ -42,6 +53,10 @@ export const getProfile = async (user_id: number) => {
 	}
 };
 
+/**
+	Returns a list of followers of a user
+	@param user_id Unique identifier of the user
+*/
 export const getFollowers = async (user_id: number) => {
 	try {
 		const response = await fetch(
@@ -64,6 +79,10 @@ export const getFollowers = async (user_id: number) => {
 	}
 };
 
+/**
+	Returns a list of users that the specified user follows
+	@param user_id Unique identifier of the user
+*/
 export const getFollowing = async (user_id: number) => {
 	try {
 		const response = await fetch(
@@ -86,6 +105,11 @@ export const getFollowing = async (user_id: number) => {
 	}
 };
 
+/**
+	Attempts to follow the specified user
+	@param user_id Unique identifier of the user to be followed
+	@param accessToken The access token for authentication
+*/
 export const followProfile = async (user_id: number, accessToken: any) => {
 	const response = await fetch(
 		`${process.env.EXPO_PUBLIC_API_URL}/community/follow-request`,
@@ -107,6 +131,11 @@ export const followProfile = async (user_id: number, accessToken: any) => {
 	return await response.json();
 };
 
+/**
+	Attempts to follow the specified user
+	@param user_id Unique identifier of the user to be unfollowed
+	@param accessToken The access token for authentication
+*/
 export const unfollowProfile = async (user_id: number, accessToken: any) => {
 	const response = await fetch(
 		`${process.env.EXPO_PUBLIC_API_URL}/community/un-follow-request`,
@@ -128,6 +157,11 @@ export const unfollowProfile = async (user_id: number, accessToken: any) => {
 	return await response.json();
 };
 
+/**
+	Check the follow status between the specified user and accessing user
+	@param user_id Unique identifier of the user
+	@param accessToken The access token for authentication
+*/
 export const checkFollowStatus = async (user_id: number, accessToken: any) => {
 	try {
 		const response = await fetch(
@@ -150,6 +184,10 @@ export const checkFollowStatus = async (user_id: number, accessToken: any) => {
 	}
 };
 
+/**
+	Attempts to search for specified name
+	@param name Search term
+*/
 export const searchProfile = async (name: string) => {
 	try {
 		const response = await fetch(
