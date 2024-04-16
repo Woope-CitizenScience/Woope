@@ -35,7 +35,7 @@ const ProfileFollowersScreen: React.FC<ProfileFollowersScreenProps> = ({
 	const [renderSearch, setRenderSearch] = useState(false);
 
 	const navigateToProfile = (user_id: number) => {
-		navigation.navigate("ProfileScreen", { userID: user_id });
+		navigation.push("ProfileScreen", { userID: user_id });
 	};
 
 	const fetchFollowers = useCallback(() => {

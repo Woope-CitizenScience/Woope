@@ -48,8 +48,11 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ route, navigation }) => {
 	const [followingCount, setFollowingCount] = useState("");
 
 	const fetchProfile = useCallback(() => {
+		setFullyLoaded(false);
 		if (userID === currentUserID) {
 			setProfileOwner(true);
+		}else {
+			setProfileOwner(false);
 		}
 		getProfile(userID)
 			.then((data) => {
