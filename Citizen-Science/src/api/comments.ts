@@ -1,15 +1,15 @@
 import { fetchAPI } from "./fetch";
 
 export const getComments = async (post_id: number) => {
-    return fetchAPI(`/comments/post_id=${post_id}`, 'GET');
+    return fetchAPI(`/comments/${post_id}`, 'GET');
 };
 
 export const deleteComment = async (comment_id: number) => {
     return fetchAPI(`/comments/${comment_id}`, 'DELETE');
 }
 
-export const createComment = async (content: string, user_id: number, post_id: number, parent_comment_id: number = NaN) => {
-    return fetchAPI(`/comments`, 'POST', { content, user_id, post_id, parent_comment_id});
+export const createComment = async (content: string, user_id: number, post_id: number) => {
+    return fetchAPI(`/comments`, 'POST', { content, user_id, post_id});
 }
 
 export const updateComment = async (comment_id: number, content: string) => {

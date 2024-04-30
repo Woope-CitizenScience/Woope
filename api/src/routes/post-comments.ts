@@ -11,9 +11,9 @@ import {
 const router = express.Router();
 
 // Get comments for post ID
-router.get('/:id', async (req: express.Request, res: express.Response) => {
+router.get('/:post_id', async (req: express.Request, res: express.Response) => {
     try {
-        const comments = await getComments(Number(req.params.id));
+        const comments = await getComments(Number(req.params.post_id));
         res.status(200).json(comments);
     } catch (error) {
         if (error instanceof Error) {
@@ -27,8 +27,9 @@ router.get('/:id', async (req: express.Request, res: express.Response) => {
 // Create a new comment
 router.post('/', async (req: express.Request, res: express.Response) => {
     try {
-        const { content, user_id, post_id, parent_id } = req.body;
-        const newComment = await createComment(content, user_id, post_id, parent_id);
+        const { content, user_id, post_id } = req.body;
+        const newComment = await createComment(content, user_id, post_id);
+        console.log(newComment);
         res.status(201).json(newComment);
     } catch (error) {
         if (error instanceof Error) {

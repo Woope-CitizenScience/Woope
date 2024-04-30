@@ -26,12 +26,13 @@ export type PostWithUsername = {
 
 export type Comment = {
 	comment_id: number;
-	post_id: number;
-	parent_comment_id: number;
-	user_id: number;
 	content: string;
-	timestamp: number;
+	created_at: Date;
+	deleted_at: Date;
 	is_active: boolean;
-	deleted_at: number;
 	likes_count: number;
+	parent_comment_id: number;
+	post_id: number;
+	user_id: number;
+	username: string;
 };
