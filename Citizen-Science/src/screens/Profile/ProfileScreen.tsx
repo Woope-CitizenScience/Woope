@@ -12,12 +12,12 @@ import {
 	responsiveWidth,
 } from "react-native-responsive-dimensions";
 import React, { useCallback, useContext, useEffect, useState } from "react";
-import { getProfile } from "../api/community";
-import IconButton from "../components/IconButton";
+import { getProfile } from "../../api/community";
+import IconButton from "../../components/IconButton";
 
 import { jwtDecode } from "jwt-decode";
-import { AccessToken } from "../util/token";
-import { AuthContext } from "../util/AuthContext";
+import { AccessToken } from "../../util/token";
+import { AuthContext } from "../../util/AuthContext";
 import { useFocusEffect } from "@react-navigation/native";
 
 interface ProfileScreenProps {

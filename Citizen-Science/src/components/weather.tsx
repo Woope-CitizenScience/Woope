@@ -26,7 +26,7 @@ const Weather: React.FC = () => {
     useEffect(() => {
         const fetchWeatherData = async () => {
             try {
-                const response = await axios.get<WeatherData[]>('http://192.168.1.169:3000/weather/forecast');
+                const response = await axios.get<WeatherData[]>(`${process.env.EXPO_PUBLIC_API_URL}/weather/forecast`);
                 const sevenDayForecast = response.data.slice(0, 7);
                 setWeatherData(sevenDayForecast);
             } catch (err) {
@@ -124,8 +124,3 @@ const styles = StyleSheet.create({
     },
 });
 export default Weather;
-
-
-
-
-

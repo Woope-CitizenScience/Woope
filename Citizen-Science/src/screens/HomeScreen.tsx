@@ -13,7 +13,7 @@ import * as Sharing from 'expo-sharing';
 import Comments from '../components/Comments';
 import LikeButton from '../components/LikeButton';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-
+import Weather from '../components/Weather';
 import { createPost,getAllPosts, updatePost, deletePost, likePost, unlikePost, getPostLikes, getUserLikedPosts } from '../api/posts';
 import { createComment, deleteComment, updateComment, likeComment, unlikeComment, getComments } from '../api/comments';
 import { PdfFile, Post, Comment, PostWithUsername } from '../api/types';
@@ -56,7 +56,6 @@ const HomeScreen = () => {
 			const commentsMap: CommentsMap = {};
 			for (const post of posts) {
 				const postComments = await getComments(post.post_id);
-				console.log(postComments);
 				commentsMap[post.post_id] = postComments;
 			}
 			setCommentsMap(commentsMap);
@@ -357,6 +356,7 @@ const HomeScreen = () => {
 			)}
 			ListHeaderComponent={
 				<>
+				<Weather/>
 					<TouchableOpacity style={styles.postBox} onPress={() => setIsPosting(true)}>
 						<View style={styles.postBoxInner}>
 							<Text style={styles.postBoxText}>What's on your mind?</Text>

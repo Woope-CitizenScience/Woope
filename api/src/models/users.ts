@@ -85,7 +85,6 @@ export const createUser = async (email: string, phoneNumber: string, hashedPassw
 	if (!email && !phoneNumber) {
 		throw new Error("Either an email or a phone number is required.");
 	}
-
 	try {
 		await pool.query('BEGIN');
 		let query;
@@ -165,7 +164,7 @@ export const getUserFullNameByID = async (userId: string) => {
 		}
 		const userINFO = result.rows[0];
 		return userINFO;
-		
+
 	} catch (error) {
 		throw new Error("Error getting user's name " + (error as Error).message);
 	}
