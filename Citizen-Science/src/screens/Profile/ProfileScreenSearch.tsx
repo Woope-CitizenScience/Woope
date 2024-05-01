@@ -6,6 +6,7 @@ import {
 	Text,
 	Pressable,
 } from "react-native";
+import { useEffect, useMemo } from "react";
 import {
 	responsiveFontSize,
 	responsiveHeight,
@@ -13,7 +14,7 @@ import {
 } from "react-native-responsive-dimensions";
 import React, { useState } from "react";
 import Icon from "react-native-vector-icons/MaterialIcons";
-import { searchProfile } from "../api/community";
+import { searchProfile } from "../../api/community";
 
 interface ProfileSearchScreenProps {
 	route: any;
@@ -31,19 +32,13 @@ const ProfileSearchScreen: React.FC<ProfileSearchScreenProps> = ({
 	const [searchResults, setSearchResults] = useState([]);
 	const [renderSearch, setRenderSearch] = useState(false);
 
-	{
-		/* Navigates to the searched profile */
-	}
 	const navigateToProfile = (user_id: number) => {
-		navigation.navigate("ProfileScreenSearchNav", {
+		navigation.navigate("ProfilePage", {
 			screen: "ProfileScreen",
 			params: { userID: user_id },
 		});
 	};
 
-	{
-		/* Calls the searchProfile api and handles rendering of results */
-	}
 	const handleSearch = async (text: string) => {
 		if (text.length < 1) {
 			setRenderSearch(false);
@@ -55,6 +50,7 @@ const ProfileSearchScreen: React.FC<ProfileSearchScreenProps> = ({
 			if (!users) {
 				setRenderSearch(false);
 			} else {
+				console.log(users);
 				setSearchResults(users);
 				setRenderSearch(true);
 			}
@@ -63,16 +59,12 @@ const ProfileSearchScreen: React.FC<ProfileSearchScreenProps> = ({
 		}
 	};
 
-	{
-		/* Will attempt search on each keypress */
-	}
 	const handleTextChange = (text: string) => {
 		setSearchName((prevState) => ({ ...prevState, textString: text }));
 		handleSearch(text);
 	};
 	return (
 		<View style={styles.container}>
-			{/* Search bar */}
 			<View
 				style={[
 					{
@@ -114,7 +106,6 @@ const ProfileSearchScreen: React.FC<ProfileSearchScreenProps> = ({
 					></TextInput>
 				</View>
 			</View>
-			{/* List of matching users */}
 			<View style={{}}>
 				{renderSearch && (
 					<FlatList
@@ -160,7 +151,7 @@ const ProfileSearchScreen: React.FC<ProfileSearchScreenProps> = ({
 										<View
 											style={{
 												maxWidth: responsiveWidth(80),
-												backgroundColor: "transparent",
+												backgroundColor: "white",
 												flexDirection: "column",
 											}}
 										>

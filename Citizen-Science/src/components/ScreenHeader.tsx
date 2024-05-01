@@ -17,6 +17,63 @@ interface ScreenHeaderProps {
 }
 
 const ScreenHeader: React.FC<ScreenHeaderProps> = ({ title, navigation }) => {
+	const { userToken } = useContext(AuthContext);
+	const decodedToken = userToken ? jwtDecode<AccessToken>(userToken) : null;
+	const firstName = decodedToken ? decodedToken.firstName : null;
+	const lastName = decodedToken ? decodedToken.lastName : null;
+
+	function checkNames(firstName: string | null, lastName: string | null) {
+		if (firstName === null && lastName === null) {
+			return "Community Forum";
+		} else if (firstName === null) {
+			return "" + lastName;
+		} else if (lastName === null) {
+			return "" + firstName;
+		} else {
+			return firstName + " " + lastName;
+		}
+	}
+
+	function WelcomeFadeAway() {
+		const [shouldRender, setShouldRender] = useState(true);
+		const position = useRef(new Animated.Value(0)).current;
+
+		{
+			/* Make this persit screen change or refresh */
+		}
+		useEffect(() => {
+			const timer = setTimeout(() => {
+				Animated.timing(position, {
+					toValue: responsiveHeight(-10),
+					duration: 600,
+					useNativeDriver: true,
+				}).start(() => {
+					LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+					setShouldRender(false);
+				});
+			}, 3500);
+			return () => clearTimeout(timer);
+		}, []);
+
+		const opacity = position.interpolate({
+			inputRange: [responsiveHeight(-5), 1],
+			outputRange: [0, 1],
+			extrapolate: "clamp",
+		});
+
+		if (!shouldRender) {
+			return null;
+		}
+
+		return (
+			<Animated.View
+				style={[{ zIndex: 1, transform: [{ translateY: position }], opacity }]}
+			>
+				<WelcomeBanner username={checkNames(firstName, lastName)} />
+			</Animated.View>
+		);
+	}
+
 	return (
 		<SafeAreaView>
 			<View
@@ -51,7 +108,7 @@ const ScreenHeader: React.FC<ScreenHeaderProps> = ({ title, navigation }) => {
 
 				{/* Maybe Add title */}
 			</View>
-			<WelcomeBanner/>
+			<WelcomeFadeAway />
 		</SafeAreaView>
 	);
 };

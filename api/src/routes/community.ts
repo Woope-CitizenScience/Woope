@@ -109,7 +109,6 @@ router.post(
 	}
 );
 
-
 router.get(
 	"/get-follow-status/:user_id/:accessToken",
 	async (req: express.Request, res: express.Response) => {
@@ -122,6 +121,7 @@ router.get(
 
 			const decodedToken = jwt.verify(accessToken, config.accessTokenSecret);
 
+
 			if (typeof decodedToken === "object" && "user_id" in decodedToken) {
 				parsed_user_id = decodedToken.user_id;
 			} else {
@@ -129,7 +129,6 @@ router.get(
 			}
 
 			const followStatus = await checkFollowExists(parsed_user_id, user_id);
-			
 
 			res.json({followStatus});
 		} catch (error) {
@@ -154,7 +153,6 @@ router.get(
 			if (!user) {
 				return res.status(404).json("No followers found");
 			}
-
 			res.json(user);
 		} catch (error) {
 			return res.status(500).json(`Error: ${(error as Error).message}`);
@@ -174,7 +172,6 @@ router.get(
 			if (!user) {
 				return res.status(404).json("No followers found");
 			}
-
 			res.json(user);
 		} catch (error) {
 			return res.status(500).json(`Error: ${(error as Error).message}`);
@@ -197,7 +194,6 @@ router.get(
 			const followerCount = await getFollowerCount(user_id);
 			const followingCount = await getFollowingCount(user_id);
 
-
 			res.json({user, followerCount, followingCount});
 		} catch (error) {
 			return res.status(500).json(`Error: ${(error as Error).message}`);
@@ -218,13 +214,11 @@ router.get(
 			if (!users) {
 				return res.status(404).json("No users found");
 			}
-
 			res.json(users);
 		} catch (error) {
 			return res.status(500).json(`Error Router: ${(error as Error).message}`);
 		}
 	}
 );
-
 
 module.exports = router;

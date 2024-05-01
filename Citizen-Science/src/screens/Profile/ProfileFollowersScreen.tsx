@@ -2,123 +2,135 @@ import {
 	View,
 	StyleSheet,
 	FlatList,
-	TextInput,
 	Text,
 	Pressable,
+	ActivityIndicator,
+	RefreshControl,
+	TouchableOpacity,
 } from "react-native";
 import {
 	responsiveFontSize,
 	responsiveHeight,
 	responsiveWidth,
 } from "react-native-responsive-dimensions";
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import Icon from "react-native-vector-icons/MaterialIcons";
-import { searchProfile } from "../api/community";
+import { getFollowers } from "../../api/community";
+import { useFocusEffect } from "@react-navigation/native";
 
-interface ProfileSearchScreenProps {
+interface ProfileFollowersScreenProps {
 	route: any;
 	navigation: any;
 }
 
-const ProfileSearchScreen: React.FC<ProfileSearchScreenProps> = ({
+const ProfileFollowersScreen: React.FC<ProfileFollowersScreenProps> = ({
 	route,
 	navigation,
 }) => {
-	const [searchName, setSearchName] = useState({
-		textString: "",
-	});
+	const { userID } = route.params;
 
+	const [fullyLoaded, setFullyLoaded] = useState(false);
 	const [searchResults, setSearchResults] = useState([]);
 	const [renderSearch, setRenderSearch] = useState(false);
 
 	{
-		/* Navigates to the searched profile */
+		/* Pushes a profile to the current screen stack takes a number to specify the profile */
 	}
 	const navigateToProfile = (user_id: number) => {
-		navigation.navigate("ProfileScreenSearchNav", {
-			screen: "ProfileScreen",
-			params: { userID: user_id },
-		});
+		navigation.push("ProfileScreen", { userID: user_id });
 	};
 
 	{
-		/* Calls the searchProfile api and handles rendering of results */
+		/* Calls the getFollowers api which will return a list of users that follow the profile */
 	}
-	const handleSearch = async (text: string) => {
-		if (text.length < 1) {
-			setRenderSearch(false);
-			return;
-		}
-
-		try {
-			const users = await searchProfile(text.replaceAll(" ", ""));
-			if (!users) {
-				setRenderSearch(false);
-			} else {
-				setSearchResults(users);
+	const fetchFollowers = useCallback(() => {
+		getFollowers(userID)
+			.then((data) => {
+				if (!data) {
+					setRenderSearch(false);
+					setFullyLoaded(true);
+				}
+				setSearchResults(data);
 				setRenderSearch(true);
-			}
-		} catch (error) {
-			console.error(error);
-		}
-	};
+				setFullyLoaded(true);
+			})
+			.catch((error) => {
+				setRenderSearch(false);
+				setFullyLoaded(false);
+				console.error("Error: ", error);
+			});
+	}, [userID]);
 
 	{
-		/* Will attempt search on each keypress */
+		/* Reload list upon each focus of screen */
 	}
-	const handleTextChange = (text: string) => {
-		setSearchName((prevState) => ({ ...prevState, textString: text }));
-		handleSearch(text);
-	};
+	useFocusEffect(fetchFollowers);
+
+	if (!fullyLoaded) {
+		return (
+			<View
+				style={{
+					alignContent: "flex-start",
+					paddingTop: responsiveHeight(10),
+				}}
+			>
+				<ActivityIndicator size={"large"} color={"lightblue"} />
+			</View>
+		);
+	}
 	return (
 		<View style={styles.container}>
-			{/* Search bar */}
+			{/* Screen title and back button */}
 			<View
-				style={[
-					{
-						flexDirection: "row",
-						alignItems: "center",
-						width: responsiveWidth(100),
-						backgroundColor: "transparent",
-						paddingLeft: responsiveWidth(5),
-						paddingTop: responsiveHeight(2),
-					},
-				]}
+				style={{
+					height: responsiveHeight(5),
+					width: responsiveWidth(100),
+					backgroundColor: "lightblue",
+					paddingStart: responsiveWidth(1),
+					flexDirection: "row",
+				}}
 			>
-				<View
+				<TouchableOpacity
 					style={{
-						width: responsiveWidth(90),
-						borderWidth: 1,
-						paddingHorizontal: 10,
-						borderRadius: 5,
-						backgroundColor: "lightgrey",
-						borderColor: "lightgrey",
-						flexDirection: "row",
+						height: responsiveHeight(4.5),
+						width: responsiveHeight(6),
+						justifyContent: "center",
 						alignItems: "center",
+						backgroundColor: "transparent",
+					}}
+					onPress={() => navigation.goBack()}
+				>
+					<Icon
+						size={responsiveHeight(4.2)}
+						color={"black"}
+						name={"arrow-back"}
+					></Icon>
+				</TouchableOpacity>
+				<Text
+					style={{
+						height: responsiveHeight(4.5),
+						fontSize: responsiveFontSize(3),
+						fontWeight: "bold",
+						paddingStart: responsiveWidth(1),
 					}}
 				>
-					<Icon name={"search"} size={responsiveWidth(5)} color={"grey"}></Icon>
-					<TextInput
-						style={[
-							{
-								width: responsiveWidth(80),
-								paddingHorizontal: responsiveWidth(1.5),
-								paddingVertical: responsiveHeight(0.5),
-								fontSize: responsiveFontSize(2),
-								textAlignVertical: "center",
-							},
-						]}
-						onChangeText={(text) => handleTextChange(text)}
-						placeholder="Search"
-						placeholderTextColor={"grey"}
-					></TextInput>
-				</View>
+					Followers
+				</Text>
 			</View>
-			{/* List of matching users */}
+			{/* List of followers */}
 			<View style={{}}>
 				{renderSearch && (
 					<FlatList
+						style={[{ width: responsiveWidth(100) }]}
 						data={searchResults}
+						showsVerticalScrollIndicator={false}
+						refreshControl={
+							<RefreshControl
+								refreshing={!fullyLoaded}
+								onRefresh={fetchFollowers}
+							/>
+						}
+						ListHeaderComponent={<></>}
 						renderItem={({ item }) => (
 							<>
 								<View
@@ -184,18 +196,18 @@ const ProfileSearchScreen: React.FC<ProfileSearchScreenProps> = ({
 												}
 											</Text>
 											{/* 
-												Next item will appear under of name.
-											*/}
+                                    Next item will appear under of name.
+                                */}
 										</View>
 										{/* 
-											Next item will appear right of name.
-											Don't
-										*/}
+                                Next item will appear right of name.
+                                Don't
+                            */}
 									</Pressable>
 								</View>
 							</>
 						)}
-					/>
+					></FlatList>
 				)}
 			</View>
 		</View>
@@ -212,4 +224,4 @@ const styles = StyleSheet.create({
 	},
 });
 
-export default ProfileSearchScreen;
+export default ProfileFollowersScreen;

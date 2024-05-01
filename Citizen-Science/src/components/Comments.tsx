@@ -1,58 +1,62 @@
-import React, { useState, useContext } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
+import { createComment, deleteComment, likeComment, unlikeComment } from '../api/comments';
+import { Comment } from '../api/types';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { AuthContext } from "../util/AuthContext";
-import {jwtDecode} from "jwt-decode";
-import { AccessToken } from "../util/token";
-
-type Comment = {
-    id: string;
-    author: string;
-    text: string;
-};
+// import { AuthContext } from "../util/AuthContext";
+// import { jwtDecode } from "jwt-decode";
+// import { AccessToken } from "../util/token";
 
 interface CommentsProps {
     comments: Comment[];
-    postId: string;
-    onAddComment: (postId: string, comment: Comment) => void;
+    postId: number;
+    userId: number;
+    onAddComment: (postId: number, comment: Comment) => void;
+    onDeleteComment: (commentId: number) => void;
+    onLikeComment: (commentId: number) => void;
+    onUnlikeComment: (commentId: number) => void;
 }
 
-const Comments: React.FC<CommentsProps> = ({ comments, postId, onAddComment }) => {
+const Comments: React.FC<CommentsProps> = ({
+    comments = [],
+    postId,
+    userId,
+    onAddComment,
+    onDeleteComment,
+    onLikeComment,
+    onUnlikeComment,
+}) => {
     const [newCommentText, setNewCommentText] = useState('');
-    const { userToken } = useContext(AuthContext);
-    const decodedToken = userToken ? jwtDecode<AccessToken>(userToken) : null;
-    const firstName = decodedToken ? decodedToken.firstName : null;
-    const lastName = decodedToken ? decodedToken.lastName : null;
 
-    function checkNames(firstName: string | null, lastName: string | null) {
-        if (firstName === null && lastName === null) {
-            return "Community Forum";
-        } else if (firstName === null) {
-            return lastName || '';
-        } else if (lastName === null) {
-            return firstName || '';
-        } else {
-            return `${firstName} ${lastName}`;
-        }
-    }
-
-    const handleNewCommentSubmit = () => {
+    const handleNewCommentSubmit = async () => {
         if (newCommentText.trim()) {
-            const newComment: Comment = {
-                id: Math.random().toString(36).substring(2, 9),
-                author: checkNames(firstName, lastName),
-                text: newCommentText
-            };
-            onAddComment(postId, newComment);
-            setNewCommentText('');
+            try {
+                // Adjust according to your `createComment` API signature
+                const createdComment = await createComment(newCommentText, userId, postId);
+                onAddComment(postId, createdComment);
+                setNewCommentText('');
+            } catch (error) {
+                console.error('Error creating comment:', error);
+                // Handle error (e.g., show an alert)
+                Alert.alert('Error', 'Failed to create comment.');
+            }
         }
     };
 
     const renderComments = (comments: Comment[]) => {
         return comments.map((comment) => (
-            <View key={comment.id} style={styles.comment}>
-                <Text style={styles.author}>{comment.author}</Text>
-                <Text style={styles.text}>{comment.text}</Text>
+            <View key={comment.comment_id} style={styles.comment}>
+                <Text style={styles.author}>{comment.username}</Text>
+                <Text style={styles.text}>{comment.content}</Text>
+                <TouchableOpacity onPress={() => onDeleteComment(comment.comment_id)}>
+                    <Text style={styles.postButton}>Delete</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => onLikeComment(comment.comment_id)}>
+                    <Text style={styles.postButton}>Like</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => onUnlikeComment(comment.comment_id)}>
+                    <Text style={styles.postButton}>Unlike</Text>
+                </TouchableOpacity>
             </View>
         ));
     };
@@ -98,6 +102,7 @@ const styles = StyleSheet.create({
         marginRight: 8,
     },
     text: {
+        flexShrink: 1,
         color: 'black',
     },
     inputContainer: {
@@ -109,33 +114,14 @@ const styles = StyleSheet.create({
         flex: 1,
         borderWidth: 1,
         borderColor: '#ccc',
-        padding: 8,
+        padding: 10,
         marginRight: 10,
-        borderRadius: 20,
+        borderRadius: 5,
         backgroundColor: '#f2f2f2',
     },
     postButton: {
         color: '#007AFF',
         fontWeight: 'bold',
-    },
-    replyButton: {
-        padding: 4,
-        marginTop: 2,
-    },
-    replyButtonText: {
-        color: '#007AFF',
-    },
-    reply: {
-        marginTop: 5,
-        padding: 8,
-        backgroundColor: '#eef2ff',
-        borderRadius: 4,
-        marginLeft: 20,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.2,
-        shadowRadius: 1,
-        elevation: 2,
     },
 });
 

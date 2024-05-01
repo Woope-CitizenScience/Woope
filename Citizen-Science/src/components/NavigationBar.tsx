@@ -17,11 +17,9 @@ interface AnimatedTabIconProps {
 }
 const AnimatedTabIcon: React.FC<AnimatedTabIconProps> = ({ focused, IconPath }) => {
     const scale = useSharedValue(1);
-
     useEffect(() => {
         scale.value = withTiming(focused ? 1.5 : 1);
     }, [focused]);
-
     const animatedStyle = useAnimatedStyle(() => {
         return {
             transform: [{ scale: scale.value }],
@@ -91,5 +89,4 @@ const NavigationBar = () => {
         </View>
     );
 };
-
 export default NavigationBar;
