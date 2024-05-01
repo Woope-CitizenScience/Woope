@@ -121,7 +121,6 @@ router.get(
 
 			const decodedToken = jwt.verify(accessToken, config.accessTokenSecret);
 
-
 			if (typeof decodedToken === "object" && "user_id" in decodedToken) {
 				parsed_user_id = decodedToken.user_id;
 			} else {
@@ -129,6 +128,7 @@ router.get(
 			}
 
 			const followStatus = await checkFollowExists(parsed_user_id, user_id);
+			
 
 			res.json({followStatus});
 		} catch (error) {

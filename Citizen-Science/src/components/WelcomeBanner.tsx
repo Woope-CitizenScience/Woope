@@ -35,6 +35,7 @@ const WelcomeBanner = () => {
 			return firstName + " " + lastName;
 		}
 	}
+	
 
 	const [shouldRender, setShouldRender] = useState(true);
 	const position = useRef(new Animated.Value(0)).current;
