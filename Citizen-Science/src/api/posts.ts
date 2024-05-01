@@ -1,7 +1,6 @@
 import { fetchAPI } from "./fetch";
 
 export const createPost = async (user_id: number, content: string) => {
-    console.log(user_id, content);
     return fetchAPI('/forum/posts', 'POST', { user_id, content });
 }
 
@@ -22,7 +21,7 @@ export const getPostByUserId = async (userId: number) => {
 }
 
 export const deletePost = async (id: number) => {
-    return fetchAPI(`/posts/${id}`, 'DELETE');
+    return fetchAPI(`/forum/posts/${id}`, 'DELETE');
 }
 
 export const updatePost = async (id: number, content: string) => {

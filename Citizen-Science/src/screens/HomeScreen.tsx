@@ -13,7 +13,7 @@ import * as Sharing from 'expo-sharing';
 import Comments from '../components/Comments';
 import LikeButton from '../components/LikeButton';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-import Weather from '../components/weather';
+import Weather from '../components/Weather';
 import { createPost,getAllPosts, updatePost, deletePost, likePost, unlikePost, getPostLikes, getUserLikedPosts } from '../api/posts';
 import { createComment, deleteComment, updateComment, likeComment, unlikeComment, getComments } from '../api/comments';
 import { PdfFile, Post, Comment, PostWithUsername } from '../api/types';
@@ -51,10 +51,10 @@ const HomeScreen = () => {
 
     const fetchPosts = async () => {
         try {
-            const posts = await getAllPosts(userId);
-            setPosts(posts);
+            const postsList = await getAllPosts(userId);
+            setPosts(postsList);
 			const commentsMap: CommentsMap = {};
-			for (const post of posts) {
+			for (const post of postsList) {
 				const postComments = await getComments(post.post_id);
 				commentsMap[post.post_id] = postComments;
 			}
@@ -65,6 +65,7 @@ const HomeScreen = () => {
         }
     };
     
+	
 	const pickImage = async () => {
 		let result = await ImagePicker.launchImageLibraryAsync({
 			mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -227,6 +228,7 @@ const HomeScreen = () => {
 			setPostText('');
 			setPostImages([]);
 			setPostPdfs([]);
+			setIsPosting(false);
 		} catch (error) {
 			console.error("Failed to update the post:", error);
 		}
@@ -249,9 +251,23 @@ const HomeScreen = () => {
 			setPostText('');
 			setPostImages([]);
 			setPostPdfs([]);
+			setIsPosting(false);
 		} catch (error) {
 			console.error(error);
 			setError("Failed to create post. Please try again.");
+		}
+	};
+
+	const handleDeletePost = async (postId: number) =>{
+		setVisibleDropdown(null);
+		try {
+			await deletePost(postId);
+			// setPosts(currentPosts => currentPosts.filter(post => post.post_id !== postId));
+			setPosts([]);
+			fetchPosts();
+		} catch (error) {
+			console.error(error);
+			setError("Failed to delete post. Please try again.");
 		}
 	};
 
@@ -346,7 +362,7 @@ const HomeScreen = () => {
 							<TouchableOpacity onPress={() => startEditingPost(item.post_id)}>
 							<Text style={styles.dropdownItem}>Edit</Text>
 							</TouchableOpacity>
-							<TouchableOpacity onPress={() => {/* Function to delete post */}}>
+							<TouchableOpacity onPress={() => {handleDeletePost(item.post_id)}}>
 							<Text style={styles.dropdownItem}>Delete</Text>
 							</TouchableOpacity>
 						</View>
