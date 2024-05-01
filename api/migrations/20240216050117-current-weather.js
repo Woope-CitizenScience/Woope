@@ -19,11 +19,12 @@ exports.setup = function(options, seedLink) {
 };
 
 exports.up = function(db) {
-  var filePath = path.join(__dirname, 'sqls', '20231212074355-create-users-up.sql');
-  return new Promise(function(resolve, reject) {
-    fs.readFile(filePath, {encoding: 'utf-8'}, function(err, data) {
+  var filePath = path.join(__dirname, 'sqls', '20240216050117-current-weather-up.sql');
+  return new Promise( function( resolve, reject ) {
+    fs.readFile(filePath, {encoding: 'utf-8'}, function(err,data){
       if (err) return reject(err);
-      console.log('Received data: ' + data);
+      console.log('received data: ' + data);
+
       resolve(data);
     });
   })
@@ -33,11 +34,12 @@ exports.up = function(db) {
 };
 
 exports.down = function(db) {
-  var filePath = path.join(__dirname, 'sqls', '20231212074355-create-users-down.sql');
-  return new Promise(function(resolve, reject) {
-    fs.readFile(filePath, {encoding: 'utf-8'}, function(err, data) {
+  var filePath = path.join(__dirname, 'sqls', '20240216050117-current-weather-down.sql');
+  return new Promise( function( resolve, reject ) {
+    fs.readFile(filePath, {encoding: 'utf-8'}, function(err,data){
       if (err) return reject(err);
-      console.log('Received data: ' + data);
+      console.log('received data: ' + data);
+
       resolve(data);
     });
   })

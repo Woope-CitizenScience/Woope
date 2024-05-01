@@ -12,13 +12,15 @@ import {
 	responsiveHeight,
 	responsiveWidth,
 } from "react-native-responsive-dimensions";
-import React, { useCallback, useContext, useState } from "react";
 import {
 	checkFollowStatus,
 	followProfile,
 	getProfile,
 	unfollowProfile,
 } from "../../api/community";
+import React, { useCallback, useContext, useEffect, useState } from "react";
+import IconButton from "../../components/IconButton";
+
 import { jwtDecode } from "jwt-decode";
 import { AccessToken } from "../../util/token";
 import { AuthContext } from "../../util/AuthContext";

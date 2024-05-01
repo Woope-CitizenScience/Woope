@@ -50,7 +50,6 @@ export type TitleProps = {
 };
 
 
-
 export type IconButtonProps = {
     iconName: string;
 	onPress: () => void;
