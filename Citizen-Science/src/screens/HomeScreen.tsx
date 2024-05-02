@@ -146,18 +146,7 @@ const HomeScreen = () => {
     const handleLikeComment = async (commentId: number) => {
         try {
             const response = await likeComment(commentId);
-            console.log("Like response:", response);
-            setPosts(posts => posts.map(post => {
-                return {
-                    ...post,
-                    comments: post.comments.map(comment => {
-                        if (comment.comment_id === commentId) {
-                            return { ...comment, likes: comment.likes_count + 1 };
-                        }
-                        return comment;
-                    })
-                };
-            }))
+			fetchPosts();
         } catch (error) {
             console.error(error);
             setError("Failed to like post. Please try again.");
@@ -166,19 +155,8 @@ const HomeScreen = () => {
 
     const handleUnlikeComment = async (commentId: number) => {
         try {
-            const response = await unlikeComment(commentId);
-            console.log("Unlike response:", response);
-            setPosts(posts => posts.map(post => {
-                return {
-                    ...post,
-                    comments: post.comments.map(comment => {
-                        if (comment.comment_id === commentId) {
-                            return { ...comment, likes: comment.likes_count - 1 };
-                        }
-                        return comment;
-                    })
-                };
-            }))
+            unlikeComment(commentId);
+            fetchPosts();
         } catch (error) {
             console.error(error);
             setError("Failed to unlike post. Please try again.");
