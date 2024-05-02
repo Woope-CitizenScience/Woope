@@ -47,11 +47,17 @@ export const updateComment = async (comment_id: number, content: string): Promis
 }
 
 export const deleteComment = async (comment_id: number): Promise<void> => {
-    console.log("Delete comment called");
-    await pool.query(
-        'DELETE FROM comments WHERE comment_id = $1',
-        [comment_id]
-    );
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+        await client.query('DELETE FROM comments WHERE comment_id = $1', [comment_id]);
+        await client.query('COMMIT');
+    } catch (error) {
+        await client.query('ROLLBACK');
+        throw error;
+    } finally {
+        client.release();
+    }
 }
 
 export const addCommentLike = async (comment_id: number): Promise<Comment> => {

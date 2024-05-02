@@ -64,7 +64,6 @@ const HomeScreen = () => {
             setError("Failed to fetch posts.");
         }
     };
-    
 	
 	const pickImage = async () => {
 		let result = await ImagePicker.launchImageLibraryAsync({
@@ -137,18 +136,12 @@ const HomeScreen = () => {
 		  }
 		  return post;
 		}));
+		fetchPosts();
 	};
 	
-	const handleDeleteComment = (commentId: number) => {
-        try {
-            const response = deleteComment(commentId);
-            console.log("Delete response:", response);
-            fetchPosts();
-        } catch (error) {
-            console.error(error);
-            setError("Failed to delete post. Please try again.");
-        }
-    };
+	const handleDeleteComment = (postId: number, commentId: number) => {
+		fetchPosts();
+	};
 	
     const handleLikeComment = async (commentId: number) => {
         try {
@@ -261,13 +254,13 @@ const HomeScreen = () => {
 	const handleDeletePost = async (postId: number) =>{
 		setVisibleDropdown(null);
 		try {
-			await deletePost(postId);
-			// setPosts(currentPosts => currentPosts.filter(post => post.post_id !== postId));
-			setPosts([]);
-			fetchPosts();
+			deletePost(postId);
+			setPosts(currentPosts => currentPosts.filter(post => post.post_id !== postId));
 		} catch (error) {
 			console.error(error);
 			setError("Failed to delete post. Please try again.");
+		} finally {
+			fetchPosts();
 		}
 	};
 
