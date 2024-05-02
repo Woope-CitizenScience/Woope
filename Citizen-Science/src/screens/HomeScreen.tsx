@@ -251,16 +251,18 @@ const HomeScreen = () => {
 		}
 	};
 
-	const handleDeletePost = async (postId: number) =>{
+	const handleDeletePost = async (postToDelete: PostWithUsername) =>{
 		setVisibleDropdown(null);
-		try {
-			deletePost(postId);
-			setPosts(currentPosts => currentPosts.filter(post => post.post_id !== postId));
-		} catch (error) {
-			console.error(error);
-			setError("Failed to delete post. Please try again.");
-		} finally {
-			fetchPosts();
+		if(userId === postToDelete.user_id){
+			try {
+				deletePost(postToDelete.post_id);
+				setPosts(currentPosts => currentPosts.filter(post => post.post_id !== postToDelete.post_id));
+			} catch (error) {
+				console.error(error);
+				setError("Failed to delete post. Please try again.");
+			} finally {
+				fetchPosts();
+			}
 		}
 	};
 
@@ -344,18 +346,21 @@ const HomeScreen = () => {
 						<MaterialIcons name="comment" size={24} color="#007AFF" />
 						<Text style={{ color: '#007AFF', marginLeft: 4 }}>{(commentsMap[item.post_id] || []).length}</Text>
 					</TouchableOpacity>
+					{userId === item.user_id && (
                     <TouchableOpacity
 						onPress={() => setVisibleDropdown(visibleDropdown === item.post_id ? null : item.post_id)}
 						style={styles.dropdownIcon}
 					>
-						<Text>...</Text>
+						
+							<Text>...</Text>
 					</TouchableOpacity>
+					)}
 					{visibleDropdown === item.post_id && (
 						<View style={styles.dropdownMenu}>
 							<TouchableOpacity onPress={() => startEditingPost(item.post_id)}>
 							<Text style={styles.dropdownItem}>Edit</Text>
 							</TouchableOpacity>
-							<TouchableOpacity onPress={() => {handleDeletePost(item.post_id)}}>
+							<TouchableOpacity onPress={() => {handleDeletePost(item)}}>
 							<Text style={styles.dropdownItem}>Delete</Text>
 							</TouchableOpacity>
 						</View>

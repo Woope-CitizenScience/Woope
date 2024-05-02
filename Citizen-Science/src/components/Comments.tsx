@@ -41,13 +41,15 @@ const Comments: React.FC<CommentsProps> = ({
         }
     };
 
-    const handleDeletePostComment = async (commentId: number) => {
-        try {
-            deleteComment(commentId);
-            onDeleteComment(postId, commentId);
-        } catch (error) {
-            console.error('Error deleting comment:', error);
-            Alert.alert('Error', 'Failed to delete comment.');
+    const handleDeletePostComment = async (commentToDelete: Comment) => {
+        if (userId === commentToDelete.user_id) {
+            try {
+                deleteComment(commentToDelete.comment_id);
+                onDeleteComment(postId, commentToDelete.comment_id);
+            } catch (error) {
+                console.error('Error deleting comment:', error);
+                Alert.alert('Error', 'Failed to delete comment.');
+            }
         }
     };
 
@@ -56,9 +58,11 @@ const Comments: React.FC<CommentsProps> = ({
             <View key={comment.comment_id} style={styles.comment}>
                 <Text style={styles.author}>{comment.username}</Text>
                 <Text style={styles.text}>{comment.content}</Text>
-                <TouchableOpacity onPress={() => handleDeletePostComment(comment.comment_id)}>
-                    <Text style={styles.postButton}>Delete</Text>
-                </TouchableOpacity>
+                {userId === comment.user_id && (
+                    <TouchableOpacity onPress={() => handleDeletePostComment(comment)}>
+                        <Text style={styles.postButton}>Delete</Text>
+                    </TouchableOpacity>
+                )}
                 <TouchableOpacity onPress={() => onLikeComment(comment.comment_id)}>
                     <Text style={styles.postButton}>Like</Text>
                 </TouchableOpacity>
