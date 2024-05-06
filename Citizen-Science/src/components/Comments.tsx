@@ -2,6 +2,10 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
 import { createComment, deleteComment, likeComment, unlikeComment } from '../api/comments';
 import { Comment } from '../api/types';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+// import { AuthContext } from "../util/AuthContext";
+// import { jwtDecode } from "jwt-decode";
+// import { AccessToken } from "../util/token";
 
 interface CommentsProps {
     comments: Comment[];
@@ -25,7 +29,6 @@ const Comments: React.FC<CommentsProps> = ({
     const [newCommentText, setNewCommentText] = useState('');
 
     const handleNewCommentSubmit = async () => {
-        console.log('Submitting new comment:');
         if (newCommentText.trim()) {
             try {
                 // Adjust according to your `createComment` API signature
@@ -40,44 +43,42 @@ const Comments: React.FC<CommentsProps> = ({
         }
     };
 
+    const renderComments = (comments: Comment[]) => {
+        return comments.map((comment) => (
+            <View key={comment.comment_id} style={styles.comment}>
+                <Text style={styles.author}>{comment.username}</Text>
+                <Text style={styles.text}>{comment.content}</Text>
+                <TouchableOpacity onPress={() => onDeleteComment(comment.comment_id)}>
+                    <Text style={styles.postButton}>Delete</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => onLikeComment(comment.comment_id)}>
+                    <Text style={styles.postButton}>Like</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => onUnlikeComment(comment.comment_id)}>
+                    <Text style={styles.postButton}>Unlike</Text>
+                </TouchableOpacity>
+            </View>
+        ));
+    };
+
     return (
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
+        <KeyboardAwareScrollView style={{ flex: 1 }} extraScrollHeight={20} enableOnAndroid={true} showsVerticalScrollIndicator={false}>
             <View style={styles.container}>
-                {comments.map((comment, index) => (
-                    <View key={index} style={styles.comment}>
-                        <Text style={styles.author}>{comment.user_id}</Text>
-                        <Text style={styles.text}>{comment.content}</Text>
-                        <TouchableOpacity onPress={() => onDeleteComment(comment.comment_id)}>
-                            <Text style={styles.postButton}>Delete</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={() => onLikeComment(comment.comment_id)}>
-                            <Text style={styles.postButton}>Like</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={() => onUnlikeComment(comment.comment_id)}>
-                            <Text style={styles.postButton}>Unlike</Text>
-                        </TouchableOpacity>
-                    </View>
-                ))}
+                {renderComments(comments)}
                 <View style={styles.inputContainer}>
                     <TextInput
                         style={styles.input}
-                        autoFocus={true}
                         value={newCommentText}
                         onChangeText={setNewCommentText}
                         placeholder="Add a comment..."
-                        multiline={true}
-                        returnKeyType="send"
                         onSubmitEditing={handleNewCommentSubmit}
                     />
-                    <TouchableOpacity onPress={() => { 
-                        console.log('Button pressed'); 
-                        handleNewCommentSubmit(); 
-                    }}>
+                    <TouchableOpacity onPress={handleNewCommentSubmit}>
                         <Text style={styles.postButton}>Post</Text>
                     </TouchableOpacity>
                 </View>
             </View>
-        </ScrollView>
+        </KeyboardAwareScrollView>
     );
 };
 
@@ -86,8 +87,15 @@ const styles = StyleSheet.create({
         padding: 10,
     },
     comment: {
-        flexDirection: 'row',
         marginTop: 5,
+        padding: 8,
+        backgroundColor: '#f8f8f8',
+        borderRadius: 4,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.2,
+        shadowRadius: 1,
+        elevation: 2,
     },
     author: {
         fontWeight: 'bold',

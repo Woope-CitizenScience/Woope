@@ -58,3 +58,22 @@ export type PopupProps = {
     message: string;
     onClose: () => void;
 };
+
+export type IconButtonProps = {
+    iconName: string;
+	onPress: () => void;
+	iconSize: number,
+	iconColor: string,
+    borderWidth?: number;
+    borderRadius?: number;
+    borderColor?: string;
+    height?: number,
+    width?: number,
+    backgroundColor?: string,
+    paddingHorizontal?: number,
+    paddingBottom?: number,
+    paddingTop?: number,
+    paddingLeft?: number,
+	paddingRight?: number,
+    paddingVertical?: number,
+};

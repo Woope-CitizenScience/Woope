@@ -1,6 +1,41 @@
-import { Post, PostWithUsername, UserLikedPosts} from "../interfaces/post";
+import { Post, PostWithUsername, PostWithMedia, UserLikedPosts} from "../interfaces/post";
 
 const pool = require('../db');
+
+export const getPostWithMedia = async (currentUserId: number): Promise<PostWithMedia[]> => {
+  const query = `
+      SELECT 
+          posts.*, 
+          profile_information.first_name, 
+          profile_information.last_name, 
+          COALESCE(COUNT(post_likes.post_id), 0) AS likes_count,
+          BOOL_OR(post_likes.user_id = $1) AS user_liked,
+          json_agg(
+              json_build_object(
+                  'media_id', post_media.media_id,
+                  'media_type', post_media.media_type,
+                  'media_url', post_media.media_url,
+                  'created_at', post_media.created_at,
+                  'updated_at', post_media.updated_at
+              )
+              FILTER (WHERE post_media.media_id IS NOT NULL)
+          ) AS media
+      FROM posts
+      JOIN profile_information ON posts.user_id = profile_information.user_id
+      LEFT JOIN post_likes ON posts.post_id = post_likes.post_id
+      LEFT JOIN post_media ON posts.post_id = post_media.post_id
+      GROUP BY posts.post_id, profile_information.first_name, profile_information.last_name
+      ORDER BY posts.created_at DESC
+  `;
+  const response = await pool.query(query, [currentUserId]);
+  return response.rows.map((row: any): PostWithUsername => ({
+      ...row,
+      userName: row.first_name + ' ' + row.last_name,
+      likes_count: parseInt(row.likes_count),
+      user_liked: Boolean(row.user_liked),
+      media: row.media // Includes media array in the returned objects
+  }));
+};
 
 export const getPost = async (currentUserId: number): Promise<UserLikedPosts[]> => {
   const query = `

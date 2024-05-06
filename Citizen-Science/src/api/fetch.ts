@@ -49,6 +49,7 @@ export async function fetchAPI(endpoint: string, method: string = 'GET', body: a
     if (!response.ok) {
         const textResponse = await response.text();
         try {
+            console.log("Non-JSON response received:", textResponse);
             const errorResponse = JSON.parse(textResponse);
             throw new Error(errorResponse.error || response.statusText);
         } catch (error) {

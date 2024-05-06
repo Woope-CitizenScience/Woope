@@ -10,8 +10,4 @@ router.get('/protected-route', authenticateToken, (req: express.Request, res: ex
   res.send('Protected!');
 });
 
-router.get('/protected-route', authenticateToken, (req: express.Request, res: express.Response) => {
-  res.send('Protected!');
-});
-
 module.exports = router;

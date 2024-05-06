@@ -13,7 +13,7 @@ import * as Sharing from 'expo-sharing';
 import Comments from '../components/Comments';
 import LikeButton from '../components/LikeButton';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-
+import Weather from '../components/Weather';
 import { createPost,getAllPosts, updatePost, deletePost, likePost, unlikePost, getPostLikes, getUserLikedPosts } from '../api/posts';
 import { createComment, deleteComment, updateComment, likeComment, unlikeComment, getComments } from '../api/comments';
 import { PdfFile, Post, Comment, PostWithUsername } from '../api/types';
@@ -34,13 +34,16 @@ const HomeScreen = () => {
 	const [selectedImageUri, setSelectedImageUri] = useState('');
 	const [selectedPost, setSelectedPost] = useState<PostWithUsername | null>(null);
 	const [commentsModalVisible, setCommentsModalVisible] = useState(false);
-	const [comments, setComments] = useState([]);
+	const [commentsMap, setCommentsMap] = useState<CommentsMap>({});
     const [visibleDropdown, setVisibleDropdown] = useState<string | null>(null);
     const [isEditing, setIsEditing] = useState(false);
     const [editingPostId, setEditingPostId] = useState<number | null>(null);
 	const [modalY] = useState(new Animated.Value(0));
 	const postTextInputRef = useRef<TextInput>(null);
-
+	
+	interface CommentsMap {
+		[key: number]: Comment[];
+	}
 
 	useEffect(() => {
 		fetchPosts();
@@ -50,9 +53,12 @@ const HomeScreen = () => {
         try {
             const posts = await getAllPosts(userId);
             setPosts(posts);
+			const commentsMap: CommentsMap = {};
 			for (const post of posts) {
-				getComments(post);
+				const postComments = await getComments(post.post_id);
+				commentsMap[post.post_id] = postComments;
 			}
+			setCommentsMap(commentsMap);
         } catch (error) {
             console.error(error);
             setError("Failed to fetch posts.");
@@ -126,7 +132,8 @@ const HomeScreen = () => {
 	const handleAddComment = (postId: number, newComment: Comment) => {
 		setPosts(posts => posts.map(post => {
 		  if (post.post_id === postId) {
-		   return { ...post, comments: [...post.comments, newComment] };
+			const updatedComments = post.comments ? [...post.comments, newComment] : [newComment];
+			return { ...post, comments: updatedComments };
 		  }
 		  return post;
 		}));
@@ -319,7 +326,6 @@ const HomeScreen = () => {
 					  </TouchableOpacity>
 					</View>
 				  ))}
-
 					<TouchableOpacity onPress={() => toggleCommentsModal(item)} style={styles.commentButton}>
                         <LikeButton
 							postId={item.post_id}
@@ -328,7 +334,7 @@ const HomeScreen = () => {
 							likedPost={item.user_liked}
 						/>
 						<MaterialIcons name="comment" size={24} color="#007AFF" />
-						<Text style={{ color: '#007AFF', marginLeft: 4 }}>{item.comments?.length ?? 0}</Text>
+						<Text style={{ color: '#007AFF', marginLeft: 4 }}>{(commentsMap[item.post_id] || []).length}</Text>
 					</TouchableOpacity>
                     <TouchableOpacity
 						onPress={() => setVisibleDropdown(visibleDropdown === item.post_id ? null : item.post_id)}
@@ -350,6 +356,7 @@ const HomeScreen = () => {
 			)}
 			ListHeaderComponent={
 				<>
+				<Weather/>
 					<TouchableOpacity style={styles.postBox} onPress={() => setIsPosting(true)}>
 						<View style={styles.postBoxInner}>
 							<Text style={styles.postBoxText}>What's on your mind?</Text>
@@ -414,28 +421,31 @@ const HomeScreen = () => {
 			</View>
 		</Modal>
 		<Modal
+			visible={commentsModalVisible}
 			animationType="slide"
 			transparent={true}
-			visible={commentsModalVisible}
 			onRequestClose={() => toggleCommentsModal()}>
-			<View style={styles.centeredViews}>
-				<Animated.View
-					style={[styles.modalView, modalStyle]}
-					{...panResponder.panHandlers}>
+				<View style={styles.centeredView}>
+					<View style={styles.modalView}>
+					<TouchableOpacity
+						style={styles.closeButton}
+						onPress={() => toggleCommentsModal()}>
+						<Text style={styles.closeButtonText}>X</Text>
+					</TouchableOpacity>
 					{selectedPost && (
 						<Comments
-							comments={selectedPost.comments}
-							postId={selectedPost.post_id}
-							userId={userId}
-							onAddComment={handleAddComment}
-							onDeleteComment={handleDeleteComment}
-							onLikeComment={handleLikeComment}
-							onUnlikeComment={handleUnlikeComment}
-					  	/>
+						comments={commentsMap[selectedPost.post_id] || []}
+						postId={selectedPost.post_id}
+						userId={userId}
+						onAddComment={handleAddComment}
+						onDeleteComment={handleDeleteComment}
+						onLikeComment={handleLikeComment}
+						onUnlikeComment={handleUnlikeComment}
+						/>
 					)}
-				</Animated.View>
-			</View>
-		</Modal>
+					</View>
+				</View>
+			</Modal>
 	</SafeAreaView>
 	);
 };
@@ -607,28 +617,10 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		resizeMode: 'contain',
 	},
-	centeredView: {
-		flex: 1,
-		justifyContent: "center",
-		alignItems: "center",
-		backgroundColor: 'rgba(0, 0, 0, 0.8)',
-	},
 	fullScreenImage: {
 		width: '90%',
 		height: '80%',
 		resizeMode: 'contain',
-	},
-	closeButton: {
-		position: 'absolute',
-		top: 50,
-		right: 20,
-		backgroundColor: 'red',
-		padding: 10,
-		borderRadius: 10,
-	},
-	closeButtonText: {
-		color: '#fff',
-		fontWeight: 'bold',
 	},
 	commentButton: {
 		marginTop: 10,
@@ -642,15 +634,6 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: "flex-end",
 		backgroundColor: 'rgba(0, 0, 0, 0.5)',
-	},
-	modalView: {
-		backgroundColor: "white",
-		borderTopLeftRadius: 20,
-		borderTopRightRadius: 20,
-		padding: 35,
-		elevation: 5,
-		width: '100%',
-		height: '20%',
 	},
 	headerRow: {
 		flexDirection: 'row',
@@ -711,6 +694,33 @@ const styles = StyleSheet.create({
 		borderRadius: 5,
 		alignSelf: 'flex-start',
 		marginTop: -20,
+	},
+	modalView: {
+		backgroundColor: "white",
+		borderTopLeftRadius: 20,
+		borderTopRightRadius: 20,
+		padding: 35,
+		paddingTop: 120,
+		width: '100%',
+		height: '100%',
+	},
+	closeButton: {
+		position: 'absolute',
+		top: 60,
+		right: 20,
+		backgroundColor: 'red',
+		padding: 10,
+		borderRadius: 10,
+	},
+	closeButtonText: {
+		color: '#fff',
+		fontWeight: 'bold',
+	},
+	centeredView: {
+		flex: 1,
+		justifyContent: "center",
+		alignItems: "center",
+		backgroundColor: 'rgba(0, 0, 0, 0.8)',
 	},
 });
 

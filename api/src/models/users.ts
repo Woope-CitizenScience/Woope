@@ -85,7 +85,6 @@ export const createUser = async (email: string, phoneNumber: string, hashedPassw
 	if (!email && !phoneNumber) {
 		throw new Error("Either an email or a phone number is required.");
 	}
-
 	try {
 		await pool.query('BEGIN');
 		let query;
@@ -151,7 +150,7 @@ export const updateName = async (userId: string, firstName: string, lastName: st
 	}
 };
 
-export const getUserFullNameByID = async (userId: number) => {
+export const getUserFullNameByID = async (userId: string) => {
 	try {
 		await pool.query('BEGIN');
 
@@ -164,17 +163,31 @@ export const getUserFullNameByID = async (userId: number) => {
 			return null;
 		}
 		const userINFO = result.rows[0];
-		if(!userINFO){
-			return result.status(404).json({ error: "User not found" });
-		}
-		
 		return userINFO;
-		
+
 	} catch (error) {
 		throw new Error("Error getting user's name " + (error as Error).message);
 	}
 }
 
+export const searchUsersWithName = async (name: string) => {
+	try{
+		await pool.query('BEGIN');
+
+		const query = 'SELECT user_id, first_name, last_name FROM profile_information WHERE CONCAT(first_name, last_name) ILIKE $1';
+		const values = [name + '%'];
+
+		const result = await pool.query(query, values);
+
+		if (result.rows.length === 0) {
+			return null;
+		}
+		const userINFO = result.rows;
+		return userINFO;
+	} catch (error) {
+		throw new Error("Error searching users: " + (error as Error).message);
+	}
+}
 
 
-module.exports = { getUser, createUser, getUserByRefreshToken, updateName, getUserFullNameByID };
+module.exports = { getUser, createUser, getUserByRefreshToken, updateName, getUserFullNameByID, searchUsersWithName };

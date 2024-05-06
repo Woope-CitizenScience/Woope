@@ -13,39 +13,44 @@ import {
 	responsiveWidth,
 } from "react-native-responsive-dimensions";
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { getProfile, updateName } from "../api/community";
-import IconButton from "../components/IconButton";
+import { getProfile, updateName } from "../../api/community";
+import IconButton from "../../components/IconButton";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { jwtDecode } from "jwt-decode";
-import { AccessToken } from "../util/token";
-import { AuthContext } from "../util/AuthContext";
+import { AccessToken } from "../../util/token";
+import { AuthContext } from "../../util/AuthContext";
 
 interface ProfileEditProps {
 	navigation: any;
 }
 
-const ProfileEditScreen: React.FC<ProfileEditProps> = ({navigation}) => {
-
-    let { userToken } = useContext(AuthContext);
+const ProfileEditScreen: React.FC<ProfileEditProps> = ({ navigation }) => {
+	let { userToken } = useContext(AuthContext);
 	const decodedToken = userToken ? jwtDecode<AccessToken>(userToken) : null;
 	const user_id = decodedToken ? decodedToken.user_id : null;
 
-    const [editFirstName, setEditFirstName] = useState("");
+	const [editFirstName, setEditFirstName] = useState("");
 	const [editLastName, setEditLastName] = useState("");
 
-    useEffect(() => {
-        if(user_id !== null)
-		getProfile(user_id)
-			.then((data) => {
-				getProfile(data);
-				setEditFirstName(data.first_name);
-				setEditLastName(data.last_name);
-			})
-			.catch((error) => {
-				console.error("Error: ", error);
-			});
+	{
+		/* Will load profile data of user */
+	}
+	useEffect(() => {
+		if (user_id !== null)
+			getProfile(user_id)
+				.then((data) => {
+					getProfile(data);
+					setEditFirstName(data.user.first_name);
+					setEditLastName(data.user.last_name);
+				})
+				.catch((error) => {
+					console.error("Error: ", error);
+				});
 	}, []);
 
+	{
+		/* Calls updateName api to set users name */
+	}
 	const handleUpdateUserName = async () => {
 		try {
 			if (
@@ -55,11 +60,10 @@ const ProfileEditScreen: React.FC<ProfileEditProps> = ({navigation}) => {
 			) {
 				const user = await updateName(
 					user_id,
-					editFirstName,
-					editLastName,
+					editFirstName.trim(),
+					editLastName.trim(),
 					userToken
 				);
-				console.log("User name updated for USER: " + user.user_id);
 			}
 		} catch (error) {
 			console.error("Errors: ", error);
@@ -68,7 +72,14 @@ const ProfileEditScreen: React.FC<ProfileEditProps> = ({navigation}) => {
 
 	return (
 		<View style={styles.container}>
-			<View style={{ height: responsiveHeight(100), width: responsiveWidth(100), backgroundColor: "white" }}>
+			<View
+				style={{
+					height: responsiveHeight(100),
+					width: responsiveWidth(100),
+					backgroundColor: "white",
+				}}
+			>
+				{/* Back button, Screen title, and confirmation button*/}
 				<View
 					style={[
 						{
@@ -83,7 +94,11 @@ const ProfileEditScreen: React.FC<ProfileEditProps> = ({navigation}) => {
 						style={[{ padding: responsiveWidth(1) }]}
 						onPress={() => navigation.goBack()}
 					>
-						<Icon name="arrow-back" size={responsiveWidth(7)} color="black" />
+						<Icon
+							name="arrow-back"
+							size={responsiveHeight(4.2)}
+							color="black"
+						/>
 					</TouchableOpacity>
 					<Text
 						style={[
@@ -99,12 +114,13 @@ const ProfileEditScreen: React.FC<ProfileEditProps> = ({navigation}) => {
 						style={[{ padding: responsiveWidth(1) }]}
 						onPress={() => {
 							handleUpdateUserName();
-							navigation.goBack()
+							navigation.goBack();
 						}}
 					>
-						<Icon name="check" size={responsiveWidth(7)} color="black" />
+						<Icon name="check" size={responsiveHeight(4.2)} color="black" />
 					</TouchableOpacity>
 				</View>
+				{/* Profile editable attributes */}
 				<View
 					style={[
 						{

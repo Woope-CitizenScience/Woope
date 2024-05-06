@@ -9,6 +9,10 @@ export const getAllPosts = async (id: number) => {
     return fetchAPI(`/forum/posts/${id}`, 'GET');
 }
 
+export const getAllPostsWithMedia = async (id: number) => {
+    return fetchAPI(`/forum/posts/${id}/media`, 'GET');
+}
+
 export const getPostById = async (id: number) => {
     return fetchAPI(`/forum/posts/${id}`, 'GET');
 }
