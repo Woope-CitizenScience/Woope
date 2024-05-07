@@ -5,14 +5,20 @@ import {
 	TouchableOpacity,
 	FlatList,
 	RefreshControl,
+	ActivityIndicator,
 } from "react-native";
 import {
 	responsiveFontSize,
 	responsiveHeight,
 	responsiveWidth,
 } from "react-native-responsive-dimensions";
+import {
+	checkFollowStatus,
+	followProfile,
+	getProfile,
+	unfollowProfile,
+} from "../../api/community";
 import React, { useCallback, useContext, useEffect, useState } from "react";
-import { getProfile } from "../../api/community";
 import IconButton from "../../components/IconButton";
 
 import { jwtDecode } from "jwt-decode";
@@ -39,23 +45,80 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ route, navigation }) => {
 	const [editFirstName, setFirstName] = useState("");
 	const [editLastName, setLastName] = useState("");
 
+	const [following, setFollowing] = useState(false);
+	const [followerCount, setFollowerCount] = useState("");
+	const [followingCount, setFollowingCount] = useState("");
+
+	{
+		/* Loads profile */
+	}
 	const fetchProfile = useCallback(() => {
+		setFullyLoaded(false);
+		if (userID === currentUserID) {
+			setProfileOwner(true);
+		} else {
+			setProfileOwner(false);
+		}
 		getProfile(userID)
 			.then((data) => {
-				setFirstName(data.first_name);
-				setLastName(data.last_name);
-				if (userID === currentUserID) {
-					setProfileOwner(true);
-				}
+				setFirstName(data.user.first_name);
+				setLastName(data.user.last_name);
+
+				setFollowerCount(data.followerCount.follower_of_count);
+				setFollowingCount(data.followingCount.following_of_count);
 				setFullyLoaded(true);
 			})
 			.catch((error) => {
 				console.error("Error: ", error);
 			});
+		{
+			/* Un-needed api calls if looking at own profile */
+		}
+		if (!profileOwner) {
+			checkFollowStatus(userID, userToken)
+				.then((data) => {
+					if (data !== 0) {
+						if (data.followStatus.status === 1) {
+							setFollowing(true);
+						}
+					} else {
+						setFollowing(false);
+					}
+				})
+				.catch((error) => {
+					console.error("Error: ", error);
+				});
+		}
 	}, [userID, currentUserID]);
 
+	{
+		/* Reload profile upon focusing screen */
+	}
 	useFocusEffect(fetchProfile);
 
+	{/* Call followProfile api and client side update screen */}
+	const handleFollowProfile = async () => {
+		try {
+			if (!following) {
+				const user = await followProfile(userID, userToken);
+				setFollowing(true);
+			}
+		} catch (error) {
+			console.error("Errors: ", error);
+		}
+	};
+
+	{/* Call unfollowProfile api and client side update screen */}
+	const handleUnfollowProfile = async () => {
+		try {
+			if (following) {
+				const user = await unfollowProfile(userID, userToken);
+				setFollowing(false);
+			}
+		} catch (error) {
+			console.error("Errors: ", error);
+		}
+	};
 	const posts = [
 		{ id: "1", content: "|||First post|||" },
 		{ id: "2", content: "|Second post" },
@@ -70,7 +133,16 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ route, navigation }) => {
 	];
 
 	if (!fullyLoaded) {
-		return <Text>Loading...</Text>;
+		return (
+			<View
+				style={{
+					alignContent: "flex-start",
+					paddingTop: responsiveHeight(10),
+				}}
+			>
+				<ActivityIndicator size={"large"} color={"lightblue"} />
+			</View>
+		);
 	}
 	return (
 		<View style={styles.container}>
@@ -80,23 +152,55 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ route, navigation }) => {
 				keyExtractor={(item) => item.id}
 				numColumns={3}
 				showsVerticalScrollIndicator={false}
-				refreshControl={<RefreshControl refreshing={!fullyLoaded} onRefresh={fetchProfile} />}
+				refreshControl={
+					<RefreshControl refreshing={!fullyLoaded} onRefresh={fetchProfile} />
+				}
 				ListHeaderComponent={
 					<>
 						<View style={styles.profileUser}>
 							{/* temp For Profile Picture */}
-							<IconButton
-								iconName={"circle"}
-								onPress={() => void 0}
-								iconSize={responsiveHeight(11)}
-								iconColor={"lightblue"}
-							/>
+							<View
+								style={{
+									height: responsiveHeight(9),
+									width: responsiveHeight(9),
+									borderRadius: 50,
+									backgroundColor: "lightblue",
+								}}
+							></View>
+							{/* Posts, Followers, Following */}
 							<View style={styles.attributes}>
-								<Text style={styles.textUserInfo}>Posts:</Text>
-								<Text style={styles.textUserInfo}>PlaceHolder:</Text>
-								<Text style={styles.textUserInfo}>PlaceHolder:</Text>
+								<TouchableOpacity
+									onPress={void 0}
+									style={styles.textAttributes}
+								>
+									<Text style={styles.textUserInfo}>Posts</Text>
+									<Text style={styles.textUserInfo}>999999999</Text>
+								</TouchableOpacity>
+								<TouchableOpacity
+									onPress={() =>
+										navigation.navigate("ProfileFollowersScreen", {
+											userID: userID,
+										})
+									}
+									style={styles.textAttributes}
+								>
+									<Text style={styles.textUserInfo}>{"Followers "}</Text>
+									<Text style={styles.textUserInfo}>{followerCount}</Text>
+								</TouchableOpacity>
+								<TouchableOpacity
+									onPress={() =>
+										navigation.navigate("ProfileFollowingScreen", {
+											userID: userID,
+										})
+									}
+									style={styles.textAttributes}
+								>
+									<Text style={styles.textUserInfo}>{"Following "}</Text>
+									<Text style={styles.textUserInfo}>{followingCount}</Text>
+								</TouchableOpacity>
 							</View>
 						</View>
+						{/* Name */}
 						<Text
 							style={{
 								fontSize: responsiveFontSize(1.8),
@@ -133,6 +237,62 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ route, navigation }) => {
 										Edit Profile
 									</Text>
 								</TouchableOpacity>
+								<TouchableOpacity onPress={void 0} style={styles.iconStyle}>
+									<Text
+										style={{
+											fontSize: responsiveFontSize(1.8),
+											fontWeight: "bold",
+											color: "black",
+										}}
+									>
+										Share Profile
+									</Text>
+								</TouchableOpacity>
+							</View>
+						)}
+						{!profileOwner && (
+							<View
+								style={[
+									styles.attributes,
+									{
+										paddingHorizontal: responsiveWidth(2),
+										paddingBottom: responsiveHeight(1),
+									},
+								]}
+							>
+								{!following && (
+									<TouchableOpacity
+										onPress={() => handleFollowProfile()}
+										style={styles.iconStyle}
+									>
+										<Text
+											style={{
+												fontSize: responsiveFontSize(1.8),
+												fontWeight: "bold",
+												color: "black",
+											}}
+										>
+											Follow Profile
+										</Text>
+									</TouchableOpacity>
+								)}
+								{following && (
+									<TouchableOpacity
+										onPress={() => handleUnfollowProfile()}
+										style={styles.iconStyle}
+									>
+										<Text
+											style={{
+												fontSize: responsiveFontSize(1.8),
+												fontWeight: "bold",
+												color: "black",
+											}}
+										>
+											Following
+										</Text>
+									</TouchableOpacity>
+								)}
+
 								<TouchableOpacity onPress={void 0} style={styles.iconStyle}>
 									<Text
 										style={{
@@ -197,7 +357,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: "flex-start",
 		alignItems: "flex-start",
-		backgroundColor: "transparent",
+		backgroundColor: "white",
 		flexDirection: "column",
 	},
 	profileUser: {
@@ -206,6 +366,7 @@ const styles = StyleSheet.create({
 		backgroundColor: "transparent",
 		height: responsiveHeight(11),
 		width: responsiveWidth(100),
+		paddingLeft: responsiveWidth(2),
 		flexDirection: "row",
 	},
 	attributes: {
@@ -220,6 +381,15 @@ const styles = StyleSheet.create({
 		color: "black",
 		backgroundColor: "transparent",
 		paddingHorizontal: responsiveWidth(3),
+	},
+	textAttributes: {
+		justifyContent: "center",
+		alignItems: "center",
+		width: responsiveWidth(27),
+		height: responsiveHeight(8),
+		paddingHorizontal: responsiveWidth(0.5),
+		backgroundColor: "transparent",
+		borderRadius: responsiveHeight(1),
 	},
 	iconStyle: {
 		justifyContent: "center",

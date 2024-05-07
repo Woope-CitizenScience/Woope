@@ -29,7 +29,6 @@ router.post('/', async (req: express.Request, res: express.Response) => {
     try {
         const { content, user_id, post_id } = req.body;
         const newComment = await createComment(content, user_id, post_id);
-        console.log(newComment);
         res.status(201).json(newComment);
     } catch (error) {
         if (error instanceof Error) {
@@ -57,8 +56,8 @@ router.put('/:comment_id', async (req: express.Request, res: express.Response) =
 // Delete comment
 router.delete('/:id', async (req: express.Request, res: express.Response) => {
     try {
-        const comment = await deleteComment(Number(req.params.id));
-        res.status(204).json(comment);
+        await deleteComment(Number(req.params.id));
+        res.status(204);
     } catch (error) {
         if (error instanceof Error) {
             res.status(500).json(`Internal server error: ${error.message}`);
@@ -86,7 +85,7 @@ router.post('/:id/like', async (req: express.Request, res: express.Response) => 
 router.delete('/:id/unlike', async (req: express.Request, res: express.Response) => {
     try {
         await removeCommentLike(Number(req.params.id));
-        res.status(204).end();
+        res.status(204);
     } catch (error) {
         if (error instanceof Error) {
             res.status(500).json(`Internal server error: ${error.message}`);

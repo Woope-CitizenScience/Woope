@@ -20,6 +20,7 @@ export type PostWithUsername = {
 	comments: Comment[];
 	timestamp: number;
 	username: string;
+	user_id: number;
 	likes_count: number;
 	likedPost: boolean;
 }

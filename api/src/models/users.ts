@@ -164,7 +164,6 @@ export const getUserFullNameByID = async (userId: string) => {
 		}
 		const userINFO = result.rows[0];
 		return userINFO;
-
 	} catch (error) {
 		throw new Error("Error getting user's name " + (error as Error).message);
 	}

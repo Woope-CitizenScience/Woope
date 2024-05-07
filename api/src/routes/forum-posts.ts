@@ -110,7 +110,7 @@ router.put('/posts/:id', async (req: express.Request, res: express.Response) => 
 router.delete('/posts/:id', async (req: express.Request, res: express.Response) => {
     try {
         const deletedPost = await deletePost(Number(req.params.id));
-        res.status(204).json(deletedPost);
+        res.status(204);
     } catch (error) {
         if (error instanceof Error) {
             res.status(500).json(`Internal server error: ${error.message}`);

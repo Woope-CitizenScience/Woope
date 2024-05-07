@@ -13,7 +13,6 @@ export const createComment = async (content: string, user_id: number, post_id: n
 }
 
 export const updateComment = async (comment_id: number, content: string) => {
-    console.log(comment_id);
     return fetchAPI(`/comments/${comment_id}`, 'PUT', { content });
 }
 

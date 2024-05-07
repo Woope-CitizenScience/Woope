@@ -51,10 +51,10 @@ const HomeScreen = () => {
 
     const fetchPosts = async () => {
         try {
-            const posts = await getAllPosts(userId);
-            setPosts(posts);
+            const postsList = await getAllPosts(userId);
+            setPosts(postsList);
 			const commentsMap: CommentsMap = {};
-			for (const post of posts) {
+			for (const post of postsList) {
 				const postComments = await getComments(post.post_id);
 				commentsMap[post.post_id] = postComments;
 			}
@@ -64,7 +64,7 @@ const HomeScreen = () => {
             setError("Failed to fetch posts.");
         }
     };
-    
+	
 	const pickImage = async () => {
 		let result = await ImagePicker.launchImageLibraryAsync({
 			mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -104,7 +104,6 @@ const HomeScreen = () => {
 			console.error('Error picking PDFs:', error);
 		}
 	};
-
 	const handleOpenPdf = async (pdfUri: string) => {
 		try {
 			const isAvailable = await Sharing.isAvailableAsync();
@@ -137,34 +136,17 @@ const HomeScreen = () => {
 		  }
 		  return post;
 		}));
+		fetchPosts();
 	};
 	
-	const handleDeleteComment = (commentId: number) => {
-        try {
-            const response = deleteComment(commentId);
-            console.log("Delete response:", response);
-            fetchPosts();
-        } catch (error) {
-            console.error(error);
-            setError("Failed to delete post. Please try again.");
-        }
-    };
+	const handleDeleteComment = (postId: number, commentId: number) => {
+		fetchPosts();
+	};
 	
     const handleLikeComment = async (commentId: number) => {
         try {
             const response = await likeComment(commentId);
-            console.log("Like response:", response);
-            setPosts(posts => posts.map(post => {
-                return {
-                    ...post,
-                    comments: post.comments.map(comment => {
-                        if (comment.comment_id === commentId) {
-                            return { ...comment, likes: comment.likes_count + 1 };
-                        }
-                        return comment;
-                    })
-                };
-            }))
+			fetchPosts();
         } catch (error) {
             console.error(error);
             setError("Failed to like post. Please try again.");
@@ -173,19 +155,8 @@ const HomeScreen = () => {
 
     const handleUnlikeComment = async (commentId: number) => {
         try {
-            const response = await unlikeComment(commentId);
-            console.log("Unlike response:", response);
-            setPosts(posts => posts.map(post => {
-                return {
-                    ...post,
-                    comments: post.comments.map(comment => {
-                        if (comment.comment_id === commentId) {
-                            return { ...comment, likes: comment.likes_count - 1 };
-                        }
-                        return comment;
-                    })
-                };
-            }))
+            unlikeComment(commentId);
+            fetchPosts();
         } catch (error) {
             console.error(error);
             setError("Failed to unlike post. Please try again.");
@@ -228,6 +199,7 @@ const HomeScreen = () => {
 			setPostText('');
 			setPostImages([]);
 			setPostPdfs([]);
+			setIsPosting(false);
 		} catch (error) {
 			console.error("Failed to update the post:", error);
 		}
@@ -250,9 +222,25 @@ const HomeScreen = () => {
 			setPostText('');
 			setPostImages([]);
 			setPostPdfs([]);
+			setIsPosting(false);
 		} catch (error) {
 			console.error(error);
 			setError("Failed to create post. Please try again.");
+		}
+	};
+
+	const handleDeletePost = async (postToDelete: PostWithUsername) =>{
+		setVisibleDropdown(null);
+		if(userId === postToDelete.user_id){
+			try {
+				deletePost(postToDelete.post_id);
+				setPosts(currentPosts => currentPosts.filter(post => post.post_id !== postToDelete.post_id));
+			} catch (error) {
+				console.error(error);
+				setError("Failed to delete post. Please try again.");
+			} finally {
+				fetchPosts();
+			}
 		}
 	};
 
@@ -336,18 +324,21 @@ const HomeScreen = () => {
 						<MaterialIcons name="comment" size={24} color="#007AFF" />
 						<Text style={{ color: '#007AFF', marginLeft: 4 }}>{(commentsMap[item.post_id] || []).length}</Text>
 					</TouchableOpacity>
+					{userId === item.user_id && (
                     <TouchableOpacity
 						onPress={() => setVisibleDropdown(visibleDropdown === item.post_id ? null : item.post_id)}
 						style={styles.dropdownIcon}
 					>
-						<Text>...</Text>
+						
+							<Text>...</Text>
 					</TouchableOpacity>
+					)}
 					{visibleDropdown === item.post_id && (
 						<View style={styles.dropdownMenu}>
 							<TouchableOpacity onPress={() => startEditingPost(item.post_id)}>
 							<Text style={styles.dropdownItem}>Edit</Text>
 							</TouchableOpacity>
-							<TouchableOpacity onPress={() => {/* Function to delete post */}}>
+							<TouchableOpacity onPress={() => {handleDeletePost(item)}}>
 							<Text style={styles.dropdownItem}>Delete</Text>
 							</TouchableOpacity>
 						</View>
@@ -723,5 +714,4 @@ const styles = StyleSheet.create({
 		backgroundColor: 'rgba(0, 0, 0, 0.8)',
 	},
 });
-
 export default HomeScreen;

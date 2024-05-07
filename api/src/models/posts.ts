@@ -107,11 +107,27 @@ export const softDeletePost = async (post_id: number): Promise<void> => {
 }
 
 export const deletePost = async (post_id: number): Promise<void> => {
+  const client = await pool.connect();
   try {
-    await pool.query('DELETE FROM posts WHERE post_id = $1', [post_id]);
+    // Start a transaction
+    await client.query('BEGIN');
+
+    // Delete related entries from post_likes first
+    await client.query('DELETE FROM post_likes WHERE post_id = $1', [post_id]);
+
+    // Delete the post
+    await client.query('DELETE FROM posts WHERE post_id = $1', [post_id]);
+
+    // Commit the transaction
+    await client.query('COMMIT');
   } catch (error) {
+    // If an error occurs, rollback the transaction
+    await client.query('ROLLBACK');
     console.error(`Error deleting post with id ${post_id}`, error);
     throw error;
+  } finally {
+    // Release the client back to the pool
+    client.release();
   }
 }
 

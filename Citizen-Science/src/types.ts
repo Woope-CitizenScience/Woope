@@ -49,15 +49,6 @@ export type TitleProps = {
     position: { top: number; left: number};
 };
 
-export type BackButtonProps = {
-    position: {top: number; left: number};
-}
-
-export type PopupProps = {
-    isVisible: boolean;
-    message: string;
-    onClose: () => void;
-};
 
 export type IconButtonProps = {
     iconName: string;
@@ -76,4 +67,14 @@ export type IconButtonProps = {
     paddingLeft?: number,
 	paddingRight?: number,
     paddingVertical?: number,
+};
+
+export type BackButtonProps = {
+    position: {top: number; left: number};
+}
+
+export type PopupProps = {
+    isVisible: boolean;
+    message: string;
+    onClose: () => void;
 };

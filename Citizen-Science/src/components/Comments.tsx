@@ -12,7 +12,7 @@ interface CommentsProps {
     postId: number;
     userId: number;
     onAddComment: (postId: number, comment: Comment) => void;
-    onDeleteComment: (commentId: number) => void;
+    onDeleteComment: (postId: number, commentId: number) => void;
     onLikeComment: (commentId: number) => void;
     onUnlikeComment: (commentId: number) => void;
 }
@@ -31,14 +31,24 @@ const Comments: React.FC<CommentsProps> = ({
     const handleNewCommentSubmit = async () => {
         if (newCommentText.trim()) {
             try {
-                // Adjust according to your `createComment` API signature
                 const createdComment = await createComment(newCommentText, userId, postId);
                 onAddComment(postId, createdComment);
                 setNewCommentText('');
             } catch (error) {
                 console.error('Error creating comment:', error);
-                // Handle error (e.g., show an alert)
                 Alert.alert('Error', 'Failed to create comment.');
+            }
+        }
+    };
+
+    const handleDeletePostComment = async (commentToDelete: Comment) => {
+        if (userId === commentToDelete.user_id) {
+            try {
+                deleteComment(commentToDelete.comment_id);
+                onDeleteComment(postId, commentToDelete.comment_id);
+            } catch (error) {
+                console.error('Error deleting comment:', error);
+                Alert.alert('Error', 'Failed to delete comment.');
             }
         }
     };
@@ -48,9 +58,11 @@ const Comments: React.FC<CommentsProps> = ({
             <View key={comment.comment_id} style={styles.comment}>
                 <Text style={styles.author}>{comment.username}</Text>
                 <Text style={styles.text}>{comment.content}</Text>
-                <TouchableOpacity onPress={() => onDeleteComment(comment.comment_id)}>
-                    <Text style={styles.postButton}>Delete</Text>
-                </TouchableOpacity>
+                {userId === comment.user_id && (
+                    <TouchableOpacity onPress={() => handleDeletePostComment(comment)}>
+                        <Text style={styles.postButton}>Delete</Text>
+                    </TouchableOpacity>
+                )}
                 <TouchableOpacity onPress={() => onLikeComment(comment.comment_id)}>
                     <Text style={styles.postButton}>Like</Text>
                 </TouchableOpacity>

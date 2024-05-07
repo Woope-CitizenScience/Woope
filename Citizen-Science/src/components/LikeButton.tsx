@@ -48,7 +48,6 @@ const LikeButton: React.FC<LikeButtonProps> = ({ postId, user_id, initialLikesCo
         </View>
     );
 };
-
 const styles = StyleSheet.create({
     LikeButton: {
         marginLeft: 7,
