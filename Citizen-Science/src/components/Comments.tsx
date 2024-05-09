@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { createComment, deleteComment, likeComment, unlikeComment } from '../api/comments';
 import { Comment } from '../api/types';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-// import { AuthContext } from "../util/AuthContext";
-// import { jwtDecode } from "jwt-decode";
-// import { AccessToken } from "../util/token";
 
 interface CommentsProps {
     comments: Comment[];
@@ -25,7 +23,8 @@ const Comments: React.FC<CommentsProps> = ({
     onDeleteComment,
     onLikeComment,
     onUnlikeComment,
-}) => {
+    }) => {
+    const [commentsState, setCommentsState] = useState(comments);
     const [newCommentText, setNewCommentText] = useState('');
 
     const handleNewCommentSubmit = async () => {
@@ -53,25 +52,55 @@ const Comments: React.FC<CommentsProps> = ({
         }
     };
 
+    const toggleLike = async (comment: Comment) => {
+        const index = commentsState.findIndex(c => c.comment_id === comment.comment_id);
+        if (index !== -1) {
+            const updatedComment = { ...commentsState[index] };
+            try {
+                if (updatedComment.likedByUser) {
+                    await unlikeComment(updatedComment.comment_id);
+                    updatedComment.likedByUser = false;
+                } else {
+                    await likeComment(updatedComment.comment_id);
+                    updatedComment.likedByUser = true;
+                }
+                setCommentsState(state => state.map((item, idx) => idx === index ? updatedComment : item));
+            } catch (error) {
+                console.error('Error updating like status:', error);
+                Alert.alert('Error', 'Failed to update like status.');
+            }
+        }
+    };
+
+
+
     const renderComments = (comments: Comment[]) => {
         return comments.map((comment) => (
             <View key={comment.comment_id} style={styles.comment}>
-                <Text style={styles.author}>{comment.username}</Text>
+                <View style={styles.commentHeader}>
+                    <Text style={styles.author}>{comment.username}</Text>
+                    {userId === comment.user_id && (
+                        <TouchableOpacity
+                            onPress={() => handleDeletePostComment(comment)}
+                        >
+                            <MaterialCommunityIcons name="delete" size={18} color="red" />
+                        </TouchableOpacity>
+                    )}
+                </View>
                 <Text style={styles.text}>{comment.content}</Text>
-                {userId === comment.user_id && (
-                    <TouchableOpacity onPress={() => handleDeletePostComment(comment)}>
-                        <Text style={styles.postButton}>Delete</Text>
+                <View style={styles.likeSection}>
+                    <TouchableOpacity onPress={() => toggleLike(comment)}>
+                        <MaterialCommunityIcons
+                            name={comment.likedByUser ? "heart" : "heart-outline"}
+                            size={15}
+                            color={comment.likedByUser ? "red" : "black"}
+                        />
                     </TouchableOpacity>
-                )}
-                <TouchableOpacity onPress={() => onLikeComment(comment.comment_id)}>
-                    <Text style={styles.postButton}>Like</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => onUnlikeComment(comment.comment_id)}>
-                    <Text style={styles.postButton}>Unlike</Text>
-                </TouchableOpacity>
+                </View>
             </View>
         ));
     };
+
 
     return (
         <KeyboardAwareScrollView style={{ flex: 1 }} extraScrollHeight={20} enableOnAndroid={true} showsVerticalScrollIndicator={false}>
@@ -96,45 +125,49 @@ const Comments: React.FC<CommentsProps> = ({
 
 const styles = StyleSheet.create({
     container: {
+        flex: 1,
         padding: 10,
     },
     comment: {
-        marginTop: 5,
-        padding: 8,
-        backgroundColor: '#f8f8f8',
-        borderRadius: 4,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.2,
-        shadowRadius: 1,
-        elevation: 2,
+        backgroundColor: '#f0f0f0',
+        borderRadius: 5,
+        padding: 10,
+        marginBottom: 10,
+    },
+    commentHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 5,
     },
     author: {
         fontWeight: 'bold',
-        marginRight: 8,
     },
     text: {
-        flexShrink: 1,
-        color: 'black',
+        fontSize: 14,
+        marginBottom: 5,
+    },
+    likeSection: {
+        flexDirection: 'row',
+        alignItems: 'center',
     },
     inputContainer: {
         flexDirection: 'row',
-        marginTop: 10,
         alignItems: 'center',
+        marginTop: 10,
     },
     input: {
         flex: 1,
+        padding: 10,
         borderWidth: 1,
         borderColor: '#ccc',
-        padding: 10,
-        marginRight: 10,
         borderRadius: 5,
-        backgroundColor: '#f2f2f2',
     },
     postButton: {
-        color: '#007AFF',
+        marginLeft: 10,
+        color: '#007BFF',
         fontWeight: 'bold',
     },
 });
 
 export default Comments;
+

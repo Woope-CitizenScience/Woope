@@ -1,15 +1,11 @@
-import { View, StyleSheet, Animated, LayoutAnimation } from "react-native";
+import { View, StyleSheet} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
 	responsiveHeight,
 	responsiveWidth,
 } from "react-native-responsive-dimensions";
 import IconButton from "./IconButton";
-import React, { useContext, useEffect, useRef, useState } from "react";
-import WelcomeBanner from "./WelcomeBanner";
-import { AuthContext } from "../util/AuthContext";
-import { jwtDecode } from "jwt-decode";
-import { AccessToken } from "../util/token";
+import React from "react";
 
 interface ScreenHeaderProps {
 	title: string;
@@ -51,7 +47,6 @@ const ScreenHeader: React.FC<ScreenHeaderProps> = ({ title, navigation }) => {
 
 				{/* Maybe Add title */}
 			</View>
-			<WelcomeBanner/>
 		</SafeAreaView>
 	);
 };
