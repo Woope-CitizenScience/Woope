@@ -17,6 +17,7 @@ import Weather from '../components/Weather';
 import { createPost,getAllPosts, updatePost, deletePost, likePost, unlikePost, getPostLikes, getUserLikedPosts } from '../api/posts';
 import { createComment, deleteComment, updateComment, likeComment, unlikeComment, getComments } from '../api/comments';
 import { PdfFile, Post, Comment, PostWithUsername } from '../api/types';
+import WelcomeBanner from '../components/WelcomeBanner';
 
 const HomeScreen = () => {
 	const { userToken, setUserToken } = useContext(AuthContext);
@@ -273,7 +274,10 @@ const HomeScreen = () => {
 	};
 
 	return (
+
+	<><WelcomeBanner/>
 	<SafeAreaView style={styles.flexContainer}>
+		
 		{data && <Text>{JSON.stringify(data, null, 2)}</Text>}
 		<KeyboardAwareFlatList
 			data={posts}
@@ -438,6 +442,7 @@ const HomeScreen = () => {
 				</View>
 			</Modal>
 	</SafeAreaView>
+	</>
 	);
 };
 
