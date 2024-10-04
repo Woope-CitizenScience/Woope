@@ -13,7 +13,7 @@ import * as Sharing from 'expo-sharing';
 import Comments from '../components/Comments';
 import LikeButton from '../components/LikeButton';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-import Weather from '../components/weather';
+import Weather from '../components/Weather';
 import { createPost,getAllPosts, updatePost, deletePost, likePost, unlikePost, getPostLikes, getUserLikedPosts } from '../api/posts';
 import { createComment, deleteComment, updateComment, likeComment, unlikeComment, getComments } from '../api/comments';
 import { PdfFile, Post, Comment, PostWithUsername } from '../api/types';
