@@ -18,6 +18,7 @@ import { createPost,getAllPosts, updatePost, deletePost, likePost, unlikePost, g
 import { createComment, deleteComment, updateComment, likeComment, unlikeComment, getComments } from '../api/comments';
 import { PdfFile, Post, Comment, PostWithUsername } from '../api/types';
 import WelcomeBanner from '../components/WelcomeBanner';
+import {userCanPost, userCanViewPostDropDown, userCanDeletePost} from '../permissions/posts'
 
 const HomeScreen = () => {
 	const { userToken, setUserToken } = useContext(AuthContext);
@@ -232,7 +233,7 @@ const HomeScreen = () => {
 
 	const handleDeletePost = async (postToDelete: PostWithUsername) =>{
 		setVisibleDropdown(null);
-		if(userId === postToDelete.user_id){
+		if(userCanDeletePost(decodedToken, postToDelete)){
 			try {
 				deletePost(postToDelete.post_id);
 				setPosts(currentPosts => currentPosts.filter(post => post.post_id !== postToDelete.post_id));
@@ -328,7 +329,7 @@ const HomeScreen = () => {
 						<MaterialIcons name="comment" size={24} color="#007AFF" />
 						<Text style={{ color: '#007AFF', marginLeft: 4 }}>{(commentsMap[item.post_id] || []).length}</Text>
 					</TouchableOpacity>
-					{userId === item.user_id && (
+					{userCanViewPostDropDown(decodedToken, item.post_id) &&  (
                     <TouchableOpacity
 						onPress={() => setVisibleDropdown(visibleDropdown === item.post_id ? null : item.post_id)}
 						style={styles.dropdownIcon}
@@ -352,11 +353,11 @@ const HomeScreen = () => {
 			ListHeaderComponent={
 				<>
 				<Weather/>
-					<TouchableOpacity style={styles.postBox} onPress={() => setIsPosting(true)}>
+					{userCanPost(decodedToken) && <TouchableOpacity style={styles.postBox} onPress={() => setIsPosting(true)}>
 						<View style={styles.postBoxInner}>
 							<Text style={styles.postBoxText}>What's on your mind?</Text>
 						</View>
-					</TouchableOpacity>
+					</TouchableOpacity>}
 					{isPosting && (
 						<View style={styles.inputContainer}>
 							<TextInput
