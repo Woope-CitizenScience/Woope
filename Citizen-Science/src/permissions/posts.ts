@@ -12,7 +12,10 @@ import { PostWithUsername } from '../api/types';
  */
 export const userCanPost = (user: AccessToken | null) => {
     if(user === null){ return false; }
-    return user.is_Admin;
+    return (
+        user.user_role === 'Admin' ||
+        user.user_role === 'Community Organizer'
+    );
 }
 
 /**
@@ -27,7 +30,7 @@ export const userCanPost = (user: AccessToken | null) => {
 export const userCanDeletePost = (user: AccessToken | null, post: PostWithUsername) => {
     if(user === null){ return false; }
     return(
-        user.is_Admin ||
+        user.user_role === 'Admin' ||
         user.user_id === post.user_id
     );
 }
@@ -44,7 +47,7 @@ export const userCanDeletePost = (user: AccessToken | null, post: PostWithUserna
 export const userCanEditPost = (user: AccessToken | null, post: PostWithUsername) => {
     if(user === null){ return false; }
     return(
-        user.is_Admin ||
+        user.user_role === 'Admin' ||
         user.user_id === post.user_id
     );
 }
@@ -61,7 +64,7 @@ export const userCanEditPost = (user: AccessToken | null, post: PostWithUsername
 export const userCanViewPostDropDown = (user: AccessToken | null, post: PostWithUsername) => {
     if(user === null){ return false; }
     return(
-        user.is_Admin ||
+        user.user_role === 'Admin' ||
         user.user_id === post.user_id
     );
 }
