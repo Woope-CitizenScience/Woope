@@ -11,6 +11,7 @@
  * @property {string} phone_number - The user's contact phone number.
  * @property {string} [password_hash] - The hashed password for user authentication (optional).
  * @property {string} [refresh_token] - The token used to refresh the user's authentication session (optional).
+ * @property {string} user_role - The user's role that determines their access level.
  */
 export interface User {
     user_id: number;
@@ -21,4 +22,5 @@ export interface User {
     phone_number: string;
     password_hash?: string;
     refresh_token?: string;
+    user_role: string;
 }

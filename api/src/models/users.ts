@@ -55,6 +55,7 @@ export const getUser = async (email?: string, phoneNumber?: string) => {
 			phone_number: userRow.phone_number,
 			password_hash: userRow.password_hash,
 			refresh_token: userRow.refresh_token,
+			user_role: userRow.user_role
 		};
 		return user;
 	} catch (error) {
@@ -76,8 +77,7 @@ export const getUser = async (email?: string, phoneNumber?: string) => {
 export const getUserByRefreshToken = async (userId: string): Promise<User | null> => {
 	try {
 		const userQuery = `
-            SELECT u.user_id, u.email, u.is_admin, u.phone_number, u.refresh_token,
-                   p.first_name, p.last_name, p.date_of_birth
+            SELECT u.*, p.first_name, p.last_name, p.date_of_birth
             FROM users u
             LEFT JOIN profile_information p ON u.user_id = p.user_id
             WHERE u.user_id = $1`;
@@ -96,6 +96,7 @@ export const getUserByRefreshToken = async (userId: string): Promise<User | null
 			last_name: userRow.last_name,
 			phone_number: userRow.phone_number,
 			refresh_token: userRow.refresh_token,
+			user_role: userRow.user_role
 		};
 		return user;
 	} catch (error) {
@@ -156,7 +157,8 @@ export const createUser = async (email: string, phoneNumber: string, hashedPassw
 			phone_number: user.phone_number,
 			is_admin: user.is_admin,
 			first_name: firstName,
-			last_name: lastName
+			last_name: lastName,
+			user_role: user.user_role
 		};
 
 	} catch (error) {
