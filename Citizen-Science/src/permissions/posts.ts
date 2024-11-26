@@ -13,8 +13,7 @@ import { PostWithUsername } from '../api/types';
 export const userCanPost = (user: AccessToken | null) => {
     if(user === null){ return false; }
     return (
-        user.user_role === 'Admin' ||
-        user.user_role === 'Community Organizer'
+        user.user_role === 'Admin'
     );
 }
 

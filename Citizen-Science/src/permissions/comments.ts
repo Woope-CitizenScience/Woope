@@ -1,7 +1,10 @@
 import { Comment } from '../api/types';
+import { AccessToken } from '../util/token';
 
-export const userCanDeleteComment = (userId: Number, comment: Comment) => {
+export const userCanDeleteComment = (user: AccessToken | null, comment: Comment) => {
+    if(user === null){return false};
     return (
-        userId === comment.user_id
+        user?.user_role === 'Admin' ||
+        user.user_id === comment.user_id
     );
 }
