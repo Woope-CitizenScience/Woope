@@ -13,12 +13,13 @@ import * as Sharing from 'expo-sharing';
 import Comments from '../components/Comments';
 import LikeButton from '../components/LikeButton';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-import Weather from '../components/Weather';
+import Weather from '../components/weather';
 import { createPost,getAllPosts, updatePost, deletePost, likePost, unlikePost, getPostLikes, getUserLikedPosts } from '../api/posts';
 import { createComment, deleteComment, updateComment, likeComment, unlikeComment, getComments } from '../api/comments';
 import { PdfFile, Post, Comment, PostWithUsername } from '../api/types';
 import WelcomeBanner from '../components/WelcomeBanner';
 import {userCanPost, userCanViewPostDropDown, userCanDeletePost} from '../permissions/posts'
+import { refreshAccessToken } from '../util/fetchWithToken';
 
 const HomeScreen = () => {
 	const { userToken, setUserToken } = useContext(AuthContext);
@@ -432,7 +433,7 @@ const HomeScreen = () => {
 						<Comments
 						comments={commentsMap[selectedPost.post_id] || []}
 						postId={selectedPost.post_id}
-						userId={userId}
+						user={decodedToken}
 						onAddComment={handleAddComment}
 						onDeleteComment={handleDeleteComment}
 						onLikeComment={handleLikeComment}

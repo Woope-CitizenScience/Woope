@@ -1,4 +1,5 @@
 import React, {useContext, useEffect, useState} from 'react';
+import { jwtDecode } from 'jwt-decode';
 import {View, Text, StyleSheet, Button, Modal, TextInput, TouchableOpacity, Dimensions, SafeAreaView} from 'react-native';
 import {fetchWithToken} from '../util/fetchWithToken';
 import {useIsFocused} from "@react-navigation/native";
@@ -8,6 +9,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import CustomButton from '../components/CustomButton';
 import { Card, Avatar } from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import {userCanCreateEvent} from '../permissions/events';
+import { AccessToken } from '../util/token';
 
 interface Item {
     name: string;
@@ -27,6 +30,8 @@ type Event = {
 
 
 const CalendarScreen: React.FC = () => {
+	const { userToken, setUserToken } = useContext(AuthContext);
+	const decodedToken = userToken ? jwtDecode<AccessToken>(userToken) : null;
 	// Todo, remove this after trip
     const hard_coded_events = {
         '2024-02-21': [
@@ -295,7 +300,7 @@ const CalendarScreen: React.FC = () => {
 			  </View>
 			</View>
 		  </Modal>
-			{!modalVisible && (
+			{!modalVisible && userCanCreateEvent(decodedToken) && (
 			<TouchableOpacity
 			style={styles.createButton}
 			onPress={() => setModalVisible(true)}

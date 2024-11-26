@@ -3,12 +3,14 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'reac
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { createComment, deleteComment, likeComment, unlikeComment } from '../api/comments';
 import { Comment } from '../api/types';
+import { AccessToken } from '../util/token';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { userCanDeleteComment } from '../permissions/comments';
 
 interface CommentsProps {
     comments: Comment[];
     postId: number;
-    userId: number;
+    user: AccessToken | null;
     onAddComment: (postId: number, comment: Comment) => void;
     onDeleteComment: (postId: number, commentId: number) => void;
     onLikeComment: (commentId: number) => void;
@@ -18,7 +20,8 @@ interface CommentsProps {
 const Comments: React.FC<CommentsProps> = ({
     comments = [],
     postId,
-    userId,
+    //userId,
+    user,
     onAddComment,
     onDeleteComment,
     onLikeComment,
@@ -26,6 +29,7 @@ const Comments: React.FC<CommentsProps> = ({
     }) => {
     const [commentsState, setCommentsState] = useState(comments);
     const [newCommentText, setNewCommentText] = useState('');
+    const userId = user !== null ? user.user_id : NaN;
 
     const handleNewCommentSubmit = async () => {
         if (newCommentText.trim()) {
@@ -41,7 +45,7 @@ const Comments: React.FC<CommentsProps> = ({
     };
 
     const handleDeletePostComment = async (commentToDelete: Comment) => {
-        if (userId === commentToDelete.user_id) {
+        if (userCanDeleteComment(user, commentToDelete)) {
             try {
                 deleteComment(commentToDelete.comment_id);
                 onDeleteComment(postId, commentToDelete.comment_id);
@@ -79,7 +83,7 @@ const Comments: React.FC<CommentsProps> = ({
             <View key={comment.comment_id} style={styles.comment}>
                 <View style={styles.commentHeader}>
                     <Text style={styles.author}>{comment.username}</Text>
-                    {userId === comment.user_id && (
+                    {userCanDeleteComment(user, comment) && (
                         <TouchableOpacity
                             onPress={() => handleDeletePostComment(comment)}
                         >
