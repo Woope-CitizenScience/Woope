@@ -11,6 +11,10 @@ import HomeScreen from "./screens/HomeScreen";
 import {MapScreen} from "./screens/Map/MapScreen";
 import {SMapScreen} from "./screens/Map/SMapScreen";
 import CommunitySideMenu from './components/CommunitySideMenu';
+import ResourceCategory from './screens/ResourceCategory';
+import ResourceFollowed from './screens/ResourceFollowed';
+import ResourceSearch from './screens/ResourceSearch';
+import ResourceScreen from './screens/ResourceScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -31,13 +35,16 @@ const AppNavigation = () => {
 	}
 
 	return (
-		<Stack.Navigator screenOptions={{ headerShown: false }}>
+		<Stack.Navigator screenOptions={{ headerShown: true }}>
 			{userToken ? (
 				<>
 					<Stack.Screen name="NavigationBar" component={NavigationBar} />
 					<Stack.Screen name="MapScreen" component={MapScreen} />
 					<Stack.Screen name="SMapScreen" component={SMapScreen} />
-					<Stack.Screen name="CommunityHome" component={CommunitySideMenu}/>
+					<Stack.Screen name="ResourceScreen" component={ResourceScreen} />
+					<Stack.Screen name="ResourceCategory" component={ResourceCategory} />
+					<Stack.Screen name="ResourceFollowed" component={ResourceFollowed} />
+					<Stack.Screen name="ResourceSearch" component={ResourceSearch} />
 				</>
 
 			) : (
