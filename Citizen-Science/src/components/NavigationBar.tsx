@@ -81,7 +81,6 @@ const NavigationBar = () => {
                 })}
             >
                 <Tab.Screen name="Home" component={CommunitySideMenu} />
-                <Tab.Screen name="Citizen Science" component={CitizenScienceScreen} />
                 <Tab.Screen name="Calendar" component={CalendarScreen} />
                 <Tab.Screen name="Resource" component={ResourceScreen} />
                 <Tab.Screen name="Map" component={MapHome} />
