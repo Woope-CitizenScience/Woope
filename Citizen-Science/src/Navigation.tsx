@@ -15,6 +15,8 @@ import ResourceCategory from './screens/ResourceCategory';
 import ResourceFollowed from './screens/ResourceFollowed';
 import ResourceSearch from './screens/ResourceSearch';
 import ResourceScreen from './screens/ResourceScreen';
+import ResourceSpecificCategory from './screens/ResourceSpecificCategory';
+import ResourceProfile from './screens/ResourceProfile';
 
 const Stack = createNativeStackNavigator();
 
@@ -45,6 +47,8 @@ const AppNavigation = () => {
 					<Stack.Screen name="ResourceCategory" component={ResourceCategory} />
 					<Stack.Screen name="ResourceFollowed" component={ResourceFollowed} />
 					<Stack.Screen name="ResourceSearch" component={ResourceSearch} />
+					<Stack.Screen name="ResourceSpecificCategory" component={ResourceSpecificCategory} />
+					<Stack.Screen name="ResourceProfile" component={ResourceProfile} />
 				</>
 
 			) : (

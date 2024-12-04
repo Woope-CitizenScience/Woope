@@ -38,3 +38,14 @@ export type Comment = {
 	username: string;
 	likedByUser?: boolean;
 };
+
+export type Organization = {
+	org_id: number;
+	description: string;
+	name: string;
+}
+export interface OrganizationWithCategory{
+    org_id: Number,
+    name: String,
+    category_name: String,
+}

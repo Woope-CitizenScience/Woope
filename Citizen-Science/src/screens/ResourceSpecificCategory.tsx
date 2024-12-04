@@ -1,42 +1,37 @@
 import React, {useEffect, useState} from 'react';
 import { StyleSheet, Text, SafeAreaView, FlatList, View, Button, StatusBar, TouchableOpacity } from 'react-native';
-import { getAllOrganizations } from '../api/organizations';
-import { Organization } from '../api/types';
+import { getOrganizationsWithCategory } from '../api/organizations';
+import { OrganizationWithCategory} from '../api/types';
 import { useNavigation } from '@react-navigation/native';
-
-/* This screen will display all the organizations in a directory */
-
-
-const ResourceSearch = () => {
+export const ResourceSpecificCategory = ({route}) => {
     const navigation = useNavigation();
-    const [data,setData] = useState<Organization[]>([]);
+    const [data,setData] = useState<OrganizationWithCategory[]>([]);
     useEffect(() => {
 		fetchOrganizations();
 	}, []);
-
     const fetchOrganizations = async () => {
         try {
-            const organizationList = await getAllOrganizations();
+            let category_name = route.params.category;
+            const organizationList = await getOrganizationsWithCategory(category_name);
             setData(organizationList);
         } catch (error) {
             console.log('Failed to retrieve organizations', error);
         }
     };
-
     return(
         <SafeAreaView style={styles.container}>
-            {/*using a flatlist to display organizations, keyextractor to use the org_id as key*/}
-            <FlatList
-             data={data}
-             numColumns={1}
-             keyExtractor={item => item.org_id}
-             renderItem={({item}) => (
-                <TouchableOpacity style={styles.directoryButton} onPress={() => navigation.navigate("ResourceProfile")}>
-                    <Text style={styles.title}>{item.name}</Text>
-                </TouchableOpacity>
-                )}
-            />
-        </SafeAreaView>
+        {/*using a flatlist to display organizations, keyextractor to use the org_id as key*/}
+        <FlatList
+         data={data}
+         numColumns={1}
+         keyExtractor={item => item.org_id}
+         renderItem={({item}) => (
+            <TouchableOpacity style={styles.directoryButton} onPress={() => navigation.navigate("ResourceProfile")}>
+                <Text style={styles.title}>{item.name}</Text>
+            </TouchableOpacity>
+            )}
+        />
+    </SafeAreaView>
     );
 };
 const styles = StyleSheet.create({
@@ -59,5 +54,4 @@ const styles = StyleSheet.create({
         justifyContent: "center",
     },
 });
-
-export default ResourceSearch;
+export default ResourceSpecificCategory
