@@ -4,7 +4,7 @@ import { View, StyleSheet, Text, Image, TouchableOpacity, Dimensions } from "rea
 import { white } from "react-native-paper/lib/typescript/styles/themes/v2/colors";
 
 //Component to display organization information on their resource page
-const OrganizationCard = () => {
+const FeaturedOrganizationCard = () => {
     return(
         // Container
         <View style={styles.cardContainer}>
@@ -14,9 +14,6 @@ const OrganizationCard = () => {
                     <Text style={styles.title}>Organization Name</Text>
                     <Text style={styles.category}>Category</Text>
                 </View>
-                <TouchableOpacity style={styles.follow}>
-                    <Text>Follow</Text>
-                </TouchableOpacity>
             </View>
             {/*Organization Banner Image */}
             <View>
@@ -38,10 +35,7 @@ const OrganizationCard = () => {
             {/* Container for Events and Posts Button */}
             <View style={styles.buttonContainer}>
                 <TouchableOpacity style={styles.postButton}>
-                    <Text>View Posts</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.eventButton}>
-                    <Text>View Events</Text>
+                    <Text>Visit Profile</Text>
                 </TouchableOpacity>
             </View>
         </View>
@@ -92,40 +86,11 @@ const styles = StyleSheet.create({
         fontSize:14,
         fontWeight: '200',
     },
-    follow:{
-        alignItems: 'center',
-        alignSelf: 'flex-start',
-        backgroundColor: 'white',
-        width: 70,
-        padding:5,
-        borderRadius: 10,
-        shadowOffset: {
-            width: 5,
-            height: 5,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 5,
-        elevation: 9,
-
-    },
     buttonContainer:{
         flexDirection:'row',
         justifyContent: 'space-evenly',
         gap: 5,
         padding: 10,
-    },
-    eventButton:{
-       
-        padding:10,
-        borderRadius:10,
-        backgroundColor: 'white',
-        shadowOffset: {
-            width: 5,
-            height: 5,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 5,
-        elevation: 9,
     },
     postButton:{
         
@@ -146,4 +111,4 @@ const styles = StyleSheet.create({
 
 });
 
-export default OrganizationCard;
+export default FeaturedOrganizationCard;

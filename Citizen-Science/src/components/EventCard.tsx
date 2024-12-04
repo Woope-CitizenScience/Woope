@@ -3,20 +3,19 @@ import React from "react";
 import { View, StyleSheet, Text, Image, TouchableOpacity, Dimensions } from "react-native";
 import { white } from "react-native-paper/lib/typescript/styles/themes/v2/colors";
 
-//Component to display organization information on their resource page
-const OrganizationCard = () => {
+//Component to display event information 
+const EventCard = () => {
     return(
         // Container
         <View style={styles.cardContainer}>
-            {/*Organization Name, Category, Follow Button */}
+            {/*Event Name, Date, Time */}
             <View style ={styles.headerContainer}>
                 <View>
-                    <Text style={styles.title}>Organization Name</Text>
-                    <Text style={styles.category}>Category</Text>
+                    <Text style={styles.title}>Event Name</Text>
+                    <Text style={styles.category}>Monday January 1</Text>
+                    <Text style={styles.category}>HH:MM AM/PM - HH:MM AM/PM</Text>
+                    <Text style={styles.category}>Location</Text>
                 </View>
-                <TouchableOpacity style={styles.follow}>
-                    <Text>Follow</Text>
-                </TouchableOpacity>
             </View>
             {/*Organization Banner Image */}
             <View>
@@ -38,10 +37,10 @@ const OrganizationCard = () => {
             {/* Container for Events and Posts Button */}
             <View style={styles.buttonContainer}>
                 <TouchableOpacity style={styles.postButton}>
-                    <Text>View Posts</Text>
+                    <Text>View Full Details</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.eventButton}>
-                    <Text>View Events</Text>
+                    <Text>Add To Calendar</Text>
                 </TouchableOpacity>
             </View>
         </View>
@@ -51,9 +50,9 @@ const deviceWidth = Math.round(Dimensions.get('window').width);
 const styles = StyleSheet.create({
     cardContainer: { 
         width: deviceWidth - 20,
-        backgroundColor: 'lightblue',
+        backgroundColor: 'white',
         margin: 10,
-        borderRadius: 20,
+        borderRadius: 0,
         padding: 13,
         gap: 6,
         shadowColor: '#000',
@@ -142,8 +141,6 @@ const styles = StyleSheet.create({
         elevation: 9,
         
     }
-    
-
 });
 
-export default OrganizationCard;
+export default EventCard;
