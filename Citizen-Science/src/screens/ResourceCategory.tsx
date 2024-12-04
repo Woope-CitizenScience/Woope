@@ -52,17 +52,23 @@ const styles = StyleSheet.create({
         backgroundColor: "white",
     },
     title: {
-        fontSize: 20,
+        fontSize: 30,
         color: '#232f46',
     },
     directoryButton: {
         borderRadius: 16,
-        borderWidth: 2,
-        padding: 20,
-        margin: 8,
+        padding: 24,
+        margin: 16,
         backgroundColor: "lightblue",
         alignItems: "center",
         justifyContent: "center",
+        shadowOffset: {
+            width: 5,
+            height: 5,
+        },
+        shadowOpacity: 0.5,
+        shadowRadius: 5,
+        elevation: 9,
     },
 });
 export default ResourceCategory

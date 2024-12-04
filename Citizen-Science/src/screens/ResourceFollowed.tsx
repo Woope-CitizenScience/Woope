@@ -32,7 +32,7 @@ export const ResourceFollowed = () => {
          numColumns={1}
          keyExtractor={item => item.org_id}
          renderItem={({item}) => (
-            <TouchableOpacity style={styles.directoryButton} onPress={() => navigation.navigate("ResourceProfile")}>
+            <TouchableOpacity style={styles.directoryButton} onPress={() => navigation.navigate("OrganizationProfile")}>
                 <Text style={styles.title}>{item.name}</Text>
             </TouchableOpacity>
             )}
@@ -52,12 +52,19 @@ const styles = StyleSheet.create({
     },
     directoryButton: {
         borderRadius: 10,
-        borderWidth: 2,
         padding: 14,
-        margin: 11,
+        marginVertical: 7,
+        marginHorizontal: 15,
         backgroundColor: "lightblue",
         alignItems: "center",
         justifyContent: "center",
+        shadowOffset: {
+            width: 1,
+            height: 1,
+        },
+        shadowOpacity: 0.3,
+        shadowRadius: 3,
+        elevation: 9,
     },
 });
 export default ResourceFollowed
