@@ -76,19 +76,21 @@ export const getPost = async (currentUserId: number): Promise<UserLikedPosts[]> 
       SELECT 
           posts.*, 
           profile_information.first_name, 
-          profile_information.last_name, 
+          profile_information.last_name,
+		      organizations.name,
           COALESCE(COUNT(post_likes.post_id), 0) AS likes_count,
           BOOL_OR(post_likes.user_id = $1) AS user_liked
       FROM posts
       JOIN profile_information ON posts.user_id = profile_information.user_id
       LEFT JOIN post_likes ON posts.post_id = post_likes.post_id
-      GROUP BY posts.post_id, profile_information.first_name, profile_information.last_name
+	    LEFT JOIN organizations ON organizations.org_id = posts.org_id
+      GROUP BY organizations.name, posts.post_id, profile_information.first_name, profile_information.last_name
       ORDER BY posts.created_at DESC
   `;
   const response = await pool.query(query, [currentUserId]);
   return response.rows.map((row: any): PostWithUsername => ({
       ...row,
-      userName: row.first_name + ' ' + row.last_name, // Combining first name and last name into a single field
+      userName: row.org_id !== null ? row.name : row.first_name + ' ' + row.last_name, // Combining first name and last name into a single field
       likes_count: parseInt(row.likes_count),
       user_liked: Boolean(row.user_liked) // This will be true if the user liked the post, false otherwise
   }));
@@ -111,7 +113,7 @@ export const getPost = async (currentUserId: number): Promise<UserLikedPosts[]> 
  *   .catch(error => console.error(error.message));
  */
 export const getPostById = async (id: number): Promise<Post[]> =>{
-    const response = await pool.query('SELECT * FROM posts WHERE id = $1', [id]);
+    const response = await pool.query('SELECT * FROM posts WHERE post_id = $1', [id]);
     return response.rows.length > 0 ? response.rows[0] : null;
 }
 
@@ -154,12 +156,12 @@ export const getPostByUserId = async (user_id: number): Promise<Post[]> =>{
  *   .then(post => console.log(post))
  *   .catch(error => console.error('Error creating post:', error));
  */
-export const createPost = async (user_id: Number, content: string): Promise<Post> => {
+export const createPost = async (user_id: Number, content: string, org_id: number | null): Promise<Post> => {
     try {
       const isActive = true;
       const response = await pool.query(
-        'INSERT INTO posts (user_id, content, is_active) VALUES ($1, $2, $3) RETURNING *', 
-        [user_id, content, isActive]
+        'INSERT INTO posts (user_id, content, is_active, org_id) VALUES ($1, $2, $3, $4) RETURNING *', 
+        [user_id, content, isActive, org_id]
       );
       return response.rows[0];
     } catch (error) {

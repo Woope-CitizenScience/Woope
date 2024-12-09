@@ -1,5 +1,20 @@
 import React, { useContext, useEffect, useState, useRef  } from 'react';
-import { StyleSheet, Image, Text, View, TouchableOpacity, TextInput, Alert, FlatList, Dimensions, Modal, Animated, PanResponder, Button, SafeAreaView } from 'react-native';
+import { 
+		StyleSheet, 
+		Image, 
+		Text, 
+		View,
+		TouchableOpacity, 
+		TextInput, Alert, 
+		FlatList, 
+		Dimensions, 
+		Modal, 
+		Animated, 
+		PanResponder, 
+		Button, 
+		SafeAreaView,
+		Switch
+	} from 'react-native';
 import { AuthContext } from '../util/AuthContext';
 import { jwtDecode } from 'jwt-decode';
 import "core-js/stable/atob";
@@ -22,11 +37,14 @@ import {userCanPost, userCanViewPostDropDown, userCanDeletePost} from '../permis
 import { refreshAccessToken } from '../util/fetchWithToken';
 
 const HomeScreen = () => {
-	const { userToken, setUserToken } = useContext(AuthContext);
 	const [data, setData] = useState(null);
+	const { userToken, setUserToken } = useContext(AuthContext);
 	const decodedToken = userToken ? jwtDecode<AccessToken>(userToken) : null;
 	const userName = decodedToken ? (decodedToken.firstName + " " + decodedToken.lastName) : null;
 	const userId = decodedToken ? decodedToken.user_id : NaN;
+	const userAdminsOrg = decodedToken ? decodedToken.admins_org : NaN;
+	const [postOrgId, setPostOrgId] = useState(NaN)
+	const [postingAsOrg, setPostingAsOrg] = useState(false);
 	const [isPosting, setIsPosting] = useState(false);
 	const [postText, setPostText] = useState('');
 	const [postImages, setPostImages] = useState<string[]>([]);
@@ -43,6 +61,7 @@ const HomeScreen = () => {
     const [editingPostId, setEditingPostId] = useState<number | null>(null);
 	const [modalY] = useState(new Animated.Value(0));
 	const postTextInputRef = useRef<TextInput>(null);
+	const scrollY = useRef(new Animated.Value(0)).current;
 	
 	interface CommentsMap {
 		[key: number]: Comment[];
@@ -208,6 +227,19 @@ const HomeScreen = () => {
 		}
     };
 
+	const togglePostingAsOrg = async () => {
+		// Toggle the state and immediately determine its new value
+		setPostingAsOrg((prevState) => {
+			const newState = !prevState;
+	
+			// Update postOrgId based on the new state
+			setPostOrgId(newState ? userAdminsOrg : NaN);
+	
+			return newState; // Return the updated state
+		});
+	};
+	
+
 	const handleCreatePost = async () => {
 		setError("");
 		if (!postText.trim()) {
@@ -218,7 +250,7 @@ const HomeScreen = () => {
 			return;
 		}
 		try {
-			await createPost(Number(userId), postText);
+			await createPost(Number(userId), postText, postOrgId);
 			fetchPosts();
 			
 			// Clear the form
@@ -279,7 +311,6 @@ const HomeScreen = () => {
 
 	<><WelcomeBanner/>
 	<SafeAreaView style={styles.flexContainer}>
-		
 		{data && <Text>{JSON.stringify(data, null, 2)}</Text>}
 		<KeyboardAwareFlatList
 			data={posts}
@@ -330,7 +361,7 @@ const HomeScreen = () => {
 						<MaterialIcons name="comment" size={24} color="#007AFF" />
 						<Text style={{ color: '#007AFF', marginLeft: 4 }}>{(commentsMap[item.post_id] || []).length}</Text>
 					</TouchableOpacity>
-					{userCanViewPostDropDown(decodedToken, item.post_id) &&  (
+					{userCanViewPostDropDown(decodedToken, item) &&  (
                     <TouchableOpacity
 						onPress={() => setVisibleDropdown(visibleDropdown === item.post_id ? null : item.post_id)}
 						style={styles.dropdownIcon}
@@ -354,7 +385,7 @@ const HomeScreen = () => {
 			ListHeaderComponent={
 				<>
 				<Weather/>
-					{userCanPost(decodedToken) && <TouchableOpacity style={styles.postBox} onPress={() => setIsPosting(true)}>
+					{/*userCanPost(decodedToken) &&*/ <TouchableOpacity style={styles.postBox} onPress={() => setIsPosting(true)}>
 						<View style={styles.postBoxInner}>
 							<Text style={styles.postBoxText}>What's on your mind?</Text>
 						</View>
@@ -433,7 +464,9 @@ const HomeScreen = () => {
 						<Comments
 						comments={commentsMap[selectedPost.post_id] || []}
 						postId={selectedPost.post_id}
-						user={decodedToken}
+						userId={userId}
+						parentUserId={selectedPost.user_id}
+						userIsAdmin={decodedToken?.is_Admin}
 						onAddComment={handleAddComment}
 						onDeleteComment={handleDeleteComment}
 						onLikeComment={handleLikeComment}
@@ -441,8 +474,30 @@ const HomeScreen = () => {
 						/>
 					)}
 					</View>
+					
 				</View>
 			</Modal>
+			<Animated.View
+        style={[
+          styles.switchContainer,
+          {
+            transform: [
+              {
+                translateY: scrollY.interpolate({
+                  inputRange: [0, 1000],
+                  outputRange: [0, -100],
+                  extrapolate: 'clamp',
+                }),
+              },
+            ],
+          },
+        ]}
+      >
+        <Switch
+          value={postingAsOrg}
+          onValueChange={togglePostingAsOrg}
+        />
+      </Animated.View>
 	</SafeAreaView>
 	</>
 	);
@@ -720,5 +775,26 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		backgroundColor: 'rgba(0, 0, 0, 0.8)',
 	},
+	orgSwitch: {
+		alignSelf: "flex-start"
+	},
+	switchContainer: {
+		position: 'absolute',
+		bottom: 20,
+		right: 20,
+		backgroundColor: '#fff',
+		padding: 10,
+		borderRadius: 25,
+		elevation: 5, // Android shadow
+		shadowColor: '#000', // iOS shadow
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.3,
+		shadowRadius: 4,
+	},
+	toggleText: {
+		marginRight: 10, // Space between the text and the switch
+		fontSize: 16,
+		color: '#333',
+	}
 });
 export default HomeScreen;

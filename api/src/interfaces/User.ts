@@ -23,4 +23,5 @@ export interface User {
     password_hash?: string;
     refresh_token?: string;
     user_role: string;
+    admins_org: number;
 }

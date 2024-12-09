@@ -13,6 +13,7 @@ export type Post = {
 };
 
 export type PostWithUsername = {
+    org_id: number;
 	post_id: number;
 	image: string[];
 	content: string;

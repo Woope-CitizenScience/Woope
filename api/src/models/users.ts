@@ -55,7 +55,8 @@ export const getUser = async (email?: string, phoneNumber?: string) => {
 			phone_number: userRow.phone_number,
 			password_hash: userRow.password_hash,
 			refresh_token: userRow.refresh_token,
-			user_role: userRow.user_role
+			user_role: userRow.user_role,
+			admins_org: userRow.admins_org
 		};
 		return user;
 	} catch (error) {
@@ -96,7 +97,8 @@ export const getUserByRefreshToken = async (userId: string): Promise<User | null
 			last_name: userRow.last_name,
 			phone_number: userRow.phone_number,
 			refresh_token: userRow.refresh_token,
-			user_role: userRow.user_role
+			user_role: userRow.user_role,
+			admins_org: userRow.admins_org
 		};
 		return user;
 	} catch (error) {
@@ -158,7 +160,8 @@ export const createUser = async (email: string, phoneNumber: string, hashedPassw
 			is_admin: user.is_admin,
 			first_name: firstName,
 			last_name: lastName,
-			user_role: user.user_role
+			user_role: user.user_role,
+			admins_org: user.admins_org
 		};
 
 	} catch (error) {

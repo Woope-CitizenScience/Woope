@@ -1,6 +1,7 @@
 import * as SecureStore from 'expo-secure-store';
 
 export interface AccessToken {
+    admins_org: number;
 	exp: number;
 	iat: number;
 	firstName: string;

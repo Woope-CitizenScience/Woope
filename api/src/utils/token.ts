@@ -44,7 +44,8 @@ export const createAccessToken = async (user: User) => {
             firstName: user.first_name,
             lastName: user.last_name,
             phoneNumber: user.phone_number,
-            user_role: user.user_role
+            user_role: user.user_role,
+            admins_org: user.admins_org
         },
         config.accessTokenSecret!,
         {

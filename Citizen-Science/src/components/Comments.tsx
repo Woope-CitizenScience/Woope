@@ -5,12 +5,14 @@ import { createComment, deleteComment, likeComment, unlikeComment } from '../api
 import { Comment } from '../api/types';
 import { AccessToken } from '../util/token';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { userCanDeleteComment } from '../permissions/comments';
+// import { userCanDeleteComment } from '../permissions/comments';
 
 interface CommentsProps {
     comments: Comment[];
     postId: number;
-    user: AccessToken | null;
+    userId: number;
+    userIsAdmin: boolean | undefined;
+    parentUserId: number;
     onAddComment: (postId: number, comment: Comment) => void;
     onDeleteComment: (postId: number, commentId: number) => void;
     onLikeComment: (commentId: number) => void;
@@ -20,8 +22,9 @@ interface CommentsProps {
 const Comments: React.FC<CommentsProps> = ({
     comments = [],
     postId,
-    //userId,
-    user,
+    userId,
+    parentUserId,
+    userIsAdmin,
     onAddComment,
     onDeleteComment,
     onLikeComment,
@@ -29,7 +32,6 @@ const Comments: React.FC<CommentsProps> = ({
     }) => {
     const [commentsState, setCommentsState] = useState(comments);
     const [newCommentText, setNewCommentText] = useState('');
-    const userId = user !== null ? user.user_id : NaN;
 
     const handleNewCommentSubmit = async () => {
         if (newCommentText.trim()) {
@@ -44,8 +46,18 @@ const Comments: React.FC<CommentsProps> = ({
         }
     };
 
+    const userCanDeleteComment = (comment: Comment) => {
+        return(
+            userIsAdmin ||
+            userId === parentUserId ||
+            userId === comment.user_id
+        );
+    }
+
     const handleDeletePostComment = async (commentToDelete: Comment) => {
-        if (userCanDeleteComment(user, commentToDelete)) {
+        const canDelete = userCanDeleteComment(commentToDelete);
+        console.log(canDelete);
+        if (canDelete) {
             try {
                 deleteComment(commentToDelete.comment_id);
                 onDeleteComment(postId, commentToDelete.comment_id);
@@ -76,14 +88,12 @@ const Comments: React.FC<CommentsProps> = ({
         }
     };
 
-
-
     const renderComments = (comments: Comment[]) => {
         return comments.map((comment) => (
             <View key={comment.comment_id} style={styles.comment}>
                 <View style={styles.commentHeader}>
                     <Text style={styles.author}>{comment.username}</Text>
-                    {userCanDeleteComment(user, comment) && (
+                    {userCanDeleteComment(comment) && (
                         <TouchableOpacity
                             onPress={() => handleDeletePostComment(comment)}
                         >
