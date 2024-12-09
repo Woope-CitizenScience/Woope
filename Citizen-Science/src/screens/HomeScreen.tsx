@@ -33,7 +33,7 @@ import { createPost,getAllPosts, updatePost, deletePost, likePost, unlikePost, g
 import { createComment, deleteComment, updateComment, likeComment, unlikeComment, getComments } from '../api/comments';
 import { PdfFile, Post, Comment, PostWithUsername } from '../api/types';
 import WelcomeBanner from '../components/WelcomeBanner';
-import {userCanPost, userCanViewPostDropDown, userCanDeletePost} from '../permissions/posts'
+import {userCanPost, userCanViewPostDropDown, userCanDeletePost, userCanToggleOrg} from '../permissions/posts'
 import { refreshAccessToken } from '../util/fetchWithToken';
 
 const HomeScreen = () => {
@@ -477,7 +477,7 @@ const HomeScreen = () => {
 					
 				</View>
 			</Modal>
-			<Animated.View
+			{userCanToggleOrg(decodedToken) && (<Animated.View
         style={[
           styles.switchContainer,
           {
@@ -497,7 +497,7 @@ const HomeScreen = () => {
           value={postingAsOrg}
           onValueChange={togglePostingAsOrg}
         />
-      </Animated.View>
+      </Animated.View>)}
 	</SafeAreaView>
 	</>
 	);

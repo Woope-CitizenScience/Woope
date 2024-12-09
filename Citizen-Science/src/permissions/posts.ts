@@ -66,7 +66,14 @@ export const userCanViewPostDropDown = (user: AccessToken | null, post: PostWith
     if(user === null){ return false; }
     return(
         user.is_Admin ||
-        user.admins_org === post.org_id ||
+        (post.org_id !== null) && (user.admins_org === post.org_id) ||
         user.user_id === post.user_id
+    );
+}
+
+export const userCanToggleOrg = (user: AccessToken | null) => {
+    if(user === null){return false;}
+    return(
+        user.admins_org !== null
     );
 }
