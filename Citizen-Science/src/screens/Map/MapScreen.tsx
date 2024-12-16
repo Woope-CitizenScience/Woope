@@ -11,6 +11,7 @@ import {
 	Text,
 	ScrollView,
 } from 'react-native';
+import { createPinNew } from '../../api/pins';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import * as ImagePicker from 'expo-image-picker';
@@ -162,10 +163,14 @@ const handleMapPress = (event: { nativeEvent: { coordinate: Location } }) => {
 				},
 			]);
 		}
+		// hardcoded stuff, update later, get latitude and longitude from location, create unique pin_id using triggers?
+		let newDate = new Date(formData.date)
+		createPinNew(400,formData.name,formData.description,newDate,formData.tag,1,1);
 		// Reset form and hide modal
 		setFormData({ name: '', date: '', description: '', tag: 'General', image: null });
 		setFormLocation(null);
 		setModalVisible(false);
+		
 	};
 
 	const handlePickImage = async () => {

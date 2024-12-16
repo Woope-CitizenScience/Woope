@@ -30,3 +30,7 @@ export const updatePin = async (pin_id: number, user_id: number,
 export const deletePin = async (id: number) => {
     return fetchAPI(`/pins/${id}`, 'DELETE');
 }
+
+export const createPinNew = async (pin_id: number, name: string, description: string, date: Date, tag: string, longitude: number, latitude: number) => {
+    return fetchAPI('/pins/pinnew', 'POST', {pin_id, name, description, date, tag, longitude, latitude});
+}

@@ -5,6 +5,7 @@ import {
     getPin,
     updatePin,
     deletePin,
+    createPinNew,
 } from '../models/pins';
 
 const router = express.Router();
@@ -81,4 +82,16 @@ router.delete('/:pin_id', async (req: express.Request, res: express.Response) =>
     }
 });
 
+router.post('/pinnew', async (req: express.Request, res: express.Response) => {
+    try {
+        const newPin = await createPinNew(Number(req.body.pin_id), req.body.name, req.body.description, req.body.date, req.body.tag, Number(req.body.longitude), Number(req.body.latitude));
+        res.status(201).json(newPin);
+    } catch (error) {
+        if (error instanceof Error) {
+            res.status(500).json(`Internal server error: ${error.message}`);
+        } else {
+            res.status(500).json('Internal server error: An unknown error occurred');
+        }
+    }
+});
 module.exports = router;
