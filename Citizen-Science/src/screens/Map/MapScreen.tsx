@@ -10,6 +10,7 @@ import {
 	TouchableOpacity,
 	Text,
 	ScrollView,
+	Alert,
 } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
@@ -158,7 +159,9 @@ export const MapScreen = () => {
 			return;
 		}
 
-		if (formLocation) {
+		const pinLocation = formData.location || formLocation; //Prioritize image location 
+
+		if (pinLocation) {
 			// Add the new pin to the pins state
 			setPins((prev) => [
 				...prev,
@@ -168,15 +171,18 @@ export const MapScreen = () => {
 					description: formData.description,
 					tag: formData.tag,
 					image: formData.image,
-					location: formLocation,
+					location: pinLocation,
 				},
 			]);
+		} else {
+			alert("no location available for this pin")
 		}
 		// Reset form and hide modal
-		setFormData({ name: '', date: '', description: '', tag: 'General', image: null });
+		setFormData({ name: '', date: '', description: '', tag: 'General', image: null, location: null });
 		setFormLocation(null);
 		setModalVisible(false);
 	};
+
 
 	const handlePickImage = async () => {
 		const result = await ImagePicker.launchImageLibraryAsync({
@@ -193,8 +199,16 @@ export const MapScreen = () => {
 			// Check for EXIF data
 			const exifData = result.assets[0].exif;
 			if (exifData && exifData.GPSLatitude && exifData.GPSLongitude) {
-				const latitude = exifData.GPSLatitude;
-				const longitude = exifData.GPSLongitude;
+				let latitude = exifData.GPSLatitude;
+				let longitude = exifData.GPSLongitude;
+
+				// Adjust based on hemisphere reference
+				if (exifData.GPSLatitudeRef === 'S') {
+					latitude = -latitude; // Southern hemisphere
+				}
+				if (exifData.GPSLongitudeRef === 'W') {
+					longitude = -longitude; // Western hemisphere
+				}
 
 				console.log(`Geolocation found: Latitude: ${latitude}, Longitude: ${longitude}`);
 
@@ -205,7 +219,29 @@ export const MapScreen = () => {
 					location: { latitude, longitude }, // Save location to form data
 				}));
 			} else {
-				alert('No geolocation data found in this image.');
+				// Handle the case where no geolocation is found
+				Alert.alert(
+					'No Geolocation Found',
+					'This image does not contain geolocation data. Would you still like to use it?',
+					[
+						{
+							text: 'Cancel',
+							onPress: () => console.log('User canceled'),
+							style: 'cancel',
+						},
+						{
+							text: 'Yes',
+							onPress: () => {
+								// Save only the image without geolocation
+								setFormData((prev) => ({
+									...prev,
+									image: imageUri,
+									location: null, // No location data available
+								}));
+							},
+						},
+					]
+				);
 			}
 		}
 	};
@@ -220,27 +256,73 @@ export const MapScreen = () => {
 
 	//handle camera button's action
 	const handleOpenCamera = async () => {
+		// Request camera permission
 		const { status } = await ImagePicker.requestCameraPermissionsAsync();
 		if (status !== 'granted') {
 			alert('Camera permission is required to take a picture.');
 			return;
 		}
 
+		// Request location permission
+		const locationPermission = await Location.requestForegroundPermissionsAsync();
+		if (locationPermission.status !== 'granted') {
+			alert('Location permission is required to capture geolocation.');
+			return;
+		}
+
+		// Launch the camera
 		const result = await ImagePicker.launchCameraAsync({
 			mediaTypes: ImagePicker.MediaTypeOptions.Images,
 			allowsEditing: true,
 			quality: 1,
+			exif: true, // EXIF data might not include geolocation
 		});
 
 		if (!result.canceled) {
-			console.log('Captured Image URI:', result.assets[0].uri);
-			// You can handle the image URI here (e.g., store it in state or upload it)
-			setFormData((prev) => ({
-				...prev,
-				image: result.assets[0].uri,
-			}));
+			const imageUri = result.assets[0].uri;
+			console.log('Captured Image URI:', imageUri);
+
+			// Fetch current location
+			const location = await Location.getCurrentPositionAsync({});
+			const latitude = location.coords.latitude;
+			const longitude = location.coords.longitude;
+
+			console.log(`Manual Geolocation: Latitude: ${latitude}, Longitude: ${longitude}`);
+
+			// Prompt user to use the captured location
+			Alert.alert(
+				'Use Current Location',
+				'The camera does not include geolocation in the image. Would you like to use your current location instead?',
+				[
+					{
+						text: 'No',
+						onPress: () => {
+							// Save the image without geolocation
+							setFormData((prev) => ({
+								...prev,
+								image: imageUri,
+								location: null, // No location
+							}));
+							console.log('User chose not to use current location');
+						},
+					},
+					{
+						text: 'Yes',
+						onPress: () => {
+							// Save image with the current location
+							setFormData((prev) => ({
+								...prev,
+								image: imageUri,
+								location: { latitude, longitude }, // Use current location
+							}));
+							console.log('User chose to use current location');
+						},
+					},
+				]
+			);
 		}
 	};
+
 
 
 
