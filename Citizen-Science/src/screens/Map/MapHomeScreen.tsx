@@ -1,4 +1,4 @@
-import React from 'react';
+{/*import React from 'react';
 import { SafeAreaView, ScrollView } from 'react-native';
 import {Appbar} from 'react-native-paper';
 import {Card, Button} from 'react-native-paper';
@@ -56,3 +56,15 @@ export const MapHome = (props: MapPageScreenProps) => {
 		</SafeAreaView>
 	);
 }
+	*/}
+import React from 'react';
+import { SafeAreaView } from 'react-native';
+import { MapScreen } from './MapScreen'; // Import the MapScreen component directly
+
+export const MapHome = () => {
+	return (
+		<SafeAreaView style={{ flex: 1 }}>
+			<MapScreen /> {/* Render the MapScreen directly */}
+		</SafeAreaView>
+	);
+};
