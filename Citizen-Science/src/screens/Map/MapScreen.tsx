@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPinNew } from '../../api/pins';
 
 import {
 	View,
@@ -12,7 +13,6 @@ import {
 	ScrollView,
 	Alert,
 } from 'react-native';
-import { createPinNew } from '../../api/pins';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import * as ImagePicker from 'expo-image-picker';
@@ -178,14 +178,15 @@ export const MapScreen = () => {
 		} else {
 			alert("no location available for this pin")
 		}
+
 		// hardcoded stuff, update later, get latitude and longitude from location, create unique pin_id using triggers?
-		let newDate = new Date(formData.date)
-		createPinNew(400,formData.name,formData.description,newDate,formData.tag,1,1);
+        let newDate = new Date(formData.date)
+        createPinNew(400,formData.name,formData.description,newDate,formData.tag,1,1);
+
 		// Reset form and hide modal
 		setFormData({ name: '', date: '', description: '', tag: 'General', image: null, location: null });
 		setFormLocation(null);
 		setModalVisible(false);
-		
 	};
 
 
