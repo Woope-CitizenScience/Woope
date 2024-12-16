@@ -181,7 +181,7 @@ export const MapScreen = () => {
 
 		// hardcoded stuff, update later, get latitude and longitude from location, create unique pin_id using triggers?
         let newDate = new Date(formData.date)
-        createPinNew(400,formData.name,formData.description,newDate,formData.tag,1,1);
+        createPinNew(formData.name,formData.description,newDate,formData.tag,1,1);
 
 		// Reset form and hide modal
 		setFormData({ name: '', date: '', description: '', tag: 'General', image: null, location: null });

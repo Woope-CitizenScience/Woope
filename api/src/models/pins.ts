@@ -42,11 +42,11 @@ export const deletePin = async (pin_id: number): Promise<void> => {
     );
 }
 
-export const createPinNew = async (pin_id: number, name: string, description: string, date: Date, tag: string, longitude:number, latitude:number): Promise<PinNew> =>{
+export const createPinNew = async (name: string, description: string, date: Date, tag: string, longitude:number, latitude:number): Promise<PinNew> =>{
     try{
         const response  = await pool.query(
-            'INSERT INTO public.pins (pin_id, name, description, date, tag, longitude, latitude) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
-            [pin_id, name, description,date,tag, longitude, latitude]
+            'INSERT INTO public.pins (name, description, date, tag, longitude, latitude) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+            [name, description,date,tag, longitude, latitude]
         ); 
         return response.rows[0];
     }catch (error) {

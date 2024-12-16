@@ -82,9 +82,10 @@ router.delete('/:pin_id', async (req: express.Request, res: express.Response) =>
     }
 });
 
+// new create pin NEW
 router.post('/pinnew', async (req: express.Request, res: express.Response) => {
     try {
-        const newPin = await createPinNew(Number(req.body.pin_id), req.body.name, req.body.description, req.body.date, req.body.tag, Number(req.body.longitude), Number(req.body.latitude));
+        const newPin = await createPinNew(req.body.name, req.body.description, req.body.date, req.body.tag, Number(req.body.longitude), Number(req.body.latitude));
         res.status(201).json(newPin);
     } catch (error) {
         if (error instanceof Error) {
