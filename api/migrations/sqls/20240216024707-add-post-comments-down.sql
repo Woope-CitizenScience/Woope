@@ -20,3 +20,6 @@ DROP TABLE IF EXISTS post_likes;
 DROP TABLE IF EXISTS post_media;
 DROP TABLE IF EXISTS comments;
 DROP TABLE IF EXISTS posts;
+
+-- Drop types
+DROP TYPE IF EXISTS media_type_enum;

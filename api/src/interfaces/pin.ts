@@ -10,9 +10,9 @@ export interface Pin {
 export interface PinNew {
     pin_id: number,
     name: string,
-    description: string,
-    date: Date,
-    tag: string,
+    text_description: string,
+    dateBegin: Date,
+    label: string,
     longitude: number,
     latitude: number,
 }

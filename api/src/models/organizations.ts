@@ -14,10 +14,11 @@ export const getOrganizations = async () : Promise<Organization[]>=> {
 export const getOrganizationsWithCategory = async (category: string) : Promise<OrganizationWithCategory[]> =>{
     try{
         let query = `
-            SELECT o.name, o.org_id, c.category_name
+            SELECT o.name, o.org_id, g.name
             FROM public.organizations o
-            INNER JOIN public.organization_categories c ON o.org_id = c.org_id
-            WHERE c.category_name = $1`;
+            INNER JOIN public.organizations_category c ON o.org_id = c.org_id
+            INNER JOIN category g ON g.category_id = c.category_id
+            WHERE g.name = $1`;
         const orgs = await pool.query(query, [category]);
         return orgs.rows;
     }catch(error){
@@ -28,9 +29,9 @@ export const getOrganizationsWithCategory = async (category: string) : Promise<O
 export const getOrganizationsFollowed = async (user_id: number) : Promise<Organization[]> => {
     try {
        let query =`
-            SELECT o.name, o.org_id, o.description
+            SELECT o.name, o.org_id, o.text_description
             FROM public.organizations o
-            INNER JOIN public.organization_follows f ON o.org_id = f.org_id
+            INNER JOIN public.user_organization_follows f ON o.org_id = f.org_id
             INNER JOIN public.users u ON u.user_id = f.user_id
             Where u.user_id = $1`;
        const orgs = await pool.query(query, [user_id]);
