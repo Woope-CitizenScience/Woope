@@ -1,16 +1,16 @@
 export interface Organization{
-    org_id: Number,
-    name: String,
-    text_description: String,
+    org_id: number,
+    name: string,
+    text_description: string,
 }
 
 export interface OrganizationWithCategory{
-    org_id: Number,
-    name: String,
-    category: String,
+    org_id: number,
+    name: string,
+    category: string,
 }
 
-export interface category{
-    category_id: Number,
-    name: String,
+export interface Category{
+    category_id: number,
+    name: string,
 }

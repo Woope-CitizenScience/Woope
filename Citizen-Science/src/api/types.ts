@@ -45,7 +45,12 @@ export type Organization = {
 	name: string;
 }
 export interface OrganizationWithCategory{
-    org_id: Number,
-    name: String,
-    category_name: String,
+    org_id: number,
+    name: string,
+    category_name: string,
+}
+export interface Category{
+	category_id: number,
+	name: string,
+	description: string;
 }

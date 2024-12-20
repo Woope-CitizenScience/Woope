@@ -1,11 +1,11 @@
-import { Organization,OrganizationWithCategory } from "../interfaces/Organization";
+import { Organization,OrganizationWithCategory,Category} from "../interfaces/Organization";
 const pool = require('../db');
 //get all organizations
 export const getOrganizations = async () : Promise<Organization[]>=> {
     try {
        let query = "SELECT * FROM public.organizations ORDER BY org_id ASC";
-       const  orgs  = await pool.query(query);
-       return orgs.rows;
+        const  orgs  = await pool.query(query);
+        return orgs.rows;
     } catch (error) {
         throw new Error("Error retrieving organizations: " + (error as Error).message);
     }
@@ -28,14 +28,14 @@ export const getOrganizationsWithCategory = async (category: string) : Promise<O
 //get organizations followed by a user
 export const getOrganizationsFollowed = async (user_id: number) : Promise<Organization[]> => {
     try {
-       let query =`
+        let query =`
             SELECT o.name, o.org_id, o.text_description
             FROM public.organizations o
             INNER JOIN public.user_organization_follows f ON o.org_id = f.org_id
             INNER JOIN public.users u ON u.user_id = f.user_id
             Where u.user_id = $1`;
-       const orgs = await pool.query(query, [user_id]);
-       return orgs.rows;
+        const orgs = await pool.query(query, [user_id]);
+        return orgs.rows;
     } catch (error) {
         throw new Error("Error retrieving organizations: " + (error as Error).message);
     }
@@ -51,5 +51,18 @@ export const getOrganizationById = async (org_id: number) : Promise<Organization
         return org.rows;
     } catch (error) {
         throw new Error("Error retrieving organization: " + (error as Error).message);
+    }
+}
+//gets all organization categories
+export const getCategory = async() : Promise<Category[]> => {
+    try{
+        let query =`
+            SELECT *
+            FROM public.category`;
+        const category = await pool.query(query);
+        return category.rows;
+    }
+    catch (error) {
+        throw new Error("Error retrieving categories: " + (error as Error).message);
     }
 }

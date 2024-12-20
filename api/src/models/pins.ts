@@ -1,6 +1,4 @@
-import { Pin } from "../interfaces/pin";
-import { PinNew } from "../interfaces/pin";
-
+import { Pin, PinNew } from "../interfaces/pin";
 const pool = require('../db');
 
 export const createPin = async (pin_id: number, user_id: number, longitude: number,
