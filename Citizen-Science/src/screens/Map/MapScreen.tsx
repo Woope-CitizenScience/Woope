@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { createPinNew } from '../../api/pins';
+import { createPinNew, getAllPinsNew } from '../../api/pins';
 
 import {
 	View,
@@ -85,6 +85,40 @@ export const MapScreen = () => {
 		{ label: 'Workshop', value: 'Workshop' },
 
 	]);
+
+	// Fetch all existing pins from the DB
+	useEffect(() => {
+		const fetchPins = async () => {
+		  try {
+			const allPins = await getAllPinsNew();
+			console.log('Fetched pins from the server:', allPins);
+
+
+
+			// Here, if the backend returns a shape that matches your `Pin` interface,
+			// you can directly setPins:
+			//setPins(allPins);
+	  
+			// If your backend returns a different shape, you might need to map it:
+			// setPins(allPins.map(dbPin => ({
+			//   name: dbPin.name,
+			//   date: dbPin.someDateField,
+			//   description: dbPin.text_description,
+			//   tag: dbPin.label,
+			//   image: null, // or dbPin.image if available
+			//   location: {
+			//     latitude: dbPin.latitude,
+			//     longitude: dbPin.longitude,
+			//   },
+			// })));
+		  } catch (error) {
+			console.error('Error fetching all pins:', error);
+		  }
+		};
+	  
+		fetchPins();
+	  }, []);
+	  
 
 	useEffect(() => {
 		const getLocation = async () => {

@@ -31,6 +31,15 @@ export const deletePin = async (id: number) => {
     return fetchAPI(`/pins/${id}`, 'DELETE');
 }
 
+////////////////////////////////////////////////
+// New Pins 2024
+
 export const createPinNew = async (name: string, description: string, date: Date, tag: string, longitude: number, latitude: number) => {
     return fetchAPI('/pins/pinnew', 'POST', {name, description, date, tag, longitude, latitude});
 }
+
+// Fetch all pins
+export const getAllPinsNew = async () => {
+    console.log("getAllPinsNew fetch api called)");
+    return fetchAPI('/pins/pinnew', 'GET'); // Fetches data from the /pins/pinnew endpoint
+};

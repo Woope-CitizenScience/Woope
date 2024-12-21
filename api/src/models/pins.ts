@@ -10,11 +10,11 @@ export const createPin = async (pin_id: number, user_id: number, longitude: numb
     return rows[0];
 }
 
-export const getPins = async (): Promise<Pin[]> => {
-    const query = 'select longitude, latitude from pins';
-    const { rows } = await pool.query(query, []);
-    return rows;
-}
+// export const getPins = async (): Promise<Pin[]> => {
+//     const query = 'select longitude, latitude from pins';
+//     const { rows } = await pool.query(query, []);
+//     return rows;
+// }
 
 export const getPin = async (pin_id: number): Promise<Pin> => {
     const query = 'select longitude, latitude from pins';
@@ -40,6 +40,10 @@ export const deletePin = async (pin_id: number): Promise<void> => {
     );
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// New Pins 2024
+
+
 export const createPinNew = async (name: string, text_description: string, dateBegin: Date, label: string, longitude:number, latitude:number): Promise<PinNew> =>{
     try{
         const response  = await pool.query(
@@ -52,3 +56,18 @@ export const createPinNew = async (name: string, text_description: string, dateB
         throw error;
     }
 }
+
+// pinModel.ts
+export const getAllPinsNew = async ()  : Promise<PinNew> => {
+    try{
+    const queryText = `SELECT * FROM public.pins ORDER BY pin_id ASC`;
+    const { rows } = await pool.query(queryText); // Ensure no second argument is passed
+
+    return rows;
+
+    }
+    catch(error){
+
+        throw new Error("Error retrieving organizations: " + (error as Error).message);
+    }
+  };
