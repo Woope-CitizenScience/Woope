@@ -84,7 +84,8 @@ function CommunitySideMenu() {
 				drawerContent={(props) => <CustomDrawerSideMenu {...props} />}
 			>
 				<Drawer.Screen name="Community Home" component={HomeScreen} />
-				<Drawer.Screen
+
+				{/* <Drawer.Screen
 					name="Profile"
 					children={(props) => (
 						<ProfileStackNavigator {...props} userID={currentUserID} />
@@ -93,7 +94,9 @@ function CommunitySideMenu() {
 				<Drawer.Screen
 					name="Search"
 					component={SearchStackNavigator}
-				></Drawer.Screen>
+				></Drawer.Screen> */}
+
+
 			</Drawer.Navigator>
 		</View>
 	);
