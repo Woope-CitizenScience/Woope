@@ -20,6 +20,7 @@ import * as Camera from 'expo-camera';
 import DropDownPicker from 'react-native-dropdown-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as MediaLibrary from 'expo-media-library';
+import test from 'node:test';
 
 const windowWidth = Dimensions.get('window').width;
 
@@ -51,7 +52,6 @@ export const MapScreen = () => {
 	const [currentLocation, setCurrentLocation] = useState<Location | null>(null);
 	const [initialRegion, setInitialRegion] = useState<Region | null>(null);
 	const [pins, setPins] = useState<Pin[]>([]);
-	const [dbPins, setDbPins] = useState<Pin[]>([]);
 	const [filteredPins, setFilteredPins] = useState<Pin[]>([]);
 	const [modalVisible, setModalVisible] = useState(false);
 	const [detailsVisible, setDetailsVisible] = useState(false); // For the sliding info modal
@@ -91,7 +91,8 @@ export const MapScreen = () => {
 	// Fetching Pins
 
 	const fetchPins = async () => {
-		try {
+		try 
+		{
 		  const allPins = await getAllPinsNew();
 		  // console.log('\nFetched pins from the server:', allPins);
 			
@@ -103,54 +104,45 @@ export const MapScreen = () => {
 			tag: pin.label,
 			image: null, // Assuming no image is provided in the data
 			location: {
-			  latitude: pin.latitude,
-			  longitude: pin.longitude,
+			//   latitude: pin.latitude,
+			//   longitude: pin.longitude,
+			latitude: pin.longitude,
+			longitude: pin.latitude,
 			},
 		  }));
 	  
 		  // console.log('\nTransformed Pins:', transformedPins);
-		  
-		  // Set the pins state
-		  setPins(transformedPins);
-		  setFilteredPins(transformedPins);
+
+		  setPins([...transformedPins]); // Spread operator ensures a new array
+          setFilteredPins([...transformedPins]);
 
 		  //console.log('\nPins (from setPins) : ', pins)
 		  //console.log("\nFiltered Pins (from setFilteredPins):", filteredPins)
+
+		  return transformedPins;
 
 		} catch (error) {
 		  console.error('Error fetching all pins:', error);
 		}
 	  };
 
-
-	  
-	  
+	  // If fetchPins runs before the map is fully initialized, the pins might not render.
 	  useEffect(() => {
-		fetchPins();
-		//console.log("Pins fetched!");
+		if (initialRegion) {
+			fetchPins();
+		}
+	}, [initialRegion]);
 
+	  useEffect(() => {
+		fetchPins().then((pins) => {
+			//console.log(pins); // Access the resolved array
+		  });
 	  }, []);
 
 	  useEffect(() => {
 		//console.log('\nUpdated Pins:', pins);
-	  }, [pins]);
-	  
-	  useEffect(() => {
 		//console.log('\nUpdated Filtered Pins:', filteredPins);
-	  }, [filteredPins]);
-	  
-
-	//   useEffect(() => {
-	// 	if (filterTag === 'All') {
-	// 	  setFilteredPins(pins);
-	// 	  console.log("\nFiltered Pins (from setFilteredPins):", filteredPins)
-	// 	} else {
-	// 	  setFilteredPins(pins.filter((pin) => pin.tag === filterTag));
-	// 	}
-	//   }, [pins, filterTag]);
-	  
-	  
-
+	  }, [pins, filteredPins]);
 
 	// End Fetch Pins
 
@@ -397,18 +389,27 @@ export const MapScreen = () => {
 		}
 	};
 
+	// Harcoded Tests - For debugging - 'put where filtedPins.map is'
+	// const testPins = [
+	// 	{
+	// 	  name: 'Test Pin',
+	// 	  date: new Date().toISOString(),
+	// 	  description: 'This is a test pin',
+	// 	  tag: 'General',
+	// 	  image: null,
+	// 	  location: { latitude: 37.7749, longitude: -122.4194 },
+	// 	},
+	// 	{
+	// 		name: 'Stanford',
+	// 		date: new Date().toISOString(),
+	// 		description: 'This is a test pin',
+	// 		tag: 'General',
+	// 		image: null,
+	// 		location: { latitude: 37.4277, longitude: -122.1701 },
+	// 	  },
+	// ];
 
-	const testPins = [
-		{
-		  name: 'Test Pin',
-		  date: new Date().toISOString(),
-		  description: 'This is a test pin',
-		  tag: 'General',
-		  image: null,
-		  location: { latitude: 37.7749, longitude: -122.4194 },
-		},
-	  ];
-
+	// HTML
 	return (
 		<View style={styles.container}>
 
@@ -425,24 +426,27 @@ export const MapScreen = () => {
 				>
 					
 					{/* Render existing pins */}
-					{console.log('!!!!Contents of filteredPins:', filteredPins)}
-					{filteredPins.map((pin) => (
-						<Marker
-							//key={index}
-							key={`${pin.name}-${pin.location.latitude}-${pin.location.longitude}`}
-							coordinate={pin.location}
-							title={pin.name}
-							description={pin.description}
-							onPress={() => handleMarkerPress(pin)} // Handle marker press for viewing pin
-						>
-							{pin.image && (
-								<Image
-									source={{ uri: pin.image }}
-									style={{ width: 50, height: 50, borderRadius: 25 }}
-								/>
-							)}
-						</Marker>
-					))}
+					{/*console.log('!!!!Contents of filteredPins:', filteredPins)*/}
+					{filteredPins.map((pin) => {
+						//console.log('Rendering Marker:', pin); // Log each pin being rendered
+						return (
+							<Marker
+								key={`${pin.name}-${pin.location.latitude}-${pin.location.longitude}`}
+								coordinate={pin.location}
+								title={pin.name}
+								description={pin.description}
+								onPress={() => handleMarkerPress(pin)} // Handle marker press for viewing pin
+							>
+								{/* Render the pin's image if it exists */}
+								{pin.image && (
+									<Image
+										source={{ uri: pin.image }}
+										style={{ width: 50, height: 50, borderRadius: 25 }}
+									/>
+								)}
+							</Marker>
+						);
+					})}
 
 					{/* Render a pin for the photo's geolocation if available */}
 					{formData.location && (
@@ -612,6 +616,8 @@ export const MapScreen = () => {
 		</View>
 	);
 };
+
+// CSS
 const styles = StyleSheet.create({
 	cameraButton: {
 		backgroundColor: '#007AFF',

@@ -40,6 +40,6 @@ export const createPinNew = async (name: string, description: string, date: Date
 
 // Fetch all pins
 export const getAllPinsNew = async () => {
-    console.log("getAllPinsNew fetch api called)");
+    //console.log("getAllPinsNew fetch api called)");
     return fetchAPI('/pins/pinnew', 'GET'); // Fetches data from the /pins/pinnew endpoint
 };
