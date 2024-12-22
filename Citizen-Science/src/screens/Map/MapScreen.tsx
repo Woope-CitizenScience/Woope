@@ -51,6 +51,7 @@ export const MapScreen = () => {
 	const [currentLocation, setCurrentLocation] = useState<Location | null>(null);
 	const [initialRegion, setInitialRegion] = useState<Region | null>(null);
 	const [pins, setPins] = useState<Pin[]>([]);
+	const [dbPins, setDbPins] = useState<Pin[]>([]);
 	const [filteredPins, setFilteredPins] = useState<Pin[]>([]);
 	const [modalVisible, setModalVisible] = useState(false);
 	const [detailsVisible, setDetailsVisible] = useState(false); // For the sliding info modal
@@ -86,39 +87,72 @@ export const MapScreen = () => {
 
 	]);
 
-	// Fetch all existing pins from the DB
-	useEffect(() => {
-		const fetchPins = async () => {
-		  try {
-			const allPins = await getAllPinsNew();
-			console.log('Fetched pins from the server:', allPins);
 
+	// Fetching Pins
 
-
-			// Here, if the backend returns a shape that matches your `Pin` interface,
-			// you can directly setPins:
-			//setPins(allPins);
+	const fetchPins = async () => {
+		try {
+		  const allPins = await getAllPinsNew();
+		  // console.log('\nFetched pins from the server:', allPins);
+			
+		  // Confirmed correct format
+		  const transformedPins = allPins.map((pin) => ({
+			name: pin.name,
+			date: new Date(pin.datebegin).toISOString().split('T')[0],
+			description: pin.text_description,
+			tag: pin.label,
+			image: null, // Assuming no image is provided in the data
+			location: {
+			  latitude: pin.latitude,
+			  longitude: pin.longitude,
+			},
+		  }));
 	  
-			// If your backend returns a different shape, you might need to map it:
-			// setPins(allPins.map(dbPin => ({
-			//   name: dbPin.name,
-			//   date: dbPin.someDateField,
-			//   description: dbPin.text_description,
-			//   tag: dbPin.label,
-			//   image: null, // or dbPin.image if available
-			//   location: {
-			//     latitude: dbPin.latitude,
-			//     longitude: dbPin.longitude,
-			//   },
-			// })));
-		  } catch (error) {
-			console.error('Error fetching all pins:', error);
-		  }
-		};
+		  // console.log('\nTransformed Pins:', transformedPins);
+		  
+		  // Set the pins state
+		  setPins(transformedPins);
+		  setFilteredPins(transformedPins);
+
+		  //console.log('\nPins (from setPins) : ', pins)
+		  //console.log("\nFiltered Pins (from setFilteredPins):", filteredPins)
+
+		} catch (error) {
+		  console.error('Error fetching all pins:', error);
+		}
+	  };
+
+
 	  
+	  
+	  useEffect(() => {
 		fetchPins();
+		//console.log("Pins fetched!");
+
 	  }, []);
+
+	  useEffect(() => {
+		//console.log('\nUpdated Pins:', pins);
+	  }, [pins]);
 	  
+	  useEffect(() => {
+		//console.log('\nUpdated Filtered Pins:', filteredPins);
+	  }, [filteredPins]);
+	  
+
+	//   useEffect(() => {
+	// 	if (filterTag === 'All') {
+	// 	  setFilteredPins(pins);
+	// 	  console.log("\nFiltered Pins (from setFilteredPins):", filteredPins)
+	// 	} else {
+	// 	  setFilteredPins(pins.filter((pin) => pin.tag === filterTag));
+	// 	}
+	//   }, [pins, filterTag]);
+	  
+	  
+
+
+	// End Fetch Pins
 
 	useEffect(() => {
 		const getLocation = async () => {
@@ -215,7 +249,7 @@ export const MapScreen = () => {
 
 		// hardcoded stuff, update later, get latitude and longitude from location, create unique pin_id using triggers?
         let newDate = new Date(formData.date)
-        createPinNew(formData.name,formData.description,newDate,formData.tag,pinLocation.latitude, pinLocation.longitude);
+        createPinNew(formData.name,formData.description,newDate,formData.tag,pinLocation.latitude, pinLocation.longitude); //DB Call
 
 		// Reset form and hide modal
 		setFormData({ name: '', date: '', description: '', tag: 'General', image: null, location: null });
@@ -364,7 +398,16 @@ export const MapScreen = () => {
 	};
 
 
-
+	const testPins = [
+		{
+		  name: 'Test Pin',
+		  date: new Date().toISOString(),
+		  description: 'This is a test pin',
+		  tag: 'General',
+		  image: null,
+		  location: { latitude: 37.7749, longitude: -122.4194 },
+		},
+	  ];
 
 	return (
 		<View style={styles.container}>
@@ -372,6 +415,7 @@ export const MapScreen = () => {
 			{/* Map */}
 			{initialRegion && (
 				<MapView
+					key={filteredPins.map((pin) => pin.name).join('-')} // Generate a unique key
 					style={styles.map}
 					initialRegion={initialRegion}
 					onPress={handleMapPress}
@@ -379,10 +423,13 @@ export const MapScreen = () => {
 					showsMyLocationButton
 					showsCompass
 				>
+					
 					{/* Render existing pins */}
-					{filteredPins.map((pin, index) => (
+					{console.log('!!!!Contents of filteredPins:', filteredPins)}
+					{filteredPins.map((pin) => (
 						<Marker
-							key={index}
+							//key={index}
+							key={`${pin.name}-${pin.location.latitude}-${pin.location.longitude}`}
 							coordinate={pin.location}
 							title={pin.name}
 							description={pin.description}
