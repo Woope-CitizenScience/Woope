@@ -1,18 +1,20 @@
-import { title } from "process";
 import React from "react";
 import { View, StyleSheet, Text, Image, TouchableOpacity, Dimensions } from "react-native";
-import { white } from "react-native-paper/lib/typescript/styles/themes/v2/colors";
-
+interface FeaturedOrganizationProps {
+    name: string;
+    tagline: string;
+    text_description: string;
+}
 //Component to display organization information on their resource page
-const FeaturedOrganizationCard = () => {
+const FeaturedOrganizationCard: React.FC<FeaturedOrganizationProps> = ({name, tagline, text_description}) => {
     return(
         // Container
         <View style={styles.cardContainer}>
             {/*Organization Name, Category, Follow Button */}
             <View style ={styles.headerContainer}>
                 <View>
-                    <Text style={styles.title}>Organization Name</Text>
-                    <Text style={styles.category}>Category</Text>
+                    <Text style={styles.title}>{name}</Text>
+                    <Text style={styles.category}></Text>
                 </View>
             </View>
             {/*Organization Banner Image */}
@@ -21,16 +23,11 @@ const FeaturedOrganizationCard = () => {
             </View>
             {/* Short Tagline */}
             <View>
-                <Text style={styles.tagline}>Short Tagline</Text>
+                <Text style={styles.tagline}>{tagline}}</Text>
             </View>
             {/* Full Description */}
             <View>
-                <Text style={styles.description}>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor 
-                    incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam
-                    , quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
-                    Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat
-                     nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia 
-                     deserunt mollit anim id est laborum.</Text>
+                <Text style={styles.description}>{text_description}</Text>
             </View>
             {/* Container for Events and Posts Button */}
             <View style={styles.buttonContainer}>

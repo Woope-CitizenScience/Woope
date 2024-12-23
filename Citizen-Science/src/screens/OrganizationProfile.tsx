@@ -4,16 +4,15 @@ import { useNavigation } from '@react-navigation/native';
 import { Organization } from '../api/types';
 import OrganizationCard from '../components/OrganizationCard';
 import EventCard from '../components/EventCard';
-import { black } from 'react-native-paper/lib/typescript/styles/themes/v2/colors';
 
 export const OrganizationProfile = ({route}) => {
-    const navigation = useNavigation();
+    const navigation = useNavigation<any>();
     return(
         <SafeAreaView>
             <ScrollView>
                 {/* Container for organization card */}
                 <View>
-                    <OrganizationCard/>
+                    <OrganizationCard name = {route.params.name} tagline = {route.params.tagline} text_description = {route.params.text_description}/>
                 </View>
                 {/* Container for upcoming events */}
                 <View>

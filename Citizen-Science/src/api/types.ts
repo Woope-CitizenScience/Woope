@@ -41,8 +41,9 @@ export type Comment = {
 
 export type Organization = {
 	org_id: number;
-	description: string;
+	text_description: string;
 	name: string;
+	tagline: string;
 }
 export interface OrganizationWithCategory{
     org_id: number,

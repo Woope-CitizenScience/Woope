@@ -1,18 +1,29 @@
-import { title } from "process";
+/*
+    This component shows the organization name, category, banner image, tagline, and full description in a contained card
+    when given those parameters
+    There is also funcitonality to follow the organization and navigate to see all their posts and events
+    
+*/
+
 import React from "react";
 import { View, StyleSheet, Text, Image, TouchableOpacity, Dimensions } from "react-native";
-import { white } from "react-native-paper/lib/typescript/styles/themes/v2/colors";
+interface OrganizationProps {
+    name: string;
+    tagline: string;
+    text_description: string;
+}
+
 
 //Component to display organization information on their resource page
-const OrganizationCard = () => {
+const OrganizationCard: React.FC<OrganizationProps> = ({name, tagline, text_description})=> {
     return(
         // Container
         <View style={styles.cardContainer}>
             {/*Organization Name, Category, Follow Button */}
             <View style ={styles.headerContainer}>
                 <View>
-                    <Text style={styles.title}>Organization Name</Text>
-                    <Text style={styles.category}>Category</Text>
+                    <Text style={styles.title}>{name}</Text>
+                    <Text style={styles.category}></Text>
                 </View>
                 <TouchableOpacity style={styles.follow}>
                     <Text>Follow</Text>
@@ -24,16 +35,11 @@ const OrganizationCard = () => {
             </View>
             {/* Short Tagline */}
             <View>
-                <Text style={styles.tagline}>Short Tagline</Text>
+                <Text style={styles.tagline}>{tagline}</Text>
             </View>
             {/* Full Description */}
             <View>
-                <Text style={styles.description}>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor 
-                    incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam
-                    , quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
-                    Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat
-                     nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia 
-                     deserunt mollit anim id est laborum.</Text>
+                <Text style={styles.description}>{text_description}</Text>
             </View>
             {/* Container for Events and Posts Button */}
             <View style={styles.buttonContainer}>

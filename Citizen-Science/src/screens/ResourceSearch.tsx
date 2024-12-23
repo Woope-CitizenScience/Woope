@@ -1,19 +1,19 @@
+/* 
+    This screen will display ALL organizations in a directory
+ */
 import React, {useEffect, useState} from 'react';
-import { StyleSheet, Text, SafeAreaView, FlatList, View, Button, StatusBar, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, SafeAreaView, FlatList, StatusBar, TouchableOpacity } from 'react-native';
 import { getAllOrganizations } from '../api/organizations';
 import { Organization } from '../api/types';
 import { useNavigation } from '@react-navigation/native';
 
-/* This screen will display all the organizations in a directory */
-
-
 const ResourceSearch = () => {
-    const navigation = useNavigation();
+    const navigation = useNavigation<any>();
+    // Fetching all organizations
     const [data,setData] = useState<Organization[]>([]);
     useEffect(() => {
 		fetchOrganizations();
 	}, []);
-
     const fetchOrganizations = async () => {
         try {
             const organizationList = await getAllOrganizations();
@@ -25,12 +25,13 @@ const ResourceSearch = () => {
 
     return(
         <SafeAreaView style={styles.container}>
-            {/*using a flatlist to display organizations, keyextractor to use the org_id as key*/}
+            {/*using a flatlist to display organizations, using the org_id as key*/}
             <FlatList
-             data={data}
-             numColumns={1}
-             keyExtractor={item => item.org_id}
-             renderItem={({item}) => (
+            data={data}
+            numColumns={1}
+            keyExtractor={item => item.org_id}
+            renderItem={({item}) => 
+                (
                 <TouchableOpacity style={styles.directoryButton} onPress={() => navigation.navigate("OrganizationProfile")}>
                     <Text style={styles.title}>{item.name}</Text>
                 </TouchableOpacity>

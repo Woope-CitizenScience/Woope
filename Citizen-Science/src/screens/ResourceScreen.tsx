@@ -1,9 +1,30 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable, SafeAreaView, StatusBar } from 'react-native';
+/*
+
+    This screen is the main page for the resources tab, it redirects to ResourceSearch, Resource Followed, ResourceCategory
+    It also features a carousel of featured organizations which when clicked lead directly to their profiles
+
+*/
+import React, {useEffect, useState} from 'react';
+import { View, Text, StyleSheet, ScrollView, Pressable, SafeAreaView, StatusBar, FlatList } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { getFeaturedOrganizations } from '../api/organizations';
+import { Organization } from '../api/types';
 import FeaturedOrganizationCard from '../components/FeaturedOrganizationCard';
 export const ResourceScreen = () => {
-    const navigation = useNavigation();
+    const navigation = useNavigation<any>();
+    // fetching featured organizations
+    const [data,setData] = useState<Organization[]>([]);
+        useEffect(() => {
+            fetchFeaturedOrganizations();
+        }, []);
+        const fetchFeaturedOrganizations = async () => {
+            try {
+                const organizationList = await getFeaturedOrganizations();
+                setData(organizationList);
+            } catch (error) {
+                console.log('Failed to retrieve organizations', error);
+            }
+        };
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView style={styles.scrollView}>
@@ -30,9 +51,15 @@ export const ResourceScreen = () => {
                     <Text style={styles.title}> Featured Groups </Text>
                 </View>
                 {/* Container for Featured Group Carousel */}
-                <View style = {styles.carouselContainer}>
-                    <FeaturedOrganizationCard/>
-                </View>
+                <FlatList
+                data={data}
+                numColumns={1}
+                horizontal={true}
+                keyExtractor={item => item.org_id}
+                renderItem={({item})=>(
+                    <FeaturedOrganizationCard name={item.name} tagline={item.tagline} text_description={item.text_description}/>
+                )}
+                />
                 {/* Container for scroll dots */}
                 <View>
                     <Text></Text>

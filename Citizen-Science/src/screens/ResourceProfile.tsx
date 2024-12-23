@@ -6,7 +6,7 @@ export const ResourceProfile = () => {
         <SafeAreaView>
             <ScrollView>
                 {/* Resource Card */}
-                <ResourceCard />
+                <ResourceCard/>
                 {/* Resources Container */}
                 <View>
                     {/* Divider */}

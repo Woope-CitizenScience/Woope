@@ -8,7 +8,7 @@ import { jwtDecode } from 'jwt-decode';
 import { AccessToken } from '../util/token';
 
 export const ResourceFollowed = () => {
-    const navigation = useNavigation();
+    const navigation = useNavigation<any>();
     const { userToken, setUserToken } = useContext(AuthContext);
     const decodedToken = userToken ? jwtDecode<AccessToken>(userToken) : null;
     const userId = decodedToken ? decodedToken.user_id : NaN;
@@ -28,10 +28,10 @@ export const ResourceFollowed = () => {
         <SafeAreaView style={styles.container}>
         {/*using a flatlist to display organizations, keyextractor to use the org_id as key*/}
         <FlatList
-         data={data}
-         numColumns={1}
-         keyExtractor={item => item.org_id}
-         renderItem={({item}) => (
+            data={data}
+            numColumns={1}
+            keyExtractor={item => item.org_id}
+            renderItem={({item}) => (
             <TouchableOpacity style={styles.directoryButton} onPress={() => navigation.navigate("OrganizationProfile")}>
                 <Text style={styles.title}>{item.name}</Text>
             </TouchableOpacity>

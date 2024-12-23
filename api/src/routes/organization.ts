@@ -1,5 +1,5 @@
 import express from 'express';
-import { getCategory, getOrganizationById, getOrganizations,getOrganizationsFollowed,getOrganizationsWithCategory } from '../models/organizations';
+import { getCategory, getFeaturedOrganizations, getOrganizationById, getOrganizations,getOrganizationsFollowed,getOrganizationsWithCategory, getOrganizationsWithCategoryId } from '../models/organizations';
 
 const router = require('express').Router();
 
@@ -42,6 +42,18 @@ router.get('/organizationsbycategory/:category_name', async(req: express.Request
         }
     }
 });
+router.get('/organizationsbycategoryid/:category_id', async(req: express.Request, res: express.Response) => {
+    try {
+        const orgs = await getOrganizationsWithCategoryId(Number(req.params.category_id));
+        res.status(200).json(orgs);
+    } catch (error) {
+        if (error instanceof Error) {
+            res.status(500).json(`Internal server error: ${error.message}`);
+        } else {
+            res.status(500).json('Internal server error: An unknown error occurred');
+        }
+    }
+});
 router.get('/organizationsbyfollowed/:user_id', async(req: express.Request, res: express.Response) => {
     try {
         const orgs = await getOrganizationsFollowed(Number(req.params.user_id));
@@ -57,6 +69,18 @@ router.get('/organizationsbyfollowed/:user_id', async(req: express.Request, res:
 router.get('/organizationsbyid/:org_id', async(req: express.Request, res: express.Response) => {
     try{
         const org = await getOrganizationById(Number(req.params.org_id));
+        res.status(200).json(org);
+    }catch(error){
+        if (error instanceof Error) {
+            res.status(500).json(`Internal server error: ${error.message}`);
+        } else {
+            res.status(500).json('Internal server error: An unknown error occurred');
+        }
+    }
+})
+router.get('/featuredorganizations', async(req: express.Request, res: express.Response) => {
+    try{
+        const org = await getFeaturedOrganizations();
         res.status(200).json(org);
     }catch(error){
         if (error instanceof Error) {

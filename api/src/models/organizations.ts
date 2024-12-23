@@ -25,6 +25,22 @@ export const getOrganizationsWithCategory = async (category: string) : Promise<O
         throw new Error("Error retrieving " + category + " organizations: " + (error as Error).message)
     }
 }
+// get organizations by specific category id
+export const getOrganizationsWithCategoryId = async (category_id: number) : Promise <Organization[]> => {
+    try{ 
+        let query = `
+            SELECT o.name, o.org_id, o.tagline, o.text_description
+            FROM public.organizations o
+            INNER JOIN public.organizations_category c ON o.org_id = c.org_id
+            WHERE c.category_id = $1
+        `
+        const orgs = await pool.query(query, [category_id]);
+        return orgs.rows;
+
+    }catch(error){
+        throw new Error("Error retrieving selected categories organizations: " + (error as Error).message)
+    }
+}
 //get organizations followed by a user
 export const getOrganizationsFollowed = async (user_id: number) : Promise<Organization[]> => {
     try {
@@ -50,6 +66,19 @@ export const getOrganizationById = async (org_id: number) : Promise<Organization
         const org = await pool.query(query, [org_id]);
         return org.rows;
     } catch (error) {
+        throw new Error("Error retrieving organization: " + (error as Error).message);
+    }
+}
+//get featured organizations
+export const getFeaturedOrganizations = async (): Promise<Organization[]> => {
+    try{
+        let query = `
+            SELECT *
+            FROM public.organizations o
+            WHERE o.is_featured = true`;
+        const org = await pool.query(query);
+        return org.rows;
+    }catch(error){
         throw new Error("Error retrieving organization: " + (error as Error).message);
     }
 }
