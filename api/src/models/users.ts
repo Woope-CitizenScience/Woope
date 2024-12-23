@@ -33,6 +33,7 @@ export const getUser = async (email?: string, phoneNumber?: string) => {
 		}
 
 		const userRow = result.rows[0];
+		const userPermissions = getUserPermissions(userRow.user_id);
 		const user: User = {
 			user_id: userRow.user_id,
 			email: userRow.email,
@@ -42,6 +43,7 @@ export const getUser = async (email?: string, phoneNumber?: string) => {
 			phone_number: userRow.phone_number,
 			password_hash: userRow.password_hash,
 			refresh_token: userRow.refresh_token,
+			permissions: userPermissions
 		};
 		return user;
 	} catch (error) {
@@ -65,6 +67,7 @@ export const getUserByRefreshToken = async (userId: string): Promise<User | null
 		}
 
 		const userRow = userResult.rows[0];
+		const userPermissions = getUserPermissions(userRow.user_id);
 		const user: User = {
 			user_id: userRow.user_id,
 			email: userRow.email,
@@ -73,6 +76,7 @@ export const getUserByRefreshToken = async (userId: string): Promise<User | null
 			last_name: userRow.last_name,
 			phone_number: userRow.phone_number,
 			refresh_token: userRow.refresh_token,
+			permissions: userPermissions
 		};
 		return user;
 	} catch (error) {
@@ -188,5 +192,37 @@ export const searchUsersWithName = async (name: string) => {
 	}
 }
 
+export const getUserPermissions = async(userId: number) => {
+	try{
+		const query = `
+		SELECT 
+			json_agg(
+				json_build_object(
+					p.name, t.permission_id IS NOT NULL
+				)
+			) AS permissions_json
+		FROM 
+			permissions p
+		LEFT JOIN (
+			SELECT rp.permission_id
+			FROM users u
+		JOIN role_permissions rp
+			ON rp.role_id = u.role_id
+			WHERE u.user_id = $1
+		) t ON p.permission_id = t.permission_id;`
+		const values = [userId]
+
+		const result = await pool.query(query, values);
+		const permissionsJson = JSON.parse(result);
+
+		const permissionsObject = permissionsJson.reduce((acc: any, item: any) => {
+			return { ...acc, ...item };
+		}, {});	
+		
+		return permissionsObject;
+	} catch(error){
+		throw new Error("Error retrieving user permissions: " + (error as Error).message);
+	}
+}
 
 module.exports = { getUser, createUser, getUserByRefreshToken, updateName, getUserFullNameByID, searchUsersWithName };

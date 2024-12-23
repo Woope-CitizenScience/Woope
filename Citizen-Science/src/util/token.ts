@@ -8,6 +8,7 @@ export interface AccessToken {
 	is_Admin: boolean;
 	user_id: number;
 	phoneNumber: string;
+	permissions: any;
 }
 export interface RefreshToken {
 	exp: number;

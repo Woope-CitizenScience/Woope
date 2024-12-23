@@ -50,6 +50,10 @@ const HomeScreen = () => {
 		fetchPosts();
 	}, []);
 
+	useEffect(() => {
+		console.log(decodedToken?.permissions.delete_all_posts)
+	})
+
     const fetchPosts = async () => {
         try {
             const postsList = await getAllPosts(userId);
@@ -272,6 +276,8 @@ const HomeScreen = () => {
 			})
 		}]
 	};
+
+	
 
 	return (
 
