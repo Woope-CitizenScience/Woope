@@ -21,7 +21,8 @@ export const createAccessToken = async (user: User) => {
             is_Admin: user.is_admin,
             firstName: user.first_name,
             lastName: user.last_name,
-            phoneNumber: user.phone_number
+            phoneNumber: user.phone_number,
+            permissions: user.permissions
         },
         config.accessTokenSecret!,
         {

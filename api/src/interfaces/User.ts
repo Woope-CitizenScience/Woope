@@ -7,7 +7,7 @@ export interface User {
     phone_number: string;
     password_hash?: string;
     refresh_token?: string;
-    permissions?: any;
+    permissions?: string;
 }
 
 

@@ -33,7 +33,7 @@ export const getUser = async (email?: string, phoneNumber?: string) => {
 		}
 
 		const userRow = result.rows[0];
-		const userPermissions = getUserPermissions(userRow.user_id);
+		const userPermissions = await getUserPermissions(userRow.user_id);
 		const user: User = {
 			user_id: userRow.user_id,
 			email: userRow.email,
@@ -45,6 +45,7 @@ export const getUser = async (email?: string, phoneNumber?: string) => {
 			refresh_token: userRow.refresh_token,
 			permissions: userPermissions
 		};
+		console.log(user);
 		return user;
 	} catch (error) {
 		throw new Error("Error retrieving user: " + (error as Error).message);
@@ -67,7 +68,7 @@ export const getUserByRefreshToken = async (userId: string): Promise<User | null
 		}
 
 		const userRow = userResult.rows[0];
-		const userPermissions = getUserPermissions(userRow.user_id);
+		const userPermissions = await getUserPermissions(userRow.user_id)
 		const user: User = {
 			user_id: userRow.user_id,
 			email: userRow.email,
@@ -122,9 +123,8 @@ export const createUser = async (email: string, phoneNumber: string, hashedPassw
 			phone_number: user.phone_number,
 			is_admin: user.is_admin,
 			first_name: firstName,
-			last_name: lastName
-		};
-
+			last_name: lastName,
+		}
 	} catch (error) {
 		await pool.query('ROLLBACK');
 		throw new Error("Error creating user: " + (error as Error).message);
@@ -196,10 +196,8 @@ export const getUserPermissions = async(userId: number) => {
 	try{
 		const query = `
 		SELECT 
-			json_agg(
-				json_build_object(
-					p.name, t.permission_id IS NOT NULL
-				)
+			json_object_agg(
+				p.name, t.permission_id IS NOT NULL
 			) AS permissions_json
 		FROM 
 			permissions p
@@ -213,13 +211,10 @@ export const getUserPermissions = async(userId: number) => {
 		const values = [userId]
 
 		const result = await pool.query(query, values);
-		const permissionsJson = JSON.parse(result);
-
-		const permissionsObject = permissionsJson.reduce((acc: any, item: any) => {
-			return { ...acc, ...item };
-		}, {});	
+		const permissionsJson = JSON.stringify(result.rows[0].permissions_json);
 		
-		return permissionsObject;
+		return permissionsJson;
+
 	} catch(error){
 		throw new Error("Error retrieving user permissions: " + (error as Error).message);
 	}

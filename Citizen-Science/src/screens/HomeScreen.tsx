@@ -23,6 +23,7 @@ const HomeScreen = () => {
 	const { userToken, setUserToken } = useContext(AuthContext);
 	const [data, setData] = useState(null);
 	const decodedToken = userToken ? jwtDecode<AccessToken>(userToken) : null;
+	const userPermissions = decodedToken ? JSON.parse(decodedToken?.permissions) : null;
 	const userName = decodedToken ? (decodedToken.firstName + " " + decodedToken.lastName) : null;
 	const userId = decodedToken ? decodedToken.user_id : NaN;
 	const [isPosting, setIsPosting] = useState(false);
@@ -47,12 +48,9 @@ const HomeScreen = () => {
 	}
 
 	useEffect(() => {
+		console.log(userPermissions.delete_all_posts)
 		fetchPosts();
-	}, []);
-
-	useEffect(() => {
-		console.log(decodedToken?.permissions.delete_all_posts)
-	})
+	}, []);	
 
     const fetchPosts = async () => {
         try {
@@ -283,7 +281,7 @@ const HomeScreen = () => {
 
 	<><WelcomeBanner/>
 	<SafeAreaView style={styles.flexContainer}>
-		
+			
 		{data && <Text>{JSON.stringify(data, null, 2)}</Text>}
 		<KeyboardAwareFlatList
 			data={posts}
