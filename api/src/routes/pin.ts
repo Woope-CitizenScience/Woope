@@ -4,9 +4,10 @@ import {
     // getPins,
     getPin,
     updatePin,
-    deletePin,
+    //deletePin,
     createPinNew,
     getAllPinsNew,
+    deletePinNew,
 } from '../models/pins';
 
 const router = express.Router();
@@ -70,18 +71,18 @@ router.put('/:pin_id', async (req: express.Request, res: express.Response) => {
 });
 
 // Delete pin
-router.delete('/:pin_id', async (req: express.Request, res: express.Response) => {
-    try {
-        const comment = await deletePin(Number(req.params.pin_id));
-        res.status(204).json(comment);
-    } catch (error) {
-        if (error instanceof Error) {
-            res.status(500).json(`Internal server error: ${error.message}`);
-        } else {
-            res.status(500).json('Internal server error: An unknown error occurred');
-        }
-    }
-});
+// router.delete('/:pin_id', async (req: express.Request, res: express.Response) => {
+//     try {
+//         const comment = await deletePin(Number(req.params.pin_id));
+//         res.status(204).json(comment);
+//     } catch (error) {
+//         if (error instanceof Error) {
+//             res.status(500).json(`Internal server error: ${error.message}`);
+//         } else {
+//             res.status(500).json('Internal server error: An unknown error occurred');
+//         }
+//     }
+// });
 
 // new create pin NEW
 router.post('/pinnew', async (req: express.Request, res: express.Response) => {
@@ -108,6 +109,25 @@ router.get('/pinnew', async (req: express.Request, res: express.Response) => {
             res.status(500).json(`Internal server error: ${error.message}`);
         } else {
             res.status(500).json('Internal server error: An unknown error occurred (route)');
+        }
+    }
+});
+
+router.delete('/pinnew', async (req: express.Request, res: express.Response) => {
+    try {
+        const pinIdRaw = req.query.pin_id; // Get the raw query param
+        const pinId = Number(pinIdRaw);   // Convert to number
+
+        console.log('Received pin_id:', pinIdRaw); // Debug raw input
+        console.log('Parsed pin_id as number:', pinId); // Debug parsed number
+
+        await deletePinNew(pinId);
+        res.status(204).end();
+    } catch (error) {
+        if (error instanceof Error) {
+            res.status(500).json(`Internal server error: ${error.message}`);
+        } else {
+            res.status(500).json('Internal server error: An unknown error occurred');
         }
     }
 });

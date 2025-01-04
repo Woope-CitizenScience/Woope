@@ -27,9 +27,9 @@ export const updatePin = async (pin_id: number, user_id: number,
     });
 }
 
-export const deletePin = async (id: number) => {
-    return fetchAPI(`/pins/${id}`, 'DELETE');
-}
+// export const deletePin = async (id: number) => {
+//     return fetchAPI(`/pins/${id}`, 'DELETE');
+// }
 
 ////////////////////////////////////////////////
 // New Pins 2024
@@ -42,4 +42,11 @@ export const createPinNew = async (name: string, description: string, date: Date
 export const getAllPinsNew = async () => {
     //console.log("getAllPinsNew fetch api called)");
     return fetchAPI('/pins/pinnew', 'GET'); // Fetches data from the /pins/pinnew endpoint
+};
+
+export const deletePinNew = async (pinId: number) => {
+    if (!pinId || isNaN(pinId)) {
+        throw new Error(`Invalid pin ID: ${pinId}`);
+    }
+    return fetchAPI(`/pins/pinnew?pin_id=${pinId}`, 'DELETE');
 };

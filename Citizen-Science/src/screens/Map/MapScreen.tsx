@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { createPinNew, getAllPinsNew } from '../../api/pins';
+import { createPinNew, getAllPinsNew, deletePinNew } from '../../api/pins';
 
 import {
 	View,
@@ -37,6 +37,7 @@ interface Region {
 }
 
 interface Pin {
+	pin_id: number; // Added pin_id for delete and update
 	name: string;
 	date: string;
 	description: string;
@@ -94,10 +95,11 @@ export const MapScreen = () => {
 		try 
 		{
 		  const allPins = await getAllPinsNew();
-		  // console.log('\nFetched pins from the server:', allPins);
+		  // console.log('\nFetched pins from the server:', allPins); // We do get the pin_id
 			
 		  // Confirmed correct format
 		  const transformedPins = allPins.map((pin) => ({
+			pin_id : pin.pin_id,
 			name: pin.name,
 			date: new Date(pin.datebegin).toISOString().split('T')[0],
 			description: pin.text_description,
@@ -210,44 +212,126 @@ export const MapScreen = () => {
 	};
 
 
+	// const handleDeletePin = async (pinId: number) => {
+	// 	try {
+	// 		//await deletePinNew(pinId);
+	// 		const response = await deletePinNew(pinId);
+			
+	// 		alert('Pin deleted successfully!');
+
+	// 		if (response === null || response === undefined) {
+	// 			console.log('Pin deleted successfully, no content returned');
+	// 		}
+
+	// 	} catch (error) {
+	// 		console.error('Failed to delete pin:', error);
+	// 		alert('Error deleting the pin. Please try again.');
+	// 	}
+	// };
+	
+	const handleDeletePin = (pinId: number) => {
+		deletePinNew(pinId)
+        .then(() => {
+            console.log('Pin deleted successfully!');
+        })
+	};
+	
+	
 
 
 
-	const handleFormSubmit = () => {
+
+
+	// const handleFormSubmit = () => {
+	// 	// Validate form before submission
+	// 	if (!formData.name || !formData.date || !formData.description || !formData.tag) {
+	// 		alert('Please fill out all fields before submitting.');
+	// 		return;
+	// 	}
+
+	// 	const pinLocation = formData.location || formLocation; //Prioritize image location 
+
+	// 	if (pinLocation) {
+	// 		// Add the new pin to the pins state
+	// 		setPins((prev) => [
+	// 			...prev,
+	// 			{
+	// 				pin_id: -1, // Temp ID //FIXME:
+	// 				name: formData.name,
+	// 				date: formData.date,
+	// 				description: formData.description,
+	// 				tag: formData.tag,
+	// 				image: formData.image,
+	// 				location: pinLocation,
+	// 			},
+	// 		]);
+	// 	} else {
+	// 		alert("no location available for this pin")
+	// 	}
+
+	// 	// hardcoded stuff, update later, get latitude and longitude from location, create unique pin_id using triggers?
+    //     let newDate = new Date(formData.date)
+    //     createPinNew(formData.name,formData.description,newDate,formData.tag,pinLocation.latitude, pinLocation.longitude); //DB Call
+
+	// 	// Reset form and hide modal
+	// 	setFormData({ name: '', date: '', description: '', tag: 'General', image: null, location: null });
+	// 	setFormLocation(null);
+	// 	setModalVisible(false);
+	// };
+
+	const handleFormSubmit = async () => {
 		// Validate form before submission
 		if (!formData.name || !formData.date || !formData.description || !formData.tag) {
 			alert('Please fill out all fields before submitting.');
 			return;
 		}
+	
+		const pinLocation = formData.location || formLocation;
+	
+		if (!pinLocation) {
+			alert('No location available for this pin');
+			return;
+		}
+	
+		try {
+			// Call the API to create the pin in the database
+			const newPin = await createPinNew(
+				formData.name,
+				formData.description,
+				new Date(formData.date),
+				formData.tag,
+				pinLocation.latitude,
+				pinLocation.longitude
+			);
 
-		const pinLocation = formData.location || formLocation; //Prioritize image location 
-
-		if (pinLocation) {
-			// Add the new pin to the pins state
+			console.log('Response from createPinNew:', newPin);
+	
+			// Add the new pin with the correct `pin_id` to the state
 			setPins((prev) => [
 				...prev,
 				{
-					name: formData.name,
+					pin_id: newPin.pin_id, // Use the ID returned by the backend
+					name: newPin.name,
 					date: formData.date,
 					description: formData.description,
 					tag: formData.tag,
-					image: formData.image,
+					image: formData.image, // Use the image from the form
 					location: pinLocation,
 				},
 			]);
-		} else {
-			alert("no location available for this pin")
+	
+			// Reset the form and hide the modal
+			setFormData({ name: '', date: '', description: '', tag: 'General', image: null, location: null });
+			setFormLocation(null);
+			setModalVisible(false);
+	
+			alert('Pin created successfully!');
+		} catch (error) {
+			console.error('Error creating pin:', error);
+			alert('Failed to create the pin. Please try again.');
 		}
-
-		// hardcoded stuff, update later, get latitude and longitude from location, create unique pin_id using triggers?
-        let newDate = new Date(formData.date)
-        createPinNew(formData.name,formData.description,newDate,formData.tag,pinLocation.latitude, pinLocation.longitude); //DB Call
-
-		// Reset form and hide modal
-		setFormData({ name: '', date: '', description: '', tag: 'General', image: null, location: null });
-		setFormLocation(null);
-		setModalVisible(false);
 	};
+	
 
 
 	const handlePickImage = async () => {
@@ -589,28 +673,64 @@ export const MapScreen = () => {
 			{/* Modal for Viewing Pin Details */}
 			<Modal visible={detailsVisible} animationType="slide" transparent={true}>
 				<View style={styles.detailsContainer}>
-					<TouchableOpacity
-						style={styles.closeButton}
-						onPress={closeDetailsModal} // Close the modal
-					>
-						<Text style={styles.closeButtonText}>Close</Text>
-					</TouchableOpacity>
-					{selectedPin && (
-						<>
-							<Text style={styles.detailsTitle}>{selectedPin.name}</Text>
-							<Text style={styles.detailsDate}>Date: {selectedPin.date}</Text>
-							<Text style={styles.detailsDescription}>{selectedPin.description}</Text>
-							<Text style={styles.detailsTag}>Tag: {selectedPin.tag}</Text>
-							{selectedPin.image && (
-								<Image
-									source={{ uri: selectedPin.image }}
-									style={styles.detailsImage}
-								/>
-							)}
-						</>
-					)}
+					<View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center' }}>
+						<TouchableOpacity
+							style={[styles.closeButton, { marginRight: 20 }]}
+
+							// onPress={() => {
+							// 	console.log('Selected Pin for deletion:', selectedPin.pin_id); // Debug log
+							// 	handleDeletePin(selectedPin.pin_id);
+							// 	closeDetailsModal();
+							// 	fetchPins(); // Refresh the map
+							// }}
+
+							// onPress={async () => {
+							// 	console.log('Selected Pin for deletion:', selectedPin.pin_id); // Debug log
+							// 	await handleDeletePin(selectedPin.pin_id); // Wait for deletion to complete
+							// 	closeDetailsModal();
+							// 	fetchPins(); // Refresh pins after modal is closed
+							// }}
+
+							onPress={async () => {
+								console.log('Selected Pin for deletion:', selectedPin.pin_id); // Debug log
+								await handleDeletePin(selectedPin.pin_id); // Ensure deletion is complete
+								closeDetailsModal(); // Close modal immediately after deletion
+								setTimeout(() => {
+									fetchPins(); // Refresh pins with a slight delay to ensure backend updates
+								}, 200); // Adjust delay as needed
+							}}
+							
+							
+							
+							//onPress={closeDetailsModal}
+						>
+							<Text style={styles.deleteButtonText}>Delete</Text>
+						</TouchableOpacity>
+
+						<TouchableOpacity
+							style={styles.closeButton}
+							onPress={closeDetailsModal} // Close the modal
+						>
+							<Text style={styles.closeButtonText}>Close</Text>
+						</TouchableOpacity>
 				</View>
-			</Modal>
+		{selectedPin && (
+			<>
+				<Text style={styles.detailsTitle}>{selectedPin.name}</Text>
+				<Text style={styles.detailsDate}>Date: {selectedPin.date}</Text>
+				<Text style={styles.detailsDescription}>{selectedPin.description}</Text>
+				<Text style={styles.detailsTag}>Tag: {selectedPin.tag}</Text>
+				{selectedPin.image && (
+					<Image
+						source={{ uri: selectedPin.image }}
+						style={styles.detailsImage}
+					/>
+				)}
+			</>
+		)}
+	</View>
+</Modal>
+
 
 
 		</View>
@@ -745,6 +865,10 @@ const styles = StyleSheet.create({
 	},
 	closeButtonText: {
 		color: '#007AFF',
+		fontWeight: 'bold',
+	},
+	deleteButtonText: {
+		color: '#FF0000',
 		fontWeight: 'bold',
 	},
 	detailsImage: {
