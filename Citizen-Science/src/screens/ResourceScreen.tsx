@@ -29,6 +29,12 @@ export const ResourceScreen = () => {
         <SafeAreaView style={styles.container}>
             <ScrollView style={styles.scrollView}>
                 {/* Followed Groups Button */}
+                <Pressable onPress={() => navigation.navigate("ManageResources")}> 
+                    <View style = {styles.directoryButton}> 
+                        <Text style={styles.title}> Manage Groups </Text>
+                    </View>
+                </Pressable>
+                {/* Followed Groups Button */}
                 <Pressable onPress={() => navigation.navigate("ResourceFollowed")}> 
                     <View style = {styles.directoryButton}> 
                         <Text style={styles.title}> Followed Groups </Text>

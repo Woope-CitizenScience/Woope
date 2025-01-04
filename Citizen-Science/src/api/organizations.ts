@@ -22,9 +22,13 @@ export const getAllCategories = async() => {
 }
 //get the info of an organization given its organization id
 export const getOrganizationById = async(org_id: number) => {
-    return fetchAPI('organizations/organizationsbyid/${org_id}', 'GET');
+    return fetchAPI('/organizations/organizationsbyid/${org_id}', 'GET');
 } 
 //get all featured organizations
 export const getFeaturedOrganizations = async() => {
     return fetchAPI('/organizations/featuredorganizations', 'GET');
+}
+// create an organization
+export const createOrganization = async(name: string, tagline: string, text_description: string) =>{
+    return fetchAPI('/organizations/create', 'POST', {name,tagline,text_description});
 }

@@ -95,3 +95,42 @@ export const getCategory = async() : Promise<Category[]> => {
         throw new Error("Error retrieving categories: " + (error as Error).message);
     }
 }
+//create an organization
+export const createOrganization = async(name: string, tagline: string, text_description: string) => {
+    if(!name){
+        throw new Error("A valid name is required");
+    }
+    try{
+        let query;
+        let values;
+        if(tagline && text_description){
+            query = `
+                INSERT INTO public.organizations (name, tagline, text_description) VALUES ($1,$2,$3) RETURNING *
+            `; 
+            values = [name, tagline, text_description];
+        }
+        else if(tagline && !text_description){
+            query = `
+                INSERT INTO public.organizations (name, tagline) VALUES ($1, $2) RETURNING *
+            `;
+            values = [name, tagline];
+        }
+        else if(text_description && !tagline){
+            query = `
+                INSERT INTO public.organizations (name, text_description) VALUES ($1,$2) RETURNING *
+            `;
+            values = [name, text_description];
+        }
+        else{
+            query = `
+                INSERT INTO public.organizations (name) VALUES ($1) RETURNING *
+            `;
+            values = [name];
+        }
+        const response = await pool.query(query, values);
+        return response.rows;
+    }
+    catch(error){
+        throw new Error("Error creating organizaton: " + (error as Error).message);
+    }
+}

@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useContext}from 'react';
-import { View, Text, SafeAreaView, FlatList, TouchableOpacity, StyleSheet, StatusBar } from 'react-native';
+import {Text, SafeAreaView, FlatList, TouchableOpacity, StyleSheet, StatusBar } from 'react-native';
 import { Organization } from '../api/types';
 import { getOrganizationsFollowed } from '../api/organizations';
 import { useNavigation } from '@react-navigation/native';

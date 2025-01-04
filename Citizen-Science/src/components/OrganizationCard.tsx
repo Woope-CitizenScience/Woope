@@ -49,6 +49,9 @@ const OrganizationCard: React.FC<OrganizationProps> = ({name, tagline, text_desc
                 <TouchableOpacity style={styles.eventButton}>
                     <Text>View Events</Text>
                 </TouchableOpacity>
+                <TouchableOpacity style={styles.editButton}>
+                    <Text>Edit</Text>
+                </TouchableOpacity>
             </View>
         </View>
     );
@@ -125,6 +128,18 @@ const styles = StyleSheet.create({
         padding:10,
         borderRadius:10,
         backgroundColor: 'white',
+        shadowOffset: {
+            width: 5,
+            height: 5,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 5,
+        elevation: 9,
+    },
+    editButton: {
+        padding:10,
+        borderRadius:10,
+        backgroundColor: 'lightyellow',
         shadowOffset: {
             width: 5,
             height: 5,

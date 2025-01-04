@@ -32,7 +32,11 @@ const ResourceSearch = () => {
             keyExtractor={item => item.org_id}
             renderItem={({item}) => 
                 (
-                <TouchableOpacity style={styles.directoryButton} onPress={() => navigation.navigate("OrganizationProfile")}>
+                <TouchableOpacity style={styles.directoryButton} onPress={() => navigation.navigate("OrganizationProfile",{
+                    name: item.name,
+                    tagline: item.tagline,
+                    text_description: item.text_description,
+                    })}>
                     <Text style={styles.title}>{item.name}</Text>
                 </TouchableOpacity>
                 )}

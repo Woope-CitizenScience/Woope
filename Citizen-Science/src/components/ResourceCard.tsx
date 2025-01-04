@@ -1,7 +1,6 @@
 import { title } from "process";
 import React from "react";
-import { View, StyleSheet, Text, Image, TouchableOpacity, Dimensions } from "react-native";
-import { white } from "react-native-paper/lib/typescript/styles/themes/v2/colors";
+import { View, StyleSheet, Text, Image, Dimensions } from "react-native";
 
 //Component to display event information 
 const ResourcesCard = () => {

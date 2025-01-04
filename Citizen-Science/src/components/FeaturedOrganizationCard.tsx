@@ -23,7 +23,7 @@ const FeaturedOrganizationCard: React.FC<FeaturedOrganizationProps> = ({name, ta
             </View>
             {/* Short Tagline */}
             <View>
-                <Text style={styles.tagline}>{tagline}}</Text>
+                <Text style={styles.tagline}>{tagline}</Text>
             </View>
             {/* Full Description */}
             <View>

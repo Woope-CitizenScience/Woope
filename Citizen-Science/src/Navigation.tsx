@@ -18,6 +18,8 @@ import ResourceScreen from './screens/ResourceScreen';
 import ResourceSpecificCategory from './screens/ResourceSpecificCategory';
 import OrganizationProfile from './screens/OrganizationProfile';
 import ResourceProfile from './screens/ResourceProfile';
+import ManageResources from './screens/ManageResources';
+import CreateOrganization from './screens/CreateOrganization';
 
 const Stack = createNativeStackNavigator();
 
@@ -51,6 +53,9 @@ const AppNavigation = () => {
 					<Stack.Screen name="ResourceSpecificCategory" component={ResourceSpecificCategory} />
 					<Stack.Screen name="OrganizationProfile" component={OrganizationProfile} />
 					<Stack.Screen name="ResourceProfile" component={ResourceProfile} />
+					<Stack.Screen name="ManageResources" component={ManageResources} />
+					<Stack.Screen name="CreateOrganization" component={CreateOrganization} />
+
 				</>
 
 			) : (
