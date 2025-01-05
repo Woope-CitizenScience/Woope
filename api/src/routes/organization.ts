@@ -1,5 +1,5 @@
 import express from 'express';
-import { createOrganization, getCategory, getFeaturedOrganizations, getOrganizationById, getOrganizations,getOrganizationsFollowed,getOrganizationsWithCategory, getOrganizationsWithCategoryId } from '../models/organizations';
+import { createOrganization, getCategory, getFeaturedOrganizations, getOrganizationById, getOrganizations,getOrganizationsFollowed,getOrganizationsWithCategory, getOrganizationsWithCategoryId, updateOrganization } from '../models/organizations';
 
 const router = require('express').Router();
 
@@ -95,6 +95,19 @@ router.post('/create', async(req: express.Request, res: express.Response) => {
         const {name, tagline, text_description} = req.body;
         const newPost = await createOrganization(name,tagline,text_description);
         res.status(201).json(newPost);
+    }catch(error){
+        if (error instanceof Error) {
+            res.status(500).json(`Internal server error: ${error.message}`);
+        } else {
+            res.status(500).json('Internal server error: An unknown error occurred');
+        }
+    }
+})
+router.put('/update', async(req: express.Request, res: express.Response) => {
+    try{
+        const {name, tagline, text_description} = req.body;
+        const edit = await updateOrganization(name,tagline,text_description);
+        res.status(200).json(edit);
     }catch(error){
         if (error instanceof Error) {
             res.status(500).json(`Internal server error: ${error.message}`);

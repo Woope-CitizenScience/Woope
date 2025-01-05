@@ -4,7 +4,11 @@ export interface Organization{
     text_description: string,
     tagline: string,
 }
-
+export interface OrganizationInfo{
+    name: string,
+    text_description: string,
+    tagline: string,
+}
 export interface OrganizationWithCategory{
     org_id: number,
     name: string,

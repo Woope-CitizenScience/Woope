@@ -57,7 +57,7 @@ export const getOrganizationsFollowed = async (user_id: number) : Promise<Organi
     }
 }
 //get an organization given an organization id
-export const getOrganizationById = async (org_id: number) : Promise<Organization[]> => {
+export const getOrganizationById = async (org_id: number) : Promise<Organization> => {
     try {
         let query = `
             SELECT * 
@@ -126,6 +126,39 @@ export const createOrganization = async(name: string, tagline: string, text_desc
                 INSERT INTO public.organizations (name) VALUES ($1) RETURNING *
             `;
             values = [name];
+        }
+        const response = await pool.query(query, values);
+        return response.rows;
+    }
+    catch(error){
+        throw new Error("Error creating organizaton: " + (error as Error).message);
+    }
+}
+//create an organization
+export const updateOrganization = async(name: string, tagline: string, text_description: string) => {
+    try{
+        let query;
+        let values;
+        if(tagline && text_description){
+            query = `
+                UPDATE public.organizations SET tagline = $1, text_description = $2 WHERE name = $3 RETURNING *
+            `; 
+            values = [tagline, text_description, name];
+        }
+        else if(tagline && !text_description){
+            query = `
+                UPDATE public.organizations SET tagline = $1 WHERE name = $2 RETURNING *
+            `;
+            values = [tagline, name];
+        }
+        else if(text_description && !tagline){
+            query = `
+                UPDATE public.organizations SET text_description = $1 WHERE name = $2 RETURNING *
+            `;
+            values = [text_description, name];
+        }
+        else{
+            throw new Error("No fields entered, no changes were made")
         }
         const response = await pool.query(query, values);
         return response.rows;

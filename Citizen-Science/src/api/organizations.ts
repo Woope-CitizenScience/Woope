@@ -29,6 +29,10 @@ export const getFeaturedOrganizations = async() => {
     return fetchAPI('/organizations/featuredorganizations', 'GET');
 }
 // create an organization
-export const createOrganization = async(name: string, tagline: string, text_description: string) =>{
+export const createOrganization = async(name: string, tagline: string, text_description: string) => {
     return fetchAPI('/organizations/create', 'POST', {name,tagline,text_description});
+}
+//update an organization
+export const updateOrganization = async(name: string, tagline: string, text_description: string) => {
+    return fetchAPI('/organizations/update', 'PUT', {name,tagline,text_description});
 }

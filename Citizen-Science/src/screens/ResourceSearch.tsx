@@ -13,7 +13,7 @@ const ResourceSearch = () => {
     const [data,setData] = useState<Organization[]>([]);
     useEffect(() => {
 		fetchOrganizations();
-	}, []);
+	});
     const fetchOrganizations = async () => {
         try {
             const organizationList = await getAllOrganizations();
@@ -33,9 +33,10 @@ const ResourceSearch = () => {
             renderItem={({item}) => 
                 (
                 <TouchableOpacity style={styles.directoryButton} onPress={() => navigation.navigate("OrganizationProfile",{
+                    org_id: item.org_id,
                     name: item.name,
                     tagline: item.tagline,
-                    text_description: item.text_description,
+                    text_description: item.text_description
                     })}>
                     <Text style={styles.title}>{item.name}</Text>
                 </TouchableOpacity>
