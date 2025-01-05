@@ -50,3 +50,82 @@ export const deletePinNew = async (pinId: number) => {
     }
     return fetchAPI(`/pins/pinnew?pin_id=${pinId}`, 'DELETE');
 };
+
+// export const updatePinNew = async (
+//     pinId: number,
+//     name: string,
+//     text_description: string,
+//     dateBegin: Date,
+//     label: string,
+//     longitude: number,
+//     latitude: number
+// ) => {
+//     if (!pinId || isNaN(pinId)) {
+//         throw new Error(`Invalid pin ID: ${pinId}`);
+//     }
+//     return fetchAPI(
+//         `/pins/pinnew?pin_id=${pinId}`,
+//         'UPDATE',
+//         {
+//             name,
+//             text_description,
+//             dateBegin,
+//             label,
+//             longitude,
+//             latitude,
+//         }
+//     );
+// };
+
+export const updatePinNew = async (
+    pinId: number,
+    name: string,
+    text_description: string,
+    dateBegin: Date,
+    label: string,
+    longitude: number,
+    latitude: number
+) => {
+    try {
+        if (!pinId || isNaN(pinId)) {
+            console.error(`Invalid pin ID: ${pinId}`);
+            throw new Error(`Invalid pin ID: ${pinId}`);
+        }
+
+        // Log the parameters being sent
+        console.log('Calling fetchAPI with:', {
+            endpoint: `/pins/pinnew?pin_id=${pinId}`,
+            method: 'UPDATE',
+            body: {
+                name,
+                text_description,
+                dateBegin,
+                label,
+                longitude,
+                latitude,
+            },
+        });
+
+        // Make the API call
+        const response = await fetchAPI(
+            `/pins/pinnew?pin_id=${pinId}`,
+            'PUT',
+            {
+                name,
+                text_description,
+                dateBegin,
+                label,
+                longitude,
+                latitude,
+            }
+        );
+
+        // Log the response
+        console.log('Response from fetchAPI:', response);
+
+        return response;
+    } catch (error) {
+        console.error('Error in updatePinNew:', error);
+        throw error;
+    }
+};

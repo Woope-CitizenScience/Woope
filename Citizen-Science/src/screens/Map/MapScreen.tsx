@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { createPinNew, getAllPinsNew, deletePinNew } from '../../api/pins';
+import { createPinNew, getAllPinsNew, deletePinNew, updatePinNew } from '../../api/pins';
 
 import {
 	View,
@@ -61,6 +61,7 @@ export const MapScreen = () => {
 	const [formLocation, setFormLocation] = useState<Location | null>(null);
 	const [isMarkerPressed, setIsMarkerPressed] = useState(false);
 	const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
+	const [isEditMode, setIsEditMode] = useState(false);
 	const [formData, setFormData] = useState<{
 		name: string;
 		date: string;
@@ -199,10 +200,9 @@ export const MapScreen = () => {
 
 		const { coordinate } = event.nativeEvent;
 		setFormLocation(coordinate); // Save the location of the tap
+		setIsEditMode(false);
 		setModalVisible(true); // Show the form modal
 	};
-
-
 
 	const closeDetailsModal = () => {
 		setSelectedPin(null); // Clear the selected pin
@@ -210,24 +210,6 @@ export const MapScreen = () => {
 		isMarkerPressedRef.current = false; // Reset the flag
 		setIsMarkerPressed(false); // Reset marker pressed state
 	};
-
-
-	// const handleDeletePin = async (pinId: number) => {
-	// 	try {
-	// 		//await deletePinNew(pinId);
-	// 		const response = await deletePinNew(pinId);
-			
-	// 		alert('Pin deleted successfully!');
-
-	// 		if (response === null || response === undefined) {
-	// 			console.log('Pin deleted successfully, no content returned');
-	// 		}
-
-	// 	} catch (error) {
-	// 		console.error('Failed to delete pin:', error);
-	// 		alert('Error deleting the pin. Please try again.');
-	// 	}
-	// };
 	
 	const handleDeletePin = (pinId: number) => {
 		deletePinNew(pinId)
@@ -236,48 +218,6 @@ export const MapScreen = () => {
         })
 	};
 	
-	
-
-
-
-
-
-	// const handleFormSubmit = () => {
-	// 	// Validate form before submission
-	// 	if (!formData.name || !formData.date || !formData.description || !formData.tag) {
-	// 		alert('Please fill out all fields before submitting.');
-	// 		return;
-	// 	}
-
-	// 	const pinLocation = formData.location || formLocation; //Prioritize image location 
-
-	// 	if (pinLocation) {
-	// 		// Add the new pin to the pins state
-	// 		setPins((prev) => [
-	// 			...prev,
-	// 			{
-	// 				pin_id: -1, // Temp ID //FIXME:
-	// 				name: formData.name,
-	// 				date: formData.date,
-	// 				description: formData.description,
-	// 				tag: formData.tag,
-	// 				image: formData.image,
-	// 				location: pinLocation,
-	// 			},
-	// 		]);
-	// 	} else {
-	// 		alert("no location available for this pin")
-	// 	}
-
-	// 	// hardcoded stuff, update later, get latitude and longitude from location, create unique pin_id using triggers?
-    //     let newDate = new Date(formData.date)
-    //     createPinNew(formData.name,formData.description,newDate,formData.tag,pinLocation.latitude, pinLocation.longitude); //DB Call
-
-	// 	// Reset form and hide modal
-	// 	setFormData({ name: '', date: '', description: '', tag: 'General', image: null, location: null });
-	// 	setFormLocation(null);
-	// 	setModalVisible(false);
-	// };
 
 	const handleFormSubmit = async () => {
 		// Validate form before submission
@@ -473,25 +413,91 @@ export const MapScreen = () => {
 		}
 	};
 
-	// Harcoded Tests - For debugging - 'put where filtedPins.map is'
-	// const testPins = [
-	// 	{
-	// 	  name: 'Test Pin',
-	// 	  date: new Date().toISOString(),
-	// 	  description: 'This is a test pin',
-	// 	  tag: 'General',
-	// 	  image: null,
-	// 	  location: { latitude: 37.7749, longitude: -122.4194 },
-	// 	},
-	// 	{
-	// 		name: 'Stanford',
-	// 		date: new Date().toISOString(),
-	// 		description: 'This is a test pin',
-	// 		tag: 'General',
-	// 		image: null,
-	// 		location: { latitude: 37.4277, longitude: -122.1701 },
-	// 	  },
-	// ];
+
+	const handleEditPin = () => {
+		if (selectedPin) {
+			setFormData({
+				name: selectedPin.name,
+				date: selectedPin.date,
+				description: selectedPin.description,
+				tag: selectedPin.tag,
+				image: selectedPin.image,
+				location: selectedPin.location,
+			});
+			setIsEditMode(true); // Switch to update mode
+			setModalVisible(true); // Open the modal with pre-filled data
+		}
+	};
+
+	const handlePinUpdateFormSubmit = async () => {
+
+		// Validate form before submission
+		if (!formData.name || !formData.date || !formData.description || !formData.tag) {
+			alert('Please fill out all fields before submitting.');
+			return;
+		}
+	
+		const pinLocation = formData.location || formLocation;
+	
+		if (!pinLocation) {
+			alert('No location available for this pin');
+			return;
+		}
+	
+		try {
+			// Call the API to update the pin in the database (assume updatePinNew exists)
+			const updatedPin = await updatePinNew(
+				selectedPin.pin_id, // Use the pin ID of the selected pin
+				formData.name,
+				formData.description,
+				new Date(formData.date),
+				formData.tag,
+				pinLocation.latitude,
+				pinLocation.longitude
+			);
+
+			// Ensure date parsing is valid
+			if (updatedPin.datebegin) {
+				updatedPin.date = new Date(updatedPin.datebegin).toISOString().split('T')[0]; // Format date correctly
+			}
+
+	
+			console.log('Response from updatePinNew:', updatedPin);
+	
+			// Update the pin in the frontend state
+			setPins((prev) =>
+				prev.map((pin) =>
+					pin.pin_id === updatedPin.pin_id
+						? {
+							  ...pin,
+							  name: updatedPin.name,
+							  date: updatedPin.date,
+							  description: updatedPin.description,
+							  tag: updatedPin.tag,
+							  location: {
+								  latitude: updatedPin.latitude,
+								  longitude: updatedPin.longitude,
+							  },
+						  }
+						: pin
+				)
+			);
+	
+			// Reset the form and hide the modal
+			setFormData({ name: '', date: '', description: '', tag: 'General', image: null, location: null });
+			setFormLocation(null);
+			setModalVisible(false);
+			closeDetailsModal(); //FIXME:
+			fetchPins();
+	
+			alert('Pin updated successfully!');
+		} catch (error) {
+			console.error('Error updating pin:', error);
+			alert('Failed to update the pin. Please try again.');
+		}
+	};
+	
+	
 
 	// HTML
 	return (
@@ -583,7 +589,9 @@ export const MapScreen = () => {
 			{/* Modal for Adding a New Pin */}
 			<Modal visible={modalVisible} animationType="slide" transparent={true}>
 				<View style={styles.modalContainer}>
-					<Text style={styles.modalTitle}>Add a New Pin</Text>
+				<Text style={styles.modalTitle}>
+            		{isEditMode ? 'Update Pin' : 'Add a New Pin'}
+        		</Text>
 					<TextInput
 						style={styles.input}
 						placeholder="Name"
@@ -655,18 +663,32 @@ export const MapScreen = () => {
 
 					{/* Action Buttons */}
 					<View style={styles.buttonContainer}>
-						<TouchableOpacity
-							style={styles.cancelButton}
-							onPress={() => setModalVisible(false)}
-						>
-							<Text style={styles.buttonText}>Cancel</Text>
-						</TouchableOpacity>
-						<TouchableOpacity
-							style={styles.submitButton}
-							onPress={handleFormSubmit}
-						>
-							<Text style={styles.buttonText}>Submit</Text>
-						</TouchableOpacity>
+						
+					<TouchableOpacity
+						style={styles.cancelButton}
+						onPress={() => {
+							setFormData({ 
+								name: '', 
+								date: '', 
+								description: '', 
+								tag: 'General', 
+								image: null, 
+								location: null 
+							}); // Clear form data
+							setModalVisible(false); // Close the modal
+						}}
+					>
+						<Text style={styles.buttonText}>Cancel</Text>
+					</TouchableOpacity>
+
+
+					<TouchableOpacity
+						style={styles.submitButton}
+						onPress={isEditMode ? handlePinUpdateFormSubmit : handleFormSubmit}
+					>
+						<Text style={styles.buttonText}>{isEditMode ? 'Update' : 'Submit'}</Text>
+					</TouchableOpacity>
+
 					</View>
 				</View>
 			</Modal>
@@ -674,22 +696,9 @@ export const MapScreen = () => {
 			<Modal visible={detailsVisible} animationType="slide" transparent={true}>
 				<View style={styles.detailsContainer}>
 					<View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center' }}>
+						
 						<TouchableOpacity
 							style={[styles.closeButton, { marginRight: 20 }]}
-
-							// onPress={() => {
-							// 	console.log('Selected Pin for deletion:', selectedPin.pin_id); // Debug log
-							// 	handleDeletePin(selectedPin.pin_id);
-							// 	closeDetailsModal();
-							// 	fetchPins(); // Refresh the map
-							// }}
-
-							// onPress={async () => {
-							// 	console.log('Selected Pin for deletion:', selectedPin.pin_id); // Debug log
-							// 	await handleDeletePin(selectedPin.pin_id); // Wait for deletion to complete
-							// 	closeDetailsModal();
-							// 	fetchPins(); // Refresh pins after modal is closed
-							// }}
 
 							onPress={async () => {
 								console.log('Selected Pin for deletion:', selectedPin.pin_id); // Debug log
@@ -698,13 +707,22 @@ export const MapScreen = () => {
 								setTimeout(() => {
 									fetchPins(); // Refresh pins with a slight delay to ensure backend updates
 								}, 200); // Adjust delay as needed
+								alert('Pin deleted successfully!');
 							}}
 							
-							
-							
-							//onPress={closeDetailsModal}
 						>
 							<Text style={styles.deleteButtonText}>Delete</Text>
+						</TouchableOpacity>
+
+						<TouchableOpacity
+							style={[styles.closeButton, { marginRight: 20 }]}
+							//onPress={closeDetailsModal} // Close the modal
+							onPress={ () => {
+								handleEditPin();
+							}}
+							
+						>
+							<Text style={styles.closeButtonText}>Edit</Text>
 						</TouchableOpacity>
 
 						<TouchableOpacity
