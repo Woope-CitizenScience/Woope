@@ -11,21 +11,23 @@ export const createPost = async (pin_id: number, user_id: number,
      });
 }  
 
-export const getAllPins = async () => {
-    return fetchAPI(`/pins/`, 'GET');
-}
+// Old Pins
 
-export const getPinById = async (id: number) => {
-    return fetchAPI(`/pins/${id}`, 'GET');
-}
+// export const getAllPins = async () => {
+//     return fetchAPI(`/pins/`, 'GET');
+// }
 
-export const updatePin = async (pin_id: number, user_id: number,
-    latitude: number, longitude: number, metadata?: string
-) => {
-    return fetchAPI(`/pins/${pin_id}`, 'PUT', {
-        user_id, latitude, longitude, metadata
-    });
-}
+// export const getPinById = async (id: number) => {
+//     return fetchAPI(`/pins/${id}`, 'GET');
+// }
+
+// export const updatePin = async (pin_id: number, user_id: number,
+//     latitude: number, longitude: number, metadata?: string
+// ) => {
+//     return fetchAPI(`/pins/${pin_id}`, 'PUT', {
+//         user_id, latitude, longitude, metadata
+//     });
+// }
 
 // export const deletePin = async (id: number) => {
 //     return fetchAPI(`/pins/${id}`, 'DELETE');
@@ -51,31 +53,6 @@ export const deletePinNew = async (pinId: number) => {
     return fetchAPI(`/pins/pinnew?pin_id=${pinId}`, 'DELETE');
 };
 
-// export const updatePinNew = async (
-//     pinId: number,
-//     name: string,
-//     text_description: string,
-//     dateBegin: Date,
-//     label: string,
-//     longitude: number,
-//     latitude: number
-// ) => {
-//     if (!pinId || isNaN(pinId)) {
-//         throw new Error(`Invalid pin ID: ${pinId}`);
-//     }
-//     return fetchAPI(
-//         `/pins/pinnew?pin_id=${pinId}`,
-//         'UPDATE',
-//         {
-//             name,
-//             text_description,
-//             dateBegin,
-//             label,
-//             longitude,
-//             latitude,
-//         }
-//     );
-// };
 
 export const updatePinNew = async (
     pinId: number,
@@ -121,7 +98,7 @@ export const updatePinNew = async (
         );
 
         // Log the response
-        console.log('Response from fetchAPI:', response);
+        //console.log('Response from fetchAPI:', response);
 
         return response;
     } catch (error) {

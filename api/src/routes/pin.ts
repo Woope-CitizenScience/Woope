@@ -1,8 +1,8 @@
 import express from 'express';
 import {
-    createPin,
-    // getPins,
-    getPin,
+    //createPin,
+    //getPins,
+    //getPin,
     //updatePin,
     //deletePin,
     createPinNew,
@@ -12,6 +12,8 @@ import {
 } from '../models/pins';
 
 const router = express.Router();
+
+// Old pins
 
 // Create a new pin
 // router.post('/', async (req: express.Request, res: express.Response) => {
@@ -85,6 +87,9 @@ const router = express.Router();
 //     }
 // });
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// New Pins 2024
+
 // new create pin NEW
 router.post('/pinnew', async (req: express.Request, res: express.Response) => {
     try {
@@ -119,8 +124,8 @@ router.delete('/pinnew', async (req: express.Request, res: express.Response) => 
         const pinIdRaw = req.query.pin_id; // Get the raw query param
         const pinId = Number(pinIdRaw);   // Convert to number
 
-        console.log('Received pin_id:', pinIdRaw); // Debug raw input
-        console.log('Parsed pin_id as number:', pinId); // Debug parsed number
+        // console.log('Received pin_id:', pinIdRaw); // Debug raw input
+        // console.log('Parsed pin_id as number:', pinId); // Debug parsed number
 
         await deletePinNew(pinId);
         res.status(204).end();
@@ -133,67 +138,17 @@ router.delete('/pinnew', async (req: express.Request, res: express.Response) => 
     }
 });
 
-// router.put('/pinnew', async (req: express.Request, res: express.Response) => {
-//     const { pin_id } = req.params;
-//     const { name, text_description, dateBegin, label, longitude, latitude } = req.body;
-
-//     try {
-//         const updatedPin = await updatePinNew(
-//             Number(pin_id),
-//             name,
-//             text_description,
-//             new Date(dateBegin),
-//             label,
-//             longitude,
-//             latitude
-//         );
-
-//         res.status(200).json(updatedPin);
-//     } catch (error) {
-//         console.error('Error updating pin:', error);
-//         res.status(500).json({ error: 'Failed to update pin' });
-//     }
-// });
-
-// router.put('/pins/pinnew', async (req: express.Request, res: express.Response) => {
-//     const { pin_id } = req.query; // Correctly use query params
-//     const { name, text_description, dateBegin, label, longitude, latitude } = req.body;
-
-//     try {
-//         // Validate pin_id
-//         if (!pin_id || isNaN(Number(pin_id))) {
-//             return res.status(400).json({ error: `Invalid pin ID: ${pin_id}` });
-//         }
-
-//         // Call the model function to update the pin
-//         const updatedPin = await updatePinNew(
-//             Number(pin_id),
-//             name,
-//             text_description,
-//             new Date(dateBegin),
-//             label,
-//             longitude,
-//             latitude
-//         );
-
-//         res.status(200).json(updatedPin);
-//     } catch (error) {
-//         console.error('Error updating pin:', error);
-//         res.status(500).json({ error: 'Failed to update pin' });
-//     }
-// });
-
 router.put('/pinnew', async (req: express.Request, res: express.Response) => {
-    console.log('PUT request received at /pinnew');
-    console.log('Query Params:', req.query);
-    console.log('Body:', req.body);
+    // console.log('PUT request received at /pinnew');
+    // console.log('Query Params:', req.query);
+    // console.log('Body:', req.body);
 
     const { pin_id } = req.query; // Correctly use query params
     const { name, text_description, dateBegin, label, longitude, latitude } = req.body;
 
-    console.log('Received PUT request at /pins/pinnew'); // Log request arrival
-    console.log('Query Parameters:', req.query); // Log query parameters
-    console.log('Request Body:', req.body); // Log request body
+    // console.log('Received PUT request at /pins/pinnew'); // Log request arrival
+    // console.log('Query Parameters:', req.query); // Log query parameters
+    // console.log('Request Body:', req.body); // Log request body
 
     try {
         // Validate pin_id
@@ -223,16 +178,13 @@ router.put('/pinnew', async (req: express.Request, res: express.Response) => {
             latitude
         );
 
-        console.log('Updated Pin:', updatedPin); // Log the response from the model
+        //console.log('Updated Pin:', updatedPin); // Log the response from the model
         res.status(200).json(updatedPin);
     } catch (error) {
         console.error('Error updating pin:', error);
         res.status(500).json({ error: 'Failed to update pin' });
     }
 });
-
-
-
 
 
 module.exports = router;

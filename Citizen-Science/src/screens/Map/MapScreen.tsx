@@ -487,7 +487,7 @@ export const MapScreen = () => {
 			setFormData({ name: '', date: '', description: '', tag: 'General', image: null, location: null });
 			setFormLocation(null);
 			setModalVisible(false);
-			closeDetailsModal(); //FIXME:
+			closeDetailsModal();
 			fetchPins();
 	
 			alert('Pin updated successfully!');

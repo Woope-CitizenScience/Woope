@@ -1,14 +1,16 @@
 import { Pin, PinNew } from "../interfaces/pin";
 const pool = require('../db');
 
-export const createPin = async (pin_id: number, user_id: number, longitude: number,
-    latitude: number, metadata?: string): Promise<Pin> => {
-    const { rows } = await pool.query(
-        'INSERT INTO pins (pin_id, user_id, longitude, latitude, metadata) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-        [pin_id, user_id, longitude, latitude, metadata]
-    );
-    return rows[0];
-}
+// Old Pins
+
+// export const createPin = async (pin_id: number, user_id: number, longitude: number,
+//     latitude: number, metadata?: string): Promise<Pin> => {
+//     const { rows } = await pool.query(
+//         'INSERT INTO pins (pin_id, user_id, longitude, latitude, metadata) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+//         [pin_id, user_id, longitude, latitude, metadata]
+//     );
+//     return rows[0];
+// }
 
 // export const getPins = async (): Promise<Pin[]> => {
 //     const query = 'select longitude, latitude from pins';
@@ -16,11 +18,11 @@ export const createPin = async (pin_id: number, user_id: number, longitude: numb
 //     return rows;
 // }
 
-export const getPin = async (pin_id: number): Promise<Pin> => {
-    const query = 'select longitude, latitude from pins';
-    const { rows } = await pool.query(query, [pin_id]);
-    return rows[0];
-}
+// export const getPin = async (pin_id: number): Promise<Pin> => {
+//     const query = 'select longitude, latitude from pins';
+//     const { rows } = await pool.query(query, [pin_id]);
+//     return rows[0];
+// }
 
 // export const updatePin = async (pin_id: number, longitude: number,
 //     latitude: number, metadata?: string): Promise<Pin> => {
@@ -42,20 +44,6 @@ export const getPin = async (pin_id: number): Promise<Pin> => {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // New Pins 2024
-
-
-// export const createPinNew = async (name: string, text_description: string, dateBegin: Date, label: string, longitude:number, latitude:number): Promise<PinNew> =>{
-//     try{
-//         const response  = await pool.query(
-//             'INSERT INTO public.pins (name, text_description, dateBegin, label, longitude, latitude) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-//             [name, text_description,dateBegin,label, longitude, latitude]
-//         ); 
-//         return response.rows[0];
-//     }catch (error) {
-//         console.error('Error creating pin', error);
-//         throw error;
-//     }
-// }
 
 export const createPinNew = async (
     name: string,
@@ -106,45 +94,6 @@ export const deletePinNew = async (pin_id: number): Promise<void> => {
         throw error;
     }
 };
-
-// export const updatePinNew = async (
-//     pin_id: number,
-//     name: string,
-//     text_description: string,
-//     dateBegin: Date,
-//     label: string,
-//     longitude: number,
-//     latitude: number
-// ): Promise<PinNew> => {
-//     try {
-//         const queryText = `
-//             UPDATE public.pins
-//             SET 
-//                 name = $1,
-//                 text_description = $2,
-//                 dateBegin = $3,
-//                 label = $4,
-//                 longitude = $5,
-//                 latitude = $6
-//             WHERE pin_id = $7
-//             RETURNING *;
-//         `;
-
-//         const values = [name, text_description, dateBegin, label, longitude, latitude, pin_id];
-
-//         const { rows } = await pool.query(queryText, values);
-
-//         if (rows.length === 0) {
-//             throw new Error(`Pin with id ${pin_id} not found`);
-//         }
-
-//         console.log('Updated Pin:', rows[0]); // Debug log for the updated pin
-//         return rows[0];
-//     } catch (error) {
-//         console.error('Error updating pin:', error);
-//         throw error;
-//     }
-// };
 
 export const updatePinNew = async (
     pin_id: number,
