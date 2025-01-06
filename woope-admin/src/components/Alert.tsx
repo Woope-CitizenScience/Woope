@@ -11,13 +11,10 @@ const Alert = ({ children, onClose }: Props) => {
       {children}
       <button
         type="button"
-        className="close"
-        data-dismiss="alert"
+        className="btn-close"
         aria-label="Close"
         onClick={onClose}
-      >
-        <span aria-hidden="true">&times;</span>
-      </button>
+      ></button>
     </div>
   );
 };
