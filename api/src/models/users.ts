@@ -37,7 +37,7 @@ export const getUser = async (email?: string, phoneNumber?: string) => {
 		const user: User = {
 			user_id: userRow.user_id,
 			email: userRow.email,
-			is_admin: userRow.is_admin,
+			// is_admin: userRow.is_admin,
 			first_name: userRow.first_name,
 			last_name: userRow.last_name,
 			phone_number: userRow.phone_number,
@@ -72,7 +72,7 @@ export const getUserByRefreshToken = async (userId: string): Promise<User | null
 		const user: User = {
 			user_id: userRow.user_id,
 			email: userRow.email,
-			is_admin: userRow.is_admin,
+			// is_admin: userRow.is_admin,
 			first_name: userRow.first_name,
 			last_name: userRow.last_name,
 			phone_number: userRow.phone_number,
