@@ -5,7 +5,7 @@ export interface AccessToken {
 	iat: number;
 	firstName: string;
 	lastName: string;
-	is_Admin: boolean;
+	// is_Admin: boolean;
 	user_id: number;
 	phoneNumber: string;
 	permissions: string;
