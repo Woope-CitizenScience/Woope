@@ -48,7 +48,6 @@ const HomeScreen = () => {
 	}
 
 	useEffect(() => {
-		console.log(userPermissions.delete_all_posts)
 		fetchPosts();
 	}, []);	
 
