@@ -23,7 +23,7 @@ const HomeScreen = () => {
 	const { userToken, setUserToken } = useContext(AuthContext);
 	const [data, setData] = useState(null);
 	const decodedToken = userToken ? jwtDecode<AccessToken>(userToken) : null;
-	const userPermissions = decodedToken ? JSON.parse(decodedToken?.permissions) : null;
+	// const userPermissions = decodedToken ? JSON.parse(decodedToken?.permissions) : null;
 	const userName = decodedToken ? (decodedToken.firstName + " " + decodedToken.lastName) : null;
 	const userId = decodedToken ? decodedToken.user_id : NaN;
 	const [isPosting, setIsPosting] = useState(false);
