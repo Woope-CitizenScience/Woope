@@ -9,6 +9,7 @@ import {MapHome} from '../screens/Map/MapHomeScreen';
 import ResourceScreen from '../screens/ResourceScreen';
 import CitizenScienceScreen from '../screens/CitizenScience';
 import CommunitySideMenu from './CommunitySideMenu';
+import { MapScreen } from '../screens/Map/MapScreen';
 
 const Tab = createBottomTabNavigator();
 interface AnimatedTabIconProps {
@@ -83,7 +84,7 @@ const NavigationBar = () => {
                 <Tab.Screen name="Home" component={CommunitySideMenu} />
                 <Tab.Screen name="Calendar" component={CalendarScreen} />
                 <Tab.Screen name="Resource" component={ResourceScreen} />
-                <Tab.Screen name="Map" component={MapHome} />
+                <Tab.Screen name="Map" component={MapScreen} />
             </Tab.Navigator>
         </View>
     );

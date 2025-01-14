@@ -1,45 +1,39 @@
-import React from 'react';
-import { View, Text, StyleSheet, StatusBar, ScrollView, Pressable, SafeAreaView, TouchableOpacity} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import { View, Text, StyleSheet, StatusBar, ScrollView, Pressable, SafeAreaView, TouchableOpacity, FlatList} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-
+import { Category } from '../api/types';
+import { getAllCategories } from '../api/organizations';
 export const ResourceCategory = () => {
     const navigation = useNavigation();
+        const [data,setData] = useState<Category[]>([]);
+        useEffect(() => {
+            fetchCategories();
+        }, []);
+    
+        const fetchCategories = async () => {
+            try {
+                const categoryList = await getAllCategories();
+                setData(categoryList);
+            } catch (error) {
+                console.log('Failed to retrieve organizations', error);
+            }
+        };
+    
     return(
-        <SafeAreaView style={styles.container}>
-            <ScrollView style={styles.scrollView}>
-                <TouchableOpacity onPress = {() => navigation.navigate("ResourceSpecificCategory", {category: "Mutual Aid"})}>
-                    <View style={styles.directoryButton}>
-                        <Text style={styles.title}>Mutual Aid</Text>
-                    </View>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => navigation.navigate("ResourceSpecificCategory", {category: "Health"})}>
-                    <View style={styles.directoryButton}>
-                        <Text style={styles.title}>Health</Text>
-                    </View>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => navigation.navigate("ResourceSpecificCategory", {category: "Food"})}>
-                    <View style={styles.directoryButton}>
-                        <Text style={styles.title}>Food</Text>
-                    </View>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => navigation.navigate("ResourceSpecificCategory", {category: "Education"})}>
-                    <View style={styles.directoryButton}>
-                        <Text style={styles.title}>Education</Text>
-                    </View>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => navigation.navigate("ResourceSpecificCategory", {category: "Social"})}>
-                    <View style={styles.directoryButton}>
-                        <Text style={styles.title}>Social</Text>
-                    </View>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => navigation.navigate("ResourceSpecificCategory", {category: "Activism"})}>
-                    <View style={styles.directoryButton}>
-                        <Text style={styles.title}>Activism</Text>
-                    </View>
-                </TouchableOpacity>
-            </ScrollView>
-        </SafeAreaView>
-    );
+            <SafeAreaView style={styles.container}>
+                {/*using a flatlist to display organizations, keyextractor to use the org_id as key*/}
+                <FlatList
+                    data={data}
+                    numColumns={1}
+                    keyExtractor={item => item.category_id}
+                    renderItem={({item}) => (
+                    <TouchableOpacity style={styles.directoryButton} onPress={() => navigation.navigate("ResourceSpecificCategory")}>
+                        <Text style={styles.title}>{item.name}</Text>
+                    </TouchableOpacity>
+                    )}
+                />
+            </SafeAreaView>
+        );
 };
 const styles = StyleSheet.create({
     container: {

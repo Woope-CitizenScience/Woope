@@ -1,10 +1,16 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-
+import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { createPinNew } from '../api/pins';
+let newDate = new Date(1);
+let num = 10;
 const CitizenScreen = () => {
     return (
         <View style={styles.container}>
-            <Text style={styles.text}>Citizen Screen</Text>
+            <Pressable onPress={() => createPinNew(num,"a","b", newDate, "c",1,2)}>
+                    <View> 
+                        <Text > Search Directory </Text>
+                    </View>
+            </Pressable>
         </View>
     );
 };

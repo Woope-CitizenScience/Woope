@@ -4,7 +4,7 @@
 Addressing environmental and socio-economic challenges in Standing Rock’s Lakota and Dakota Nations, focusing on people, land, water, and air.
 
 ## Local Setup
-- Install Node v16, I recommend using [Node Version Manager](https://github.com/nvm-sh/nvm)
+- Install Node v20, I recommend using [Node Version Manager](https://github.com/nvm-sh/nvm)
 - You will need to place `.env` files in the `api` and `Citizen-Science` directories with the following contents:
   - `api/.env`:
     ```

@@ -1,6 +1,11 @@
 {
   "dependencies": {
     "@types/react-native-calendars": "^1.1264.7",
+    "expo-camera": "^16.0.9",
+    "expo-image-picker": "^16.0.3",
     "mime": "^4.0.1"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
   }
 }

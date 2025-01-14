@@ -7,3 +7,12 @@ export interface Pin {
     created_at: Date,
     is_active: boolean,
 }
+export interface PinNew {
+    pin_id: number,
+    name: string,
+    text_description: string,
+    dateBegin: Date,
+    label: string,
+    longitude: number,
+    latitude: number,
+}
