@@ -1,4 +1,4 @@
-import {User} from "../interfaces/User";
+import { User } from "../interfaces/User";
 
 const pool = require('../db');
 
@@ -121,7 +121,6 @@ export const createUser = async (email: string, phoneNumber: string, hashedPassw
 			user_id: user.user_id,
 			email: user.email,
 			phone_number: user.phone_number,
-			is_admin: user.is_admin,
 			first_name: firstName,
 			last_name: lastName,
 		}
@@ -174,38 +173,38 @@ export const getUserFullNameByID = async (userId: string) => {
 }
 
 export const searchUsersWithName = async (name: string) => {
-	try{
+	try {
 		await pool.query('BEGIN');
 
-		// const query = 'SELECT user_id, first_name, last_name FROM profile_information WHERE CONCAT(first_name, last_name) ILIKE $1';
 		const query = `
-			select p.first_name, p.last_name, u.email, r.name as role, o.name as org 
-			from users as u
-			join profile_information as p
-			on u.user_id=p.user_id
-			left join roles as r
-			on r.role_id=u.role_id
-			left join organizations as o
-			on u.admins_org=o.org_id
-			where p.first_name ILIKE $1
-			or p.last_name ILIKE $1 
-		`
-		const values = [name + '%'];
+		SELECT p.first_name, p.last_name, u.email, r.name AS role, o.name AS org 
+		FROM users AS u
+		JOIN profile_information AS p
+		ON u.user_id = p.user_id
+		LEFT JOIN roles AS r
+		ON r.role_id = u.role_id
+		LEFT JOIN organizations AS o
+		ON u.admins_org = o.org_id
+		WHERE LOWER(CONCAT(p.first_name, p.last_name)) 
+		LIKE LOWER(REPLACE($1, ' ', ''))
+	  `;
+		const values = [`%${name}%`];
 
 		const result = await pool.query(query, values);
 
 		if (result.rows.length === 0) {
 			return null;
 		}
-		const userINFO = result.rows;
-		return userINFO;
+
+		return result.rows;
 	} catch (error) {
 		throw new Error("Error searching users: " + (error as Error).message);
 	}
-}
+};
 
-export const getUserPermissions = async(userId: number) => {
-	try{
+
+export const getUserPermissions = async (userId: number) => {
+	try {
 		const query = `
 		SELECT 
 			json_object_agg(
@@ -224,10 +223,10 @@ export const getUserPermissions = async(userId: number) => {
 
 		const result = await pool.query(query, values);
 		const permissionsJson = JSON.stringify(result.rows[0].permissions_json);
-		
+
 		return permissionsJson;
 
-	} catch(error){
+	} catch (error) {
 		throw new Error("Error retrieving user permissions: " + (error as Error).message);
 	}
 }

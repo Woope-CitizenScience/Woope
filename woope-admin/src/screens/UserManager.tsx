@@ -7,14 +7,14 @@ import { searchUser } from "../api/community";
 function UserManager() {
   const [searchInput, setSearchInput] = useState("");
   const [searchResults, setSearchResults] = useState<string[][]>([]);
-  const findByOptions = ["Full Name", "Email", "Role", "Organization"];
+  const findByOptions = ["Name", "Email", "Role", "Organization"];
   const logicOptions = ["starts with", "contains", "is", "is not"];
   const tableHeaders = [
     "First Name",
     "Last Name",
     "Email",
     "Role",
-    "Organization ",
+    "Organization",
   ];
 
   const handleSearch = async () => {
@@ -37,32 +37,34 @@ function UserManager() {
 
   return (
     <>
-      <h1>User Administration</h1>
-      <form>
-        <div className="row mb-3">
-          {/* <label htmlFor="userSearch" className="col-sm col-form-label">
-            Find by:
-          </label>
-          <div className="col-sm-2">
-            <Select options={findByOptions} id="userSearch" />
+      <div className="container-lg">
+        <h1 className="py-3">User Administration</h1>
+        <form>
+          <div className="row mb-3">
+            {/* <label htmlFor="userSearch" className="col-sm col-form-label">
+              Find by:
+            </label> */}
+            <div className="col-sm-2">
+              <Select options={findByOptions} id="userSearch" />
+            </div>
+            {/* <div className="col-sm-2">
+              <Select options={logicOptions} id="searchLogic" />
+            </div> */}
+            <div className="col-sm-4">
+              <input
+                type="text"
+                className="form-control"
+                value={searchInput}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div className="col-sm-3">
+              <Button onClick={handleSearch}>Search</Button>
+            </div>
           </div>
-          <div className="col-sm-2">
-            <Select options={logicOptions} id="searchLogic" />
-          </div> */}
-          <div className="col-sm-4">
-            <input
-              type="text"
-              className="form-control"
-              value={searchInput}
-              onChange={handleInputChange}
-            />
-          </div>
-          <div className="col-sm-3">
-            <Button onClick={handleSearch}>Search</Button>
-          </div>
-        </div>
-        <Table headers={tableHeaders} rows={searchResults} />
-      </form>
+          <Table headers={tableHeaders} rows={searchResults} />
+        </form>
+      </div>
     </>
   );
 }
