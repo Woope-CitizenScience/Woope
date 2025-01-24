@@ -1,39 +1,49 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 
-const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const navigate = useNavigate(); // Helps navigate to other pages
+// Context for managing authentication (you can implement this later)
+import { AuthContext } from "../context/AuthContext";
 
-  const handleSubmit = async (e: React.FormEvent) => {
+const Login = () => {
+  const [email, setEmail] = useState(""); // State for email
+  const [password, setPassword] = useState(""); // State for password
+  const [error, setError] = useState(""); // State for errors
+  const { setUserToken } = useContext(AuthContext); // Context to set user token
+  const navigate = useNavigate(); // Navigation hook
+
+  // Handle login submission
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
+    setError(""); // Clear errors
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/login`, {
+      // API call to login
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
 
       if (!response.ok) {
-        throw new Error("Invalid credentials");
+        const errorData = await response.json();
+        throw new Error(errorData || "Invalid credentials");
       }
 
-      const data = await response.json();
-      localStorage.setItem("token", data.token); // Store token
-      navigate("/home"); // Redirect to Home on success
+      const data = await response.json(); // Extract tokens
+      localStorage.setItem("accessToken", data.accessToken); // Store access token
+      localStorage.setItem("refreshToken", data.refreshToken); // Store refresh token
+      setUserToken(data.accessToken); // Update auth context
+      navigate("/home"); // Redirect to home page
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message); // Display error
     }
   };
 
   return (
     <div className="container mt-5">
       <h2>Login</h2>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleLogin}>
+        {/* Email Input */}
         <div className="mb-3">
           <label htmlFor="email" className="form-label">Email</label>
           <input
@@ -45,6 +55,8 @@ const Login = () => {
             required
           />
         </div>
+
+        {/* Password Input */}
         <div className="mb-3">
           <label htmlFor="password" className="form-label">Password</label>
           <input
@@ -56,7 +68,11 @@ const Login = () => {
             required
           />
         </div>
+
+        {/* Error Message */}
         {error && <div className="alert alert-danger">{error}</div>}
+
+        {/* Login Button */}
         <button type="submit" className="btn btn-primary">Login</button>
       </form>
     </div>
