@@ -1,15 +1,18 @@
 import Table from "../components/Table";
 import Select from "../components/Select";
 import Button from "../components/Button";
+import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
 import { SetStateAction, useEffect, useState } from "react";
 import { searchUser } from "../api/community";
 
 function UserManager() {
+  const navigate = useNavigate();
   const [searchInput, setSearchInput] = useState("");
   const [searchResults, setSearchResults] = useState<string[][]>([]);
   const findByOptions = ["Name", "Email", "Role", "Organization"];
-  const logicOptions = ["starts with", "contains", "is", "is not"];
+  // const logicOptions = ["starts with", "contains", "is", "is not"];
   const tableHeaders = [
+    "ID",
     "First Name",
     "Last Name",
     "Email",
@@ -20,7 +23,6 @@ function UserManager() {
   const handleSearch = async () => {
     try {
       const res = await searchUser(searchInput);
-      console.log(res);
       const users = res.map(
         (obj: { [s: string]: unknown } | ArrayLike<unknown>) =>
           Object.values(obj).map((value) => String(value))
@@ -38,7 +40,7 @@ function UserManager() {
   return (
     <>
       <div className="container-lg">
-        <h1 className="py-3">User Administration</h1>
+        <h1 className="py-2">User Administration</h1>
         <form>
           <div className="row mb-3">
             {/* <label htmlFor="userSearch" className="col-sm col-form-label">
@@ -62,7 +64,7 @@ function UserManager() {
               <Button onClick={handleSearch}>Search</Button>
             </div>
           </div>
-          <Table headers={tableHeaders} rows={searchResults} />
+          <Table headers={tableHeaders} rows={searchResults} navigateTo="/users"/>
         </form>
       </div>
     </>

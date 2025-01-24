@@ -1,6 +1,6 @@
 import { config } from "../config/config";
 import express from "express";
-import { updateName, getUserFullNameByID, searchUsersWithName } from "../models/users";
+import { updateName, getUserFullNameByID, searchUsersWithName, getUserByID } from "../models/users";
 import jwt from "jsonwebtoken";
 import { checkFollowExists, createFollowRelation, deleteFollowRelation, getFollowerCount, getFollowersList, getFollowingCount, getFollowingList } from "../models/user-follows";
 const router = require("express").Router();
@@ -114,7 +114,7 @@ router.get(
 	async (req: express.Request, res: express.Response) => {
 		try {
 			let parsed_user_id;
-			const { user_id, accessToken} = req.params;
+			const { user_id, accessToken } = req.params;
 			if (!user_id || !accessToken) {
 				return res.status(405).json("Missing attributes");
 			}
@@ -128,9 +128,9 @@ router.get(
 			}
 
 			const followStatus = await checkFollowExists(parsed_user_id, user_id);
-			
 
-			res.json({followStatus});
+
+			res.json({ followStatus });
 		} catch (error) {
 			if (error instanceof jwt.JsonWebTokenError) {
 				res.status(403).json('Invalid access token');
@@ -194,7 +194,7 @@ router.get(
 			const followerCount = await getFollowerCount(user_id);
 			const followingCount = await getFollowingCount(user_id);
 
-			res.json({user, followerCount, followingCount});
+			res.json({ user, followerCount, followingCount });
 		} catch (error) {
 			return res.status(500).json(`Error: ${(error as Error).message}`);
 		}
@@ -202,15 +202,36 @@ router.get(
 );
 
 router.get(
+	"/get-user-info/:user_id",
+	async (req: express.Request, res: express.Response) => {
+		try {
+			const { user_id } = req.params;
+			if (!user_id) {
+				return res.status(405).json("No user ID");
+			}
+			const user = await getUserByID(user_id);
+			if (!user) {
+				return res.status(500).json("Error getting user");
+			}
+
+			res.json({ user });
+		} catch (error) {
+			return res.status(500).json(`Error: ${(error as Error).message}`);
+		}
+	}
+);
+
+
+router.get(
 	"/search-profile/:name",
 	async (req: express.Request, res: express.Response) => {
 		try {
-			const {name} = req.params;
-			if(!name){
+			const { name } = req.params;
+			if (!name) {
 				return res.status(405).json("Empty search query")
 			}
 			const users = await searchUsersWithName(name);
-			{/*Goal is to return name + profile image*/}
+			{/*Goal is to return name + profile image*/ }
 			if (!users) {
 				return res.status(404).json("No users found");
 			}

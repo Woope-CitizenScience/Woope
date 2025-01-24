@@ -172,12 +172,38 @@ export const getUserFullNameByID = async (userId: string) => {
 	}
 }
 
+export const getUserByID = async (userId: string) => {
+	try {
+		await pool.query('BEGIN');
+
+		const query = `
+			select u.email, u.phone_number, u.created_at, u.admins_org, u.role_id, p.first_name, p.last_name, p.date_of_birth 
+				from users as u
+				join profile_information as p
+				on u.user_id=p.user_id
+				and u.user_id=$1
+		`;
+
+		const values = [userId];
+
+		const result = await pool.query(query, values);
+
+		if (result.rows.length === 0) {
+			return null;
+		}
+		const userINFO = result.rows;
+		return userINFO;
+	} catch (error) {
+		throw new Error("Error getting user's info " + (error as Error).message);
+	}
+}
+
 export const searchUsersWithName = async (name: string) => {
 	try {
 		await pool.query('BEGIN');
 
 		const query = `
-		SELECT p.first_name, p.last_name, u.email, r.name AS role, o.name AS org 
+		SELECT u.user_id, p.first_name, p.last_name, u.email, r.name AS role, o.name AS org 
 		FROM users AS u
 		JOIN profile_information AS p
 		ON u.user_id = p.user_id
@@ -231,4 +257,4 @@ export const getUserPermissions = async (userId: number) => {
 	}
 }
 
-module.exports = { getUser, createUser, getUserByRefreshToken, updateName, getUserFullNameByID, searchUsersWithName };
+module.exports = { getUser, createUser, getUserByRefreshToken, updateName, getUserFullNameByID, getUserByID, searchUsersWithName };

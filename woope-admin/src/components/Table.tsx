@@ -1,11 +1,15 @@
 import React, { ReactNode } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   headers: ReactNode[];
   rows: string[][];
+  navigateTo?: string;
 }
 
-const Table = ({ headers, rows }: Props) => {
+
+const Table = ({ headers, rows, navigateTo }: Props) => {
+  const navigate = useNavigate();
   return (
     <>
       <table className="table table-hover">
@@ -23,7 +27,7 @@ const Table = ({ headers, rows }: Props) => {
         <tbody>
           {rows.map((row, index) => {
             return (
-              <tr key={index}>
+              <tr onClick={() => navigate(navigateTo + '/' + row[0])} key={index}>
                 {row.map((e, index) => {
                   return <td key={index}>{e}</td>;
                 })}
@@ -32,7 +36,7 @@ const Table = ({ headers, rows }: Props) => {
           })}
         </tbody>
       </table>
-      {rows.length === 0 && <p>No Results</p>}
+      {rows.length === 0 && <p className="text-center">No Results</p>}
       <nav aria-label="Page navigation example">
         <ul className="pagination">
           <li className="page-item">

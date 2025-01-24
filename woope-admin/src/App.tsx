@@ -6,6 +6,7 @@ import UserManager from "./screens/UserManager";
 import Layout from "./components/Layout";
 import PostManager from "./screens/PostManager";
 import OrgManager from "./screens/OrgManager";
+import UserProfile from "./screens/UserProfile";
 
 
 function App() {
@@ -44,6 +45,14 @@ function App() {
             < OrgManager />
           </Layout>
         }
+        />
+        <Route 
+          path="/users/:id" 
+          element={
+            <Layout>
+              <UserProfile/>
+            </Layout>
+          }
         />
       </Routes>
     </Router>
