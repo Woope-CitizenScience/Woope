@@ -1,7 +1,6 @@
 import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 
-// Context for managing authentication (you can implement this later)
 import { AuthContext } from "../context/AuthContext";
 
 const Login = () => {
@@ -35,7 +34,7 @@ const Login = () => {
       setUserToken(data.accessToken); // Update auth context
       navigate("/home"); // Redirect to home page
     } catch (err: any) {
-      setError(err.message); // Display error
+      setError(err.message);
     }
   };
 
