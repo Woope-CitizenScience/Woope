@@ -23,12 +23,18 @@ function UserManager() {
   const handleSearch = async () => {
     try {
       const res = await searchUser(searchInput);
-      const users = res.map(
-        (obj: { [s: string]: unknown } | ArrayLike<unknown>) =>
-          Object.values(obj).map((value) => String(value))
-      );
-      setSearchResults(users);
-    } catch {
+      if(res === "No users found"){
+        setSearchResults([]);
+      }
+      else{
+        const users = res.map(
+          (obj: { [s: string]: unknown } | ArrayLike<unknown>) =>
+            Object.values(obj).map((value) => String(value))
+        );
+        setSearchResults(users);
+      }
+    } catch(e) {
+      console.log(e)
       setSearchResults([]);
     }
   };

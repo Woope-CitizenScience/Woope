@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import {useParams} from "react-router-dom";
 import { getUserByID } from "../api/community";
+import { getOrganizationById } from "../api/organizations";
 
 function UserProfile() {
-  const { id } = useParams(); // Retrieve the 'id' parameter from the URL
+  const { userId } = useParams(); // Retrieve the 'id' parameter from the URL
+  const [userOrg, setUserOrg] = useState<any>(null);
   const [userInfo, setUserInfo] = useState<any>(null);
   const userFirstName = userInfo ? userInfo.first_name : null;
   const userLastName = userInfo ? userInfo.last_name : null;
@@ -12,21 +14,51 @@ function UserProfile() {
   const userPhoneNumber = userInfo ? userInfo.phone_number : null;
   const userCreatedAt = userInfo ? userInfo.created_at : null;
   const userAdminsOrg = userInfo ? userInfo.admins_org : null;
-  const userRole = userInfo ? userInfo.role_id : null;
+  const userRole = userInfo ? userInfo.name : null;
   const userDOB = userInfo ? userInfo.date_of_birth : null;
+  const orgName = userOrg ? userOrg.name : null;
 
   useEffect(() => {
     fetchUser();
-  }, [])
+    fetchOrganization();
+  }, [userId, userAdminsOrg]);
+
 
   const fetchUser = async() => {
     try{
-      const user = id ? await getUserByID(id) : null;
+      const user = userId ? await getUserByID(userId) : null;
       const userInfo = user["user"];
       setUserInfo(userInfo[0]);
     }
     catch(e){
+      console.error('Error fetching user information: ' + e);
+    }
+  }
+
+  const fetchOrganization = async() => {
+    try{
+      const org = userAdminsOrg 
+        ? await getOrganizationById(userAdminsOrg)
+        : null;
+      setUserOrg(org[0]);
+    }
+    catch(e){
+      console.error('Error fetching organization: ' + e);
+    }
+  }
+
+  const formatDate = (date: string) => {
+    try{
+      if(!date){return "";}
+      const values = date.split('-');
+      const year = values[0];
+      const month = values[1];
+      const day = values[2].slice(0,2);
+      return month + '/' + day + '/' + year;
+    }
+    catch(e){
       console.log(e);
+      return "";
     }
   }
 
@@ -49,11 +81,11 @@ function UserProfile() {
         <div className="row">
           <div className="col-6">
             <dt>Profile Created: </dt>
-            <dd>{userCreatedAt}</dd>
+            <dd>{formatDate(userCreatedAt)}</dd>
           </div>
           <div className="col-6">
             <dt>Date of Birth: </dt>
-            <dd>{userDOB}</dd>
+            <dd>{formatDate(userDOB)}</dd>
           </div>
         </div>
         <div className="row">
@@ -63,7 +95,7 @@ function UserProfile() {
           </div>
           <div className="col-6">
             <dt>Organization: </dt>
-            <dd>{userAdminsOrg ? userAdminsOrg : "N/A"}</dd>
+            <dd>{userAdminsOrg ? orgName : "N/A"}</dd>
           </div>
         </div>
       </div>

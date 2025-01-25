@@ -177,10 +177,12 @@ export const getUserByID = async (userId: string) => {
 		await pool.query('BEGIN');
 
 		const query = `
-			select u.email, u.phone_number, u.created_at, u.admins_org, u.role_id, p.first_name, p.last_name, p.date_of_birth 
+			select u.email, u.phone_number, u.created_at, u.admins_org, r.name, p.first_name, p.last_name, p.date_of_birth 
 				from users as u
 				join profile_information as p
 				on u.user_id=p.user_id
+				join roles as r
+				on r.role_id=u.role_id
 				and u.user_id=$1
 		`;
 
