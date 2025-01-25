@@ -1,8 +1,8 @@
 import Table from "../components/Table";
 import Select from "../components/Select";
 import Button from "../components/Button";
-import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
-import { SetStateAction, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { searchUser } from "../api/community";
 
 function UserManager() {
