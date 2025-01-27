@@ -1,29 +1,30 @@
-import React, {useState, useEffect, useContext}from 'react';
-import {Text, SafeAreaView, FlatList, TouchableOpacity, StyleSheet, StatusBar } from 'react-native';
-import { Organization } from '../api/types';
-import { getOrganizationsFollowed } from '../api/organizations';
-import { useNavigation } from '@react-navigation/native';
-import { AuthContext } from '../util/AuthContext';
-import { jwtDecode } from 'jwt-decode';
-import { AccessToken } from '../util/token';
+/*
+    This screen displays all the organizations that have the category that is passed to it by 'route'
+    Organizations can fall under multiple categories, this navigates to the specific profile of the organization that is selected
+*/
 
-export const ResourceFollowed = () => {
+import React, {useEffect, useState} from 'react';
+import { StyleSheet, Text, SafeAreaView, FlatList, View, Button, StatusBar, TouchableOpacity } from 'react-native';
+import { getOrganizationsByCategoryId} from '../../api/organizations';
+import { Organization} from '../../api/types';
+import { useNavigation } from '@react-navigation/native';
+export const SpecificCategory = ({route}) => {
+    // using api to retrieve the specified organizations
     const navigation = useNavigation<any>();
-    const { userToken, setUserToken } = useContext(AuthContext);
-    const decodedToken = userToken ? jwtDecode<AccessToken>(userToken) : null;
-    const userId = decodedToken ? decodedToken.user_id : NaN;
     const [data,setData] = useState<Organization[]>([]);
     useEffect(() => {
 		fetchOrganizations();
 	}, []);
     const fetchOrganizations = async () => {
         try {
-            const organizationList = await getOrganizationsFollowed(userId);
+            let category_id = route.params.category;
+            const organizationList = await getOrganizationsByCategoryId(category_id);
             setData(organizationList);
         } catch (error) {
             console.log('Failed to retrieve organizations', error);
         }
     };
+    // displaying organizations using a flatlist, passing the organization data to the next screen when clicked
     return(
         <SafeAreaView style={styles.container}>
         {/*using a flatlist to display organizations, keyextractor to use the org_id as key*/}
@@ -32,7 +33,11 @@ export const ResourceFollowed = () => {
             numColumns={1}
             keyExtractor={item => item.org_id}
             renderItem={({item}) => (
-            <TouchableOpacity style={styles.directoryButton} onPress={() => navigation.navigate("OrganizationProfile")}>
+            <TouchableOpacity style={styles.directoryButton} onPress={() => navigation.navigate("OrganizationProfile",{
+                name: item.name,
+                tagline: item.tagline,
+                text_description: item.text_description,
+                })}>
                 <Text style={styles.title}>{item.name}</Text>
             </TouchableOpacity>
             )}
@@ -67,4 +72,4 @@ const styles = StyleSheet.create({
         elevation: 9,
     },
 });
-export default ResourceFollowed
+export default SpecificCategory

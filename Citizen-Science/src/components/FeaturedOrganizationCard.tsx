@@ -1,12 +1,14 @@
 import React from "react";
 import { View, StyleSheet, Text, Image, TouchableOpacity, Dimensions } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 interface FeaturedOrganizationProps {
     name: string;
     tagline: string;
     text_description: string;
 }
 //Component to display organization information on their resource page
-const FeaturedOrganizationCard: React.FC<FeaturedOrganizationProps> = ({name, tagline, text_description}) => {
+const FeaturedOrganizationCard: React.FC<FeaturedOrganizationProps> = ({org_id, name, tagline, text_description}) => {
+    const navigation = useNavigation<any>();
     return(
         // Container
         <View style={styles.cardContainer}>
@@ -31,7 +33,10 @@ const FeaturedOrganizationCard: React.FC<FeaturedOrganizationProps> = ({name, ta
             </View>
             {/* Container for Events and Posts Button */}
             <View style={styles.buttonContainer}>
-                <TouchableOpacity style={styles.postButton}>
+                <TouchableOpacity style={styles.postButton} onPress={() => navigation.navigate("OrganizationProfile", {
+                    name: name,
+                    org_id: org_id,
+                })}>
                     <Text>Visit Profile</Text>
                 </TouchableOpacity>
             </View>

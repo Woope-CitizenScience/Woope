@@ -4,128 +4,129 @@
     There is also funcitonality to follow the organization and navigate to see all their posts and events
     
 */
+//TODO: FIX follow button jitter when toggled
 import React, { useState,useEffect } from "react";
 import * as ImagePicker from 'expo-image-picker';
-import { View, StyleSheet, Text, Image, TouchableOpacity, Dimensions, TextInput } from "react-native";
-import { updateOrganization } from "../api/organizations";
+import { View, StyleSheet, Text, Image, TouchableOpacity, Dimensions, FlatList, SafeAreaView } from "react-native";
+import { Organization } from "../api/types";
+import {getOrganizationById, followOrganization, checkFollowed, unfollow} from "../api/organizations";
+import UpdateOrganizationModal from "../components/UpdateOrganizationModal";
+import { useNavigation } from "@react-navigation/native";
 interface OrganizationProps {
-    name: string;
-    tagline: string;
-    text_description: string;
+    org_id: number;
+    user_id: number;
 }
-interface OrganizationInfo {
-    orgName: string;
-    orgTagline: string;
-    orgDescription: string;
-}
-interface Errors {
-	name?: string;
-	tagline?: string;
-    textDescription?: string;
-}
-
 //Component to display organization information on their resource page
-const OrganizationCard: React.FC<OrganizationProps> = ({name, tagline, text_description})=> {
-    const [textColor,setTextColor] = useState("black");
-    const [isPopupVisible, setIsPopupVisible] = useState(false);
-    const [popupMessage, setPopupMessage] = useState('');
-    const [editable, setEditable] = useState(false);
-    const [editText, setEditText] = useState("Edit");
-    const [errors, setErrors] = useState<Errors>({});
-    const [orgInfo, setOrgInfo] = useState<OrganizationInfo>({
-        orgName: name,
-        orgTagline: tagline,
-        orgDescription: text_description,
-        });
-    const [newInfo, setNewInfo] = useState<OrganizationInfo>({
-        orgName: name,
-        orgTagline: tagline,
-        orgDescription: text_description,
-    })
-    const showPopup = (messages: string[]) => {
-        const formattedMessages = messages.map(message => `\u2022 ${message}`).join('\n');
-        setPopupMessage(formattedMessages);
-        setIsPopupVisible(true);
-    };
-    const handleInputChange = (field: keyof OrganizationInfo, value: string) => {
-		setNewInfo(prevState => ({ ...prevState, [field]: value }));
-	};
-    const handleSavePress = async () => {
-            try {
-                const response = await updateOrganization(newInfo.orgName,newInfo.orgTagline,newInfo.orgDescription);
-                setOrgInfo(newInfo);
-                setEditable(false);
-                setTextColor("black");
-                setEditText("Edit")
-            } catch (error) {
-                console.log('Update failed', error);
+const OrganizationCard: React.FC<OrganizationProps> = ({org_id, user_id})=> {
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [data, setData] = useState<Organization[]>([]);
+    const [org, setOrg] = useState<OrganizationProps[]>();
+    const [isFollowed, setIsFollowed] = useState<boolean>();
+    const navigation = useNavigation<any>();
+    
+    const fetchInfo = async () => {
+        try {
+            const organizationList = await getOrganizationById(org_id);
+            setData(organizationList);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+    const followedStatus = async (org_id: number, user_id: number) => {
+        try {
+            let response = await checkFollowed(user_id, org_id);
+            setOrg(response);
+            if(org[0].org_id !== undefined){
+                setIsFollowed(true);
+            }else{
+                setIsFollowed(false);
             }
-        };
+        } catch (error) {
+            setIsFollowed(false);
+        }
+        
+        
+    } 
+    useEffect(() => {
+        fetchInfo();
+        followedStatus(org_id, user_id);
+        console.log(1);
+    },[isModalVisible,isFollowed])
     return(
         // Container
-        <View style={styles.cardContainer}>
-            {/*Organization Name, Category, Follow Button */}
-            <View style ={styles.headerContainer}>
-                <View>
-                    <TextInput style={styles.title} editable={false}>{orgInfo.orgName}</TextInput>
-                    <Text style={styles.category}></Text>
+        <SafeAreaView style={styles.container}> 
+            <FlatList
+            data={data}
+            keyExtractor={(item) => item.org_id}
+            scrollEnabled={false}
+            renderItem={({item}) =>(
+                <View style={styles.cardContainer}>
+                    {/*Organization Name, Category, Follow Button */}
+                    <View style ={styles.headerContainer}>
+                        <View>
+                            <Text style={styles.title}>{item.name}</Text>
+                            <Text style={styles.category}></Text>
+                        </View>
+                        {isFollowed == false && <TouchableOpacity style={styles.follow} onPress={() => {
+                            followOrganization(user_id,item.org_id)
+                            setIsFollowed(true);
+                            }}>
+                            <Text>Follow</Text>
+                        </TouchableOpacity>}
+                        {isFollowed == true && <TouchableOpacity style={styles.follow} onPress={() => {
+                            unfollow(user_id,item.org_id)
+                            setIsFollowed(false);
+                            }}>
+                            <Text>Unfollow</Text>
+                        </TouchableOpacity>}
+                    </View>
+                    {/*Organization Banner Image */}
+                    <View>
+                        <Image style={styles.imageStyle} source={require('../../assets/adaptive-icon.png')}/>
+                    </View>
+                    {/* Short Tagline */}
+                    <View>
+                        <Text style = {styles.tagline}>{item.tagline}</Text>
+                    </View>
+                    {/* Full Description */}
+                    <View>
+                        <Text style = {styles.description}>{item.text_description}</Text>
+                    </View>
+                    {/* Container for Events and Posts Button */}
+                    <View style={styles.buttonContainer}>
+                        <TouchableOpacity style={styles.postButton}>
+                            <Text>View Posts</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.eventButton} onPress={() => navigation.navigate("EventHome", {
+                            org_id: item.org_id
+                        })}>
+                            <Text>View Events</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity 
+                        style={styles.editButton} 
+                        onPress={() => setIsModalVisible(true)}
+                        >
+                            <Text>Edit</Text>
+                        </TouchableOpacity>
+                    </View>
+                    <UpdateOrganizationModal
+                    isVisible = {isModalVisible} 
+                    onClose={() => {
+                        setIsModalVisible(false);
+                        fetchInfo();
+                    }} 
+                    name={item.name}/>
                 </View>
-                <TouchableOpacity style={styles.follow}>
-                    <Text>Follow</Text>
-                </TouchableOpacity>
-            </View>
-            {/*Organization Banner Image */}
-            <View>
-                <Image style={styles.imageStyle}source={require('../../assets/adaptive-icon.png')}/>
-            </View>
-            {/* Short Tagline */}
-            <View>
-                <TextInput 
-                style={{'fontSize':14, 'fontWeight': '600', 'color': textColor}} 
-                editable = {editable}
-                onChangeText = {(value) => handleInputChange('orgTagline',value)}
-                >
-                    {orgInfo.orgTagline}
-                </TextInput>
-            </View>
-            {/* Full Description */}
-            <View>
-                <TextInput 
-                style={{'fontSize':14, 'fontWeight': '600', 'color': textColor}} 
-                editable = {editable}
-                onChangeText = {(value) => handleInputChange('orgDescription',value)}
-                multiline = {true}
-                >{orgInfo.orgDescription}</TextInput>
-            </View>
-            {/* Container for Events and Posts Button */}
-            <View style={styles.buttonContainer}>
-                <TouchableOpacity style={styles.postButton}>
-                    <Text>View Posts</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.eventButton}>
-                    <Text>View Events</Text>
-                </TouchableOpacity>
-                <TouchableOpacity 
-                style={styles.editButton} 
-                onPress={() => {
-                    if(editable === false){
-                        setEditable(true);
-                        setTextColor("red");
-                        setEditText("Save")
-                    }
-                    else{
-                        handleSavePress();
-                    }
-                }}
-                >
-                        <Text>{editText}</Text>
-                </TouchableOpacity>
-            </View>
-        </View>
+            )}/>
+    </SafeAreaView>
     );
 };
 const deviceWidth = Math.round(Dimensions.get('window').width);
 const styles = StyleSheet.create({
+    container:{
+        flex: 1,
+    },
     cardContainer: { 
         width: deviceWidth - 20,
         backgroundColor: 'lightblue',
@@ -193,7 +194,6 @@ const styles = StyleSheet.create({
         padding: 10,
     },
     eventButton:{
-       
         padding:10,
         borderRadius:10,
         backgroundColor: 'white',

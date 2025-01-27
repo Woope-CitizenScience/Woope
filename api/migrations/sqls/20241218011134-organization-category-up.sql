@@ -21,6 +21,8 @@ CREATE TABLE IF NOT EXISTS organizations_category(
 -- orgnaizations and user bridge table
 CREATE TABLE IF NOT EXISTS user_organization_follows(
     user_id INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
-    org_id INT NOT NULL REFERENCES organizations(org_id) ON DELETE CASCADE,
+    org_id INT NOT NULL REFERENCES organizations(org_id),
     PRIMARY KEY (user_id, org_id)
 );
+-- populating categories with values
+INSERT INTO category (name) VALUES ('Activism'),('Food'), ('Health'), ('Mutual Aid'), ('Social');

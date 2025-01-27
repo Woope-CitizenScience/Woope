@@ -285,7 +285,7 @@ const HomeScreen = () => {
 			renderItem={({ item }) => (
 				<View style={styles.post}>
 					<View style={styles.headerRow}>
-						<Image source={{ uri: 'https://wallpapercave.com/wp/wp4008083.jpg' }} style={styles.avatar} />
+						<Image source={{ uri: 'https://wallpapercave.com/wp/wp4008083.jpg' }} style={styles.avatar} /> 
 						<View style={styles.headerTextContainer}>
 							<Text style={styles.userName}>{item.userName}</Text>
 							<Text style={styles.timestamp}>

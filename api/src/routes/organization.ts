@@ -1,5 +1,5 @@
 import express from 'express';
-import { createOrganization, getCategory, getFeaturedOrganizations, getOrganizationById, getOrganizations,getOrganizationsFollowed,getOrganizationsWithCategory, getOrganizationsWithCategoryId, updateOrganization } from '../models/organizations';
+import {checkFollowed, createOrganization, deleteOrganization, featureOrganization, followOrganization, getCategory, getFeaturedOrganizations, getOrganizationById, getOrganizationByName, getOrganizations,getOrganizationsFollowed,getOrganizationsWithCategory, getOrganizationsWithCategoryId, removeFeature, unfollow, updateOrganization } from '../models/organizations';
 
 const router = require('express').Router();
 
@@ -78,6 +78,18 @@ router.get('/organizationsbyid/:org_id', async(req: express.Request, res: expres
         }
     }
 })
+router.get('/organizationsbyname/:name', async(req: express.Request, res: express.Response) => {
+    try{
+        const org = await getOrganizationByName(req.params.name);
+        res.status(200).json(org);
+    }catch(error){
+        if (error instanceof Error) {
+            res.status(500).json(`Internal server error: ${error.message}`);
+        } else {
+            res.status(500).json('Internal server error: An unknown error occurred');
+        }
+    }
+})
 router.get('/featuredorganizations', async(req: express.Request, res: express.Response) => {
     try{
         const org = await getFeaturedOrganizations();
@@ -103,6 +115,19 @@ router.post('/create', async(req: express.Request, res: express.Response) => {
         }
     }
 })
+router.post('/follow', async(req: express.Request, res: express.Response) => {
+    try{
+        const {user_id, org_id} = req.body;
+        const newFollow = await followOrganization(user_id,org_id);
+        res.status(201).json(newFollow);
+    }catch(error){
+        if (error instanceof Error) {
+            res.status(500).json(`Internal server error: ${error.message}`);
+        } else {
+            res.status(500).json('Internal server error: An unknown error occurred');
+        }
+    }
+});
 router.put('/update', async(req: express.Request, res: express.Response) => {
     try{
         const {name, tagline, text_description} = req.body;
@@ -116,4 +141,69 @@ router.put('/update', async(req: express.Request, res: express.Response) => {
         }
     }
 })
+router.put('/setfeatured', async(req: express.Request, res: express.Response) => {
+    try{
+        const {name} = req.body;
+        const edit = await featureOrganization(name);
+        res.status(200).json(edit);
+    }catch(error){
+        if (error instanceof Error) {
+            res.status(500).json(`Internal server error: ${error.message}`);
+        } else {
+            res.status(500).json('Internal server error: An unknown error occurred');
+        }
+    }
+})
+router.put('/removefeatured', async(req: express.Request, res: express.Response) => {
+    try{
+        const {name} = req.body
+        const edit = await removeFeature(name);
+        res.status(200).json(edit);
+    }catch(error){
+        if (error instanceof Error) {
+            res.status(500).json(`Internal server error: ${error.message}`);
+        } else {
+            res.status(500).json('Internal server error: An unknown error occurred');
+        }
+    }
+})
+router.put('/checkfollow', async(req: express.Request, res: express.Response) => {
+    try{
+        const{user_id, org_id} = req.body;
+        const edit = await checkFollowed(user_id, org_id);
+        res.status(200).json(edit);
+    }catch(error){
+        if (error instanceof Error) {
+            res.status(500).json(`Internal server error: ${error.message}`);
+        } else {
+            res.status(500).json('Internal server error: An unknown error occurred');
+        }
+    }
+})
+router.delete('/unfollow', async (req: express.Request, res: express.Response) => {
+    try {
+        const {user_id, org_id} = req.body;
+        await unfollow(user_id, org_id);
+        res.status(204);
+    } catch (error) {
+        if (error instanceof Error) {
+            res.status(500).json(`Internal server error: ${error.message}`);
+        } else {
+            res.status(500).json('Internal server error: An unknown error occurred');
+        }
+    }
+});
+router.delete('/deleteorganization', async (req: express.Request, res: express.Response) => {
+    try {
+        const {name} = req.body;
+        await deleteOrganization(name);
+        res.status(204);
+    } catch (error) {
+        if (error instanceof Error) {
+            res.status(500).json(`Internal server error: ${error.message}`);
+        } else {
+            res.status(500).json('Internal server error: An unknown error occurred');
+        }
+    }
+});
 module.exports = router;

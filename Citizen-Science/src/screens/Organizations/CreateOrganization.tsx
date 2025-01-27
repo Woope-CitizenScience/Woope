@@ -1,10 +1,14 @@
-//modal maybe
-import React, {useContext, useState} from 'react';
-import {ImageBackground, SafeAreaView, Platform, KeyboardAvoidingView, Text, StatusBar, StyleSheet, View, TextInput, TouchableOpacity, Keyboard, ScrollView} from "react-native";
+/*
+    This screen will allow the user to create an organization
+    ?: convert into a modal component instead?
+*/
+import React, {useState} from 'react';
+import {ImageBackground, SafeAreaView, Platform, KeyboardAvoidingView, Text, StatusBar, StyleSheet, View, TextInput, TouchableOpacity, Keyboard} from "react-native";
 import { useNavigation } from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import Popup from "../components/Popup";
-import { createOrganization } from '../api/organizations';
+import Popup from "../../components/Popup";
+import { createOrganization, getOrganizationByName } from '../../api/organizations';
+import { Organization } from '../../api/types';
 
 type NavigationParam = {
     Login: undefined;
@@ -34,7 +38,7 @@ export const CreateOrganization = () => {
 		tagline: '',
 		text_description: '',
 	});
-
+    const [orgName, setOrgName] = useState<Organization>();
 	const [isPopupVisible, setIsPopupVisible] = useState(false);
 	const [popupMessage, setPopupMessage] = useState('');
 
@@ -44,36 +48,44 @@ export const CreateOrganization = () => {
 		setIsPopupVisible(true);
 	};
 	const [errors, setErrors] = useState<Errors>({});
-
+    const fetchName = async(name: string) => {
+        try {
+            const response = await getOrganizationByName(name);
+            setOrgName(response);
+        } catch (error) {
+            console.log("Organization Does Not Exist")
+        }
+    }
 	const handleInputChange = (field: keyof OrganizationInfo, value: string) => {
 		setUserInfo(prevState => ({ ...prevState, [field]: value }));
 	};
 
-    const handleSignUpPress = async () => {
-	    if (validate()) {
-		    try {
-			    const response = await createOrganization(userInfo.name,userInfo.tagline,userInfo.text_description);
-		    } catch (error) {
-			    console.log('Signup failed', error);
-		    }
-	    }
-    };
-	const validate = (): boolean => {
-		let newErrors: Errors = {};
-		let isValid = true;
-		let errorMessages: string[] = [];
-        //checks that name is valid 
-		if (userInfo.name.trim().length === 0) {
-			newErrors.name = 'Group name is required';
-			isValid = false;
-			errorMessages.push('Group name is required');
-		}
-		setErrors(newErrors);
-		if (!isValid) {
-			showPopup(errorMessages);
-		}
-		return isValid;
-	};
+    const handleSignUpPress = async (name: string) => {
+            try {
+                const response = await createOrganization(userInfo.name,userInfo.tagline,userInfo.text_description);
+                showPopup(["Success!"]);
+            } catch (error) {
+                showPopup(["Name is already taken"]);
+                console.log('Signup failed', error);
+            }
+    }
+    //TODO regex to not allow blank characters at beginning, symbols, and removing trailing spaces from character
+	// const validate = (name: string): boolean => {
+	// 	let newErrors: Errors = {};
+	// 	let isValid = true;
+	// 	let errorMessages: string[] = [];
+    //     fetchName(name);
+    //     //checks that name is valid 
+	// 	if (orgName == undefined) {
+	// 		isValid = false;
+	// 		showPopup(["Invalid name"]);
+	// 	}
+	// 	setErrors(newErrors);
+	// 	if (!isValid) {
+	// 		showPopup(errorMessages);
+	// 	}
+	// 	return isValid;
+	// };
 	return(
         <KeyboardAvoidingView 
         behavior="padding"
@@ -81,15 +93,16 @@ export const CreateOrganization = () => {
         style={styles.container}
         >
             <ImageBackground
-                source={require('../../assets/background2.png')}
+                source={require('../../../assets/background2.png')}
                 style={styles.image}>
                     <SafeAreaView style={styles.body}>
                             {/* 'Create group' title on signup */}
                             <View style={styles.titlebox}>
-                                <Text style={styles.title}> Create {"\n"} Organization</Text>
+                                <Text style={styles.title}> Create {"\n"} Group</Text>
                             </View>
                             {/* Group name input */}
                             <View style={styles.content}>
+                                <Text style={styles.requirements}>Required:</Text>
                                 <TextInput
                                 style={styles.input}
                                 placeholder={"Group Name"}
@@ -100,6 +113,7 @@ export const CreateOrganization = () => {
                             </View>
                             {/* tagline input */}
                             <View style={styles.content}>
+                                <Text style={styles.optional}>Optional:</Text>
                                 <TextInput
                                 style={styles.input}
                                 placeholder={"Optional: One sentence description"}
@@ -110,9 +124,10 @@ export const CreateOrganization = () => {
                             </View>
                             {/* full description input */}
                             <View style={styles.content}>
+                                <Text style = {styles.optional}>Optional:</Text>
                                 <TextInput
                                 style={styles.input}
-                                placeholder={"Optional: An in-depth Description"}
+                                placeholder={"An in-depth Description"}
                                 maxLength={500}
                                 textAlign='center'
                                 // onBlur along with scrollview for dismissal of keyboard without using return button
@@ -123,7 +138,7 @@ export const CreateOrganization = () => {
                                 />
                             </View>
                             {/* Submit button */}
-                            <TouchableOpacity style={styles.content} onPress={() => handleSignUpPress()}>
+                            <TouchableOpacity style={styles.content} onPress={() => handleSignUpPress(userInfo.name)}>
                                 <Text style={styles.label}>Submit</Text>
                             </TouchableOpacity>
                             <Popup
@@ -157,6 +172,16 @@ const styles = StyleSheet.create({
         fontSize: 50,
         fontWeight: 'bold',
         color: 'white',
+    },
+    requirements: {
+        color: "red",
+        fontSize: 14,
+        fontWeight: "600"
+    },
+    optional: {
+        color: "black",
+        fontSize: 14,
+        fontWeight: "600"
     },
     titlebox:{
         marginTop: 30,

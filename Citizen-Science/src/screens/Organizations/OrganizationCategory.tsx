@@ -8,9 +8,9 @@
 import React, {useState, useEffect} from 'react';
 import { View, Text, StyleSheet, StatusBar, ScrollView, Pressable, SafeAreaView, TouchableOpacity, FlatList} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { Category } from '../api/types';
-import { getAllCategories } from '../api/organizations';
-export const ResourceCategory = () => {
+import { Category } from '../../api/types';
+import { getAllCategories } from '../../api/organizations';
+export const OrganizationCategory = () => {
     const navigation = useNavigation<any>();
         // Using api to fetch all categories
         const [data,setData] = useState<Category[]>([]);
@@ -25,8 +25,8 @@ export const ResourceCategory = () => {
                 console.log('Failed to retrieve organizations', error);
             }
         };
-    
-    return(
+    if (data[0] !== undefined){
+        return(
             <SafeAreaView style={styles.container}>
                 {/*
                     using a flatlist to display categories, keyextractor to use the categoy_id as key
@@ -37,13 +37,21 @@ export const ResourceCategory = () => {
                     numColumns={1}
                     keyExtractor={item => item.category_id}
                     renderItem={({item}) => (
-                    <TouchableOpacity style={styles.directoryButton} onPress={() => navigation.navigate("ResourceSpecificCategory",{category: item.category_id})}> 
+                    <TouchableOpacity style={styles.directoryButton} onPress={() => navigation.navigate("SpecificCategory",{category: item.category_id})}> 
                         <Text style={styles.title}>{item.name}</Text>
                     </TouchableOpacity>
                     )}
                 />
             </SafeAreaView>
         );
+    }
+    else{
+        return(
+            <SafeAreaView style = {styles.errorContainer}>
+                <Text style={styles.error}>No categories exist</Text>
+            </SafeAreaView>
+        );
+    }
 };
 const styles = StyleSheet.create({
     container: {
@@ -58,6 +66,16 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 30,
         color: '#232f46',
+    },
+    errorContainer: {
+        flex: 1, 
+        backgroundColor: "white",
+        alignItems: "center",
+        justifyContent: "center"
+    },
+    error: {
+        alignSelf: "center",
+        fontSize: 20,
     },
     directoryButton: {
         borderRadius: 16,
@@ -75,4 +93,4 @@ const styles = StyleSheet.create({
         elevation: 9,
     },
 });
-export default ResourceCategory
+export default OrganizationCategory
