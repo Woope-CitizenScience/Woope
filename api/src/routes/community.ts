@@ -1,6 +1,6 @@
 import { config } from "../config/config";
 import express from "express";
-import { updateName, getUserFullNameByID, searchUsersWithName, getUserByID } from "../models/users";
+import { updateName, getUserFullNameByID, searchUsersWithName, getUserByID, updateUserOrg, updateUserRole } from "../models/users";
 import jwt from "jsonwebtoken";
 import { checkFollowExists, createFollowRelation, deleteFollowRelation, getFollowerCount, getFollowersList, getFollowingCount, getFollowingList } from "../models/user-follows";
 const router = require("express").Router();
@@ -46,6 +46,40 @@ router.post(
 		}
 	}
 );
+
+router.post("/update-org",
+	async(req: express.Request, res: express.Response) => {
+		const { user_id, org_id } = req.body;
+		
+		try{
+			const updatedUserOrg = await updateUserOrg(user_id, org_id);
+			if(!updatedUserOrg){
+				return res.status(501).json('Error updating organization');
+			}
+			res.status(200).json(updatedUserOrg);
+		}
+		catch (error){
+			res.status(500).json(`Internal server error: ${(error as Error).message}`);
+		}
+	}
+)
+
+router.post("/update-role",
+	async(req: express.Request, res: express.Response) => {
+		const { user_id, role_id } = req.body;
+		
+		try{
+			const updatedUserRole = await updateUserRole(user_id, role_id);
+			if(!updatedUserRole){
+				return res.status(501).json('Error updating role');
+			}
+			res.status(200).json(updatedUserRole);
+		}
+		catch (error){
+			res.status(500).json(`Internal server error: ${(error as Error).message}`);
+		}
+	}
+)
 
 router.post(
 	"/follow-request",

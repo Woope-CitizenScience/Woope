@@ -23,18 +23,17 @@ function UserManager() {
   const handleSearch = async () => {
     try {
       const res = await searchUser(searchInput);
-      if(res === "No users found"){
+      if (res === "No users found") {
         setSearchResults([]);
-      }
-      else{
+      } else {
         const users = res.map(
           (obj: { [s: string]: unknown } | ArrayLike<unknown>) =>
             Object.values(obj).map((value) => String(value))
         );
         setSearchResults(users);
       }
-    } catch(e) {
-      console.log(e)
+    } catch (e) {
+      console.log(e);
       setSearchResults([]);
     }
   };
@@ -52,9 +51,9 @@ function UserManager() {
             {/* <label htmlFor="userSearch" className="col-sm col-form-label">
               Find by:
             </label> */}
-            <div className="col-sm-2">
+            {/* <div className="col-sm-2">
               <Select options={findByOptions} id="userSearch" />
-            </div>
+            </div> */}
             {/* <div className="col-sm-2">
               <Select options={logicOptions} id="searchLogic" />
             </div> */}
@@ -70,7 +69,11 @@ function UserManager() {
               <Button onClick={handleSearch}>Search</Button>
             </div>
           </div>
-          <Table headers={tableHeaders} rows={searchResults} navigateTo="/users"/>
+          <Table
+            headers={tableHeaders}
+            rows={searchResults}
+            navigateTo="/users"
+          />
         </form>
       </div>
     </>

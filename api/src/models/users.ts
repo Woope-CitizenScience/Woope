@@ -259,4 +259,34 @@ export const getUserPermissions = async (userId: number) => {
 	}
 }
 
-module.exports = { getUser, createUser, getUserByRefreshToken, updateName, getUserFullNameByID, getUserByID, searchUsersWithName };
+export const updateUserOrg = async(userId: string, orgId: string | null) => {
+	try{
+		const response = await pool.query(
+			`UPDATE users SET admins_org=$1 WHERE user_id=$2 RETURNING *`,
+			[orgId, userId]
+		)
+		console.log(response.rows[0])
+		return response.rows[0];
+	}
+	catch(error){
+		console.error(`Error updating user with user id ${userId}`, error);
+		throw error;
+	}
+}
+
+export const updateUserRole = async(userId: string, roleId: string) => {
+	try{
+		const response = await pool.query(
+			`UPDATE users SET role_id=$1 WHERE user_id=$2 RETURNING *`,
+			[roleId, userId]
+		)
+		console.log(response.rows[0])
+		return response.rows[0];
+	}
+	catch(error){
+		console.error(`Error updating user with user id ${userId}`, error);
+		throw error;
+	}
+}
+
+module.exports = { getUser, createUser, getUserByRefreshToken, updateName, getUserFullNameByID, getUserByID, searchUsersWithName, updateUserOrg, updateUserRole };

@@ -1,14 +1,31 @@
 interface Props {
-  options: string[];
+  className?: string;
+  options?: string[];
+  values?: string[];
   id?: string;
+  selected?: string;
+  onChange?: (event: React.ChangeEvent<HTMLSelectElement>) => void;
 }
 
-const Select = ({ options, id }: Props) => {
+const Select = ({
+  options = [],
+  values = [],
+  id,
+  className,
+  selected = "",
+  onChange,
+}: Props) => {
   return (
-    <select className="form-select" aria-label="Default select example" id={id}>
+    <select
+      className={`form-select ${className}`}
+      aria-label="Default select example"
+      id={id}
+      onChange={onChange}
+    >
+      <option selected>{selected}</option>
       {options.map((e, index) => {
         return (
-          <option value={index} key={e}>
+          <option value={index < values.length ? values[index] : ""} key={e}>
             {e}
           </option>
         );

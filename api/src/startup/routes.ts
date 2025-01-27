@@ -7,6 +7,7 @@ let communityRouter = require('../routes/community')
 let weatherRouter = require('../routes/weatherRouter')
 let pinRouter = require('../routes/pin')
 let organizationRouter = require('../routes/organization')
+let rolesRouter = require('../routes/roles')
 // add more routers here
 
 module.exports = function (app: express.Application) {
@@ -19,4 +20,5 @@ module.exports = function (app: express.Application) {
     app.use('/weather', weatherRouter);
     app.use('/pins', pinRouter);
     app.use('/organizations', organizationRouter);
+    app.use('/roles', rolesRouter)
 };
