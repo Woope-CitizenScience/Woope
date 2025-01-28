@@ -37,7 +37,7 @@ export const getUser = async (email?: string, phoneNumber?: string) => {
 		const user: User = {
 			user_id: userRow.user_id,
 			email: userRow.email,
-			// is_admin: userRow.is_admin,
+			role_id: userRow.role_id,
 			first_name: userRow.first_name,
 			last_name: userRow.last_name,
 			phone_number: userRow.phone_number,
@@ -72,7 +72,7 @@ export const getUserByRefreshToken = async (userId: string): Promise<User | null
 		const user: User = {
 			user_id: userRow.user_id,
 			email: userRow.email,
-			// is_admin: userRow.is_admin,
+			role_id: userRow.role_id,
 			first_name: userRow.first_name,
 			last_name: userRow.last_name,
 			phone_number: userRow.phone_number,
@@ -123,6 +123,7 @@ export const createUser = async (email: string, phoneNumber: string, hashedPassw
 			phone_number: user.phone_number,
 			first_name: firstName,
 			last_name: lastName,
+			role_id: user.role_id,
 		}
 	} catch (error) {
 		await pool.query('ROLLBACK');

@@ -1,79 +1,43 @@
 import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-
 import { AuthContext } from "../context/AuthContext";
+import { loginUser } from "../api/login";
+import LoginForm from "../components/LoginForm";
 
 const Login = () => {
-  const [email, setEmail] = useState(""); // State for email
-  const [password, setPassword] = useState(""); // State for password
-  const [error, setError] = useState(""); // State for errors
-  const { setUserToken } = useContext(AuthContext); // Context to set user token
-  const navigate = useNavigate(); // Navigation hook
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const { setUserToken, setUserRole } = useContext(AuthContext);
+  const navigate = useNavigate();
 
-  // Handle login submission
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(""); // Clear errors
+    setError("");
 
     try {
-      // API call to login
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData || "Invalid credentials");
-      }
-
-      const data = await response.json(); // Extract tokens
-      localStorage.setItem("accessToken", data.accessToken); // Store access token
-      localStorage.setItem("refreshToken", data.refreshToken); // Store refresh token
-      setUserToken(data.accessToken); // Update auth context
-      navigate("/home"); // Redirect to home page
+      const data = await loginUser(email, password); // Call the login API
+      localStorage.setItem("accessToken", data.accessToken);
+      localStorage.setItem("userRole", data.role_id.toString()); // Store role_id
+      setUserToken(data.accessToken);
+      setUserRole(data.role_id); // Update context with role_id
+      navigate("/home");
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message); // Handle error
     }
   };
 
   return (
     <div className="container mt-5">
       <h2>Login</h2>
-      <form onSubmit={handleLogin}>
-        {/* Email Input */}
-        <div className="mb-3">
-          <label htmlFor="email" className="form-label">Email</label>
-          <input
-            type="email"
-            id="email"
-            className="form-control"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
-
-        {/* Password Input */}
-        <div className="mb-3">
-          <label htmlFor="password" className="form-label">Password</label>
-          <input
-            type="password"
-            id="password"
-            className="form-control"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-
-        {/* Error Message */}
-        {error && <div className="alert alert-danger">{error}</div>}
-
-        {/* Login Button */}
-        <button type="submit" className="btn btn-primary">Login</button>
-      </form>
+      <LoginForm
+        email={email}
+        password={password}
+        error={error}
+        setEmail={setEmail}
+        setPassword={setPassword}
+        onSubmit={handleLogin}
+      />
     </div>
   );
 };
