@@ -1,7 +1,7 @@
 export interface User {
     user_id: number;
     email: string;
-    // is_admin: boolean;
+    role_id: number;
     first_name: string;
     last_name: string;
     phone_number: string;

@@ -22,7 +22,6 @@ router.post('/login', async (req: express.Request, res: express.Response) => {
             return res.status(404).json('User does not exist');
         }
 
-
         if (await comparePasswords(password, user.password_hash as string)) {
             const accessToken = await createAccessToken(user);
             const refreshToken = await createRefreshToken(user);
@@ -31,7 +30,12 @@ router.post('/login', async (req: express.Request, res: express.Response) => {
             await pool.query('UPDATE users SET last_login = NOW() WHERE user_id = $1', [user.user_id]);
             await pool.query('UPDATE users SET refresh_token = $1 WHERE user_id = $2', [hashedRefreshToken, user.user_id]);
 
-            res.status(200).json({ 'accessToken': accessToken, 'refreshToken': refreshToken });
+            // Include role_id in the response
+            res.status(200).json({
+                accessToken,
+                refreshToken,
+                role_id: user.role_id, // Add role_id here
+            });
         } else {
             res.status(401).json('Invalid password');
         }
@@ -41,6 +45,7 @@ router.post('/login', async (req: express.Request, res: express.Response) => {
         res.status(500).json(`Internal server error: ${err.message}`);
     }
 });
+
 
 router.post('/logout', async (req: express.Request, res: express.Response) => {
     const { userId } = req.body;
