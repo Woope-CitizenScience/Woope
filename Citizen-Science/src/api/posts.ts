@@ -1,7 +1,7 @@
 import { fetchAPI } from "./fetch";
 
-export const createPost = async (user_id: number, content: string) => {
-    return fetchAPI('/forum/posts', 'POST', { user_id, content });
+export const createPost = async (user_id: number, org_id: number | null, content: string) => {
+    return fetchAPI('/forum/posts', 'POST', { user_id, org_id, content });
 }
 
 export const getAllPosts = async (id: number) => {

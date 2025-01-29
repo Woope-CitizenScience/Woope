@@ -8,7 +8,9 @@ CREATE TABLE IF NOT EXISTS posts (
     comments_count INTEGER DEFAULT 0, 
     likes_count INTEGER DEFAULT 0,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    org_id INTEGER
     FOREIGN KEY (user_id) REFERENCES users(user_id)
+    FOREIGN KEY (org_id) REFERENCES organizations(org_id)
 );
 
 -- Create Comments Table
@@ -22,8 +24,10 @@ CREATE TABLE IF NOT EXISTS comments (
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     deleted_at TIMESTAMP,
     likes_count INTEGER DEFAULT 0,
+    org_id INTEGER,
     FOREIGN KEY (post_id) REFERENCES posts(post_id) ON DELETE CASCADE,
-    FOREIGN KEY (user_id) REFERENCES users(user_id)
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (org_id) REFERENCES organizations(org_id)
 );
 
 -- Create enum for accepted media types

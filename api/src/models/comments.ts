@@ -1,12 +1,17 @@
 const pool = require('../db');
 
-export const createComment = async (content: string, user_id: number, post_id: number): Promise<Comment> => {
+export const createComment = async (
+    content: string, user_id: 
+    number, post_id: number, 
+    org_id: number | null
+): Promise<Comment> => {
+    
     const insertQuery = `
-        INSERT INTO comments (content, user_id, post_id, parent_comment_id)
-        VALUES ($1, $2, $3, $4)
+        INSERT INTO comments (content, user_id, post_id, parent_comment_id, org_id)
+        VALUES ($1, $2, $3, $4, $5)
         RETURNING *
     `;
-    const commentResult = await pool.query(insertQuery, [content, user_id, post_id, null]);
+    const commentResult = await pool.query(insertQuery, [content, user_id, post_id, null, org_id]);
     const newComment = commentResult.rows[0];
 
     const userQuery = `
@@ -26,10 +31,15 @@ export const createComment = async (content: string, user_id: number, post_id: n
 
 export const getComments = async (post_id: number): Promise<Comment[]> => {
     const { rows } = await pool.query(
-        `SELECT comments.*, pi.first_name || ' ' || pi.last_name AS username
+        `SELECT comments.*, 
+		 CASE 
+		 	WHEN comments.org_id IS NOT NULL THEN o.name
+			ELSE pi.first_name || ' ' || pi.last_name
+		 END AS username
          FROM comments
          JOIN users u ON u.user_id = comments.user_id
          JOIN profile_information pi ON pi.user_id = u.user_id
+		 LEFT JOIN organizations o ON comments.org_id = o.org_id
          WHERE comments.post_id = $1 AND comments.is_active = true
          ORDER BY comments.created_at DESC`,
         [post_id]

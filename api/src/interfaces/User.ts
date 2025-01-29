@@ -8,6 +8,8 @@ export interface User {
     password_hash?: string;
     refresh_token?: string;
     permissions?: string;
+    org_id: number;
+    org_name: string;
 }
 
 

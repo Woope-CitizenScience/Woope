@@ -13,16 +13,18 @@ export const getUser = async (email?: string, phoneNumber?: string) => {
 
 		if (email) {
 			query = `
-                SELECT u.*, p.first_name, p.last_name, p.date_of_birth
+                SELECT u.*, o.name AS org_name, p.first_name, p.last_name, p.date_of_birth
                 FROM users u 
                 LEFT JOIN profile_information p ON u.user_id = p.user_id
+				LEFT JOIN organizations AS o ON u.admins_org = o.org_id
                 WHERE u.email = $1`;
 			values = [email];
 		} else if (phoneNumber) {
 			query = `
-                SELECT u.*, p.first_name, p.last_name, p.date_of_birth
-                FROM users u
+                SELECT u.*, o.name AS org_name, p.first_name, p.last_name, p.date_of_birth
+                FROM users u 
                 LEFT JOIN profile_information p ON u.user_id = p.user_id
+				LEFT JOIN organizations AS o ON u.admins_org = o.org_id
                 WHERE u.phone_number = $1`;
 			values = [phoneNumber];
 		}
@@ -43,7 +45,9 @@ export const getUser = async (email?: string, phoneNumber?: string) => {
 			phone_number: userRow.phone_number,
 			password_hash: userRow.password_hash,
 			refresh_token: userRow.refresh_token,
-			permissions: userPermissions
+			permissions: userPermissions,
+			org_id: userRow.admins_org,
+			org_name: userRow.org_name
 		};
 		console.log(user);
 		return user;
@@ -56,10 +60,12 @@ export const getUser = async (email?: string, phoneNumber?: string) => {
 export const getUserByRefreshToken = async (userId: string): Promise<User | null> => {
 	try {
 		const userQuery = `
-            SELECT u.user_id, u.email, u.is_admin, u.phone_number, u.refresh_token,
-                   p.first_name, p.last_name, p.date_of_birth
+            SELECT u.user_id, u.email, u.role_id, u.phone_number, u.refresh_token,
+                   u.admins_org, o.name as org_name, p.first_name, 
+				   p.last_name, p.date_of_birth
             FROM users u
             LEFT JOIN profile_information p ON u.user_id = p.user_id
+			LEFT JOIN organizations o ON u.admins_org=o.org_id
             WHERE u.user_id = $1`;
 
 		const userResult = await pool.query(userQuery, [userId]);
@@ -77,6 +83,8 @@ export const getUserByRefreshToken = async (userId: string): Promise<User | null
 			last_name: userRow.last_name,
 			phone_number: userRow.phone_number,
 			refresh_token: userRow.refresh_token,
+			org_id: userRow.admins_org,
+			org_name: userRow.org_name,
 			permissions: userPermissions
 		};
 		return user;
@@ -108,6 +116,7 @@ export const createUser = async (email: string, phoneNumber: string, hashedPassw
 
 		const userResult = await pool.query(query, values);
 		const user = userResult.rows[0];
+		const userPermissions = await getUserPermissions(user.user_id);
 
 		query = 'INSERT INTO profile_information (user_id, first_name, last_name, date_of_birth) VALUES ($1, $2, $3, $4)';
 		values = [user.user_id, firstName, lastName, dateOfBirth];
@@ -124,6 +133,9 @@ export const createUser = async (email: string, phoneNumber: string, hashedPassw
 			first_name: firstName,
 			last_name: lastName,
 			role_id: user.role_id,
+			permissions: userPermissions,
+			org_id: user.org_id,
+			org_name: user.org_name
 		}
 	} catch (error) {
 		await pool.query('ROLLBACK');

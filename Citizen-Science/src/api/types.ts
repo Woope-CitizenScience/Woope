@@ -14,6 +14,7 @@ export type Post = {
 
 export type PostWithUsername = {
 	post_id: number;
+	org_id: number;
 	image: string[];
 	content: string;
 	pdfs: PdfFile[];
@@ -37,6 +38,7 @@ export type Comment = {
 	user_id: number;
 	username: string;
 	likedByUser?: boolean;
+	org_id: number;
 };
 
 export type Organization = {

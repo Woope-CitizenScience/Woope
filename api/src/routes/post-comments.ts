@@ -27,8 +27,8 @@ router.get('/:post_id', async (req: express.Request, res: express.Response) => {
 // Create a new comment
 router.post('/', async (req: express.Request, res: express.Response) => {
     try {
-        const { content, user_id, post_id } = req.body;
-        const newComment = await createComment(content, user_id, post_id);
+        const { content, user_id, post_id, org_id } = req.body;
+        const newComment = await createComment(content, user_id, post_id, org_id);
         res.status(201).json(newComment);
     } catch (error) {
         if (error instanceof Error) {
