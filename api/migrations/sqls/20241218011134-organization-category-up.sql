@@ -26,3 +26,21 @@ CREATE TABLE IF NOT EXISTS user_organization_follows(
 );
 -- populating categories with values
 INSERT INTO category (name) VALUES ('Activism'),('Food'), ('Health'), ('Mutual Aid'), ('Social');
+
+-- Add foreign key in user table to organization table
+ALTER TABLE IF EXISTS users
+    ADD CONSTRAINT users_admins_org_fkey FOREIGN KEY (admins_org)
+        REFERENCES public.organizations (org_id)
+;
+
+-- Add foreign key in posts table to org table
+ALTER TABLE IF EXISTS posts
+    ADD CONSTRAINT post_org_id_fkey FOREIGN KEY (org_id) 
+        REFERENCES organizations(org_id)
+;  
+
+-- Add foreign key in comments table to org table
+ALTER TABLE IF EXISTS comments
+    ADD CONSTRAINT comments_org_id_fkey FOREIGN KEY (org_id) 
+        REFERENCES organizations(org_id)
+;

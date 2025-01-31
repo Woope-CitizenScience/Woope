@@ -9,6 +9,7 @@ let pinRouter = require('../routes/pin')
 let organizationRouter = require('../routes/organization')
 let resourceRouter = require('../routes/resource')
 let eventRouter = require('../routes/event')
+let rolesRouter = require('../routes/roles')
 // add more routers here
 
 module.exports = function (app: express.Application) {
@@ -23,4 +24,5 @@ module.exports = function (app: express.Application) {
     app.use('/organizations', organizationRouter);
     app.use('/resources', resourceRouter);
     app.use('/events', eventRouter);
+    app.use('/roles', rolesRouter)
 };

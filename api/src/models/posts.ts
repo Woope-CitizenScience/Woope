@@ -41,6 +41,7 @@ export const getPost = async (currentUserId: number): Promise<UserLikedPosts[]> 
   const query = `
       SELECT 
           posts.*, 
+		      organizations.name AS org_name,
           profile_information.first_name, 
           profile_information.last_name, 
           COALESCE(COUNT(post_likes.post_id), 0) AS likes_count,
@@ -48,13 +49,17 @@ export const getPost = async (currentUserId: number): Promise<UserLikedPosts[]> 
       FROM posts
       JOIN profile_information ON posts.user_id = profile_information.user_id
       LEFT JOIN post_likes ON posts.post_id = post_likes.post_id
-      GROUP BY posts.post_id, profile_information.first_name, profile_information.last_name
+	    LEFT JOIN organizations ON posts.org_id = organizations.org_id
+      GROUP BY posts.post_id, profile_information.first_name, 
+	  		      profile_information.last_name, organizations.name
       ORDER BY posts.created_at DESC
   `;
   const response = await pool.query(query, [currentUserId]);
   return response.rows.map((row: any): PostWithUsername => ({
       ...row,
-      userName: row.first_name + ' ' + row.last_name, // Combining first name and last name into a single field
+      userName: row.org_id 
+        ? row.org_name 
+        : row.first_name + ' ' + row.last_name, // Combining first name and last name into a single field
       likes_count: parseInt(row.likes_count),
       user_liked: Boolean(row.user_liked) // This will be true if the user liked the post, false otherwise
   }));
@@ -70,12 +75,12 @@ export const getPostByUserId = async (user_id: number): Promise<Post[]> =>{
     return response.rows;
 }
 
-export const createPost = async (user_id: Number, content: string): Promise<Post> => {
+export const createPost = async (user_id: number, org_id: number | null, content: string): Promise<Post> => {
     try {
       const isActive = true;
       const response = await pool.query(
-        'INSERT INTO posts (user_id, content, is_active) VALUES ($1, $2, $3) RETURNING *', 
-        [user_id, content, isActive]
+        'INSERT INTO posts (user_id, content, is_active, org_id) VALUES ($1, $2, $3, $4) RETURNING *', 
+        [user_id, content, isActive, org_id]
       );
       return response.rows[0];
     } catch (error) {

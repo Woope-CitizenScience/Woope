@@ -22,13 +22,22 @@ Addressing environmental and socio-economic challenges in Standing Rock’s Lako
 - `npm install` to install dependencies
 - `npx expo start` to start the Expo server
 - Download the Expo app on your phone and scan the QR code to run the app on your phone
-- Install Docker Desktopn
+- Install Docker Desktop
 - Now `cd` into the `api` directory
 - `npm install`
 - Run `docker compose build` to build the API and PostgreSQL image
 - Run `docker compose up` to start the API and PostgreSQL server
 - Once Postgres is running, run `npx db-migrate up` in the `api` directory to run the migrations
 - You can now access the API at `localhost:3000`, check `/health`
+
+### Admin Website Local Setup
+
+- From the `Woope` directory, `cd` into the `woope-admin` directory
+- `npm install` to install dependencies
+- Create a new `.env` file with the following contents:
+  - VITE_API_URL=http://localhost:3000
+- `npm run dev` to start the Vite server
+- In the terminal where it says Local: http://localhost:5173/, `ctrl + click` on the link to open the website in your default browser
 
 ## Challenges & Focus
 - **Challenges:** Poverty, unemployment, limited healthy living options, restricted data access.

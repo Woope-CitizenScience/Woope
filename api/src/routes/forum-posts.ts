@@ -81,7 +81,7 @@ router.get('/posts/user/:id', async (req: express.Request, res: express.Response
 // Create a new post
 router.post('/posts', async (req: express.Request, res: express.Response) => {
     try {
-        const newPost = await createPost(Number(req.body.user_id), req.body.content);
+        const newPost = await createPost(Number(req.body.user_id), req.body.org_id, req.body.content);
         res.status(201).json(newPost);
     } catch (error) {
         if (error instanceof Error) {

@@ -9,8 +9,14 @@ CREATE TABLE users
     phone_number  VARCHAR(15) UNIQUE,
     created_at    TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     last_login    TIMESTAMP WITH TIME ZONE,
-    is_Admin      BOOLEAN DEFAULT FALSE,
-    refresh_token VARCHAR(255) UNIQUE
+    -- is_Admin      BOOLEAN DEFAULT FALSE,
+    refresh_token VARCHAR(255) UNIQUE,
+    admins_org    INTEGER,
+    role_id       INTEGER DEFAULT 2
+    -- CONSTRAINT users_role_id_fkey FOREIGN KEY (role_id)
+    --     REFERENCES public.roles (role_id)
+    -- CONSTRAINT users_admins_org_fkey FOREIGN KEY (admins_org)
+    --     REFERENCES public.organizations (org_id)
 );
 
 -- Create Profile Information Table
