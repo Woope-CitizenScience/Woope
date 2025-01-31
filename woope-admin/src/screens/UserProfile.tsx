@@ -274,10 +274,10 @@ function UserProfile() {
             <dt>Profile Created: </dt>
             <dd>{formatDate(userCreatedAt)}</dd>
           </div>
-          <div className="col-6">
+          {/* <div className="col-6">
             <dt>Date of Birth: </dt>
             <dd>{formatDate(userDOB)}</dd>
-          </div>
+          </div> */}
         </div>
         <div className="row">
           <div className="col-6">
