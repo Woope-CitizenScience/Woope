@@ -377,7 +377,7 @@ const HomeScreen = () => {
     <>
       <WelcomeBanner />
       <SafeAreaView style={styles.flexContainer}>
-        {userPermissions.create_org_posts && (
+        {(userPermissions.create_org_posts && userOrgId) && (
           <FixedSwitch
             onValueChange={togglePostAsOrg}
             value={postAsOrganization}
