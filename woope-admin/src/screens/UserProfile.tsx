@@ -261,6 +261,16 @@ function UserProfile() {
       <div className="grid p-2">
         <div className="row">
           <div className="col-6">
+            <dt>Role: </dt>
+            <dd>{userRole}</dd>
+          </div>
+          <div className="col-6">
+            <dt>Organization: </dt>
+            <dd>{userAdminsOrg ? orgName : "N/A"}</dd>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-6">
             <dt>Email: </dt>
             <dd>{userEmail}</dd>
           </div>
@@ -278,16 +288,6 @@ function UserProfile() {
             <dt>Date of Birth: </dt>
             <dd>{formatDate(userDOB)}</dd>
           </div> */}
-        </div>
-        <div className="row">
-          <div className="col-6">
-            <dt>Role: </dt>
-            <dd>{userRole}</dd>
-          </div>
-          <div className="col-6">
-            <dt>Organization: </dt>
-            <dd>{userAdminsOrg ? orgName : "N/A"}</dd>
-          </div>
         </div>
       </div>
       {/* <h2 className="pt-5">Posts</h2> */}
