@@ -9,6 +9,7 @@ import OrgManager from "./screens/OrgManager";
 import UserProfile from "./screens/UserProfile";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthContext } from "./context/AuthContext";
+import OrgProfile from "./screens/OrgProfile";
 
 function App() {
   const { userToken, userRole } = useContext(AuthContext);
@@ -56,6 +57,16 @@ function App() {
             <ProtectedRoute isAuthenticated={!!userToken} userRole={userRole}>
               <Layout>
                 <OrgManager />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/organizations/:id"
+          element={
+            <ProtectedRoute isAuthenticated={!!userToken} userRole={userRole}>
+              <Layout>
+                <OrgProfile />
               </Layout>
             </ProtectedRoute>
           }

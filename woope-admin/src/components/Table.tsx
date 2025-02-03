@@ -7,7 +7,6 @@ interface Props {
   navigateTo?: string;
 }
 
-
 const Table = ({ headers, rows, navigateTo }: Props) => {
   const navigate = useNavigate();
   return (
@@ -27,7 +26,10 @@ const Table = ({ headers, rows, navigateTo }: Props) => {
         <tbody>
           {rows.map((row, index) => {
             return (
-              <tr onClick={() => navigate(navigateTo + '/' + row[0])} key={index}>
+              <tr
+                onClick={() => navigate(navigateTo + "/" + row[0])}
+                key={index}
+              >
                 {row.map((e, index) => {
                   return <td key={index}>{e}</td>;
                 })}
@@ -37,7 +39,7 @@ const Table = ({ headers, rows, navigateTo }: Props) => {
         </tbody>
       </table>
       {rows.length === 0 && <p className="text-center">No Results</p>}
-      <nav aria-label="Page navigation example">
+      {/* <nav aria-label="Page navigation example">
         <ul className="pagination">
           <li className="page-item">
             <a className="page-link" href="#">
@@ -65,7 +67,7 @@ const Table = ({ headers, rows, navigateTo }: Props) => {
             </a>
           </li>
         </ul>
-      </nav>
+      </nav> */}
     </>
   );
 };
