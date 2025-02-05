@@ -7,3 +7,7 @@ export const getOrganizationById = async (userId: string) => {
 export const getOrganizations = async() => {
     return fetchAPI(`/organizations/organizations`)
 }
+
+export const createOrganization = async(name: string, tagline: string, text_description: string) => {
+    return fetchAPI(`/organizations/create`, 'POST', {name,tagline,text_description});
+}
