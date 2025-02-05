@@ -1,15 +1,22 @@
+/* 
+
+    This screen displays all the organization categories in a list,
+    clicking on the category takes you to another screen that displays all organizations with
+    that specific category
+
+*/
 import React, {useState, useEffect} from 'react';
 import { View, Text, StyleSheet, StatusBar, ScrollView, Pressable, SafeAreaView, TouchableOpacity, FlatList} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { Category } from '../api/types';
-import { getAllCategories } from '../api/organizations';
-export const ResourceCategory = () => {
-    const navigation = useNavigation();
+import { Category } from '../../api/types';
+import { getAllCategories } from '../../api/organizations';
+export const OrganizationCategory = () => {
+    const navigation = useNavigation<any>();
+        // Using api to fetch all categories
         const [data,setData] = useState<Category[]>([]);
         useEffect(() => {
             fetchCategories();
         }, []);
-    
         const fetchCategories = async () => {
             try {
                 const categoryList = await getAllCategories();
@@ -18,22 +25,33 @@ export const ResourceCategory = () => {
                 console.log('Failed to retrieve organizations', error);
             }
         };
-    
-    return(
+    if (data[0] !== undefined){
+        return(
             <SafeAreaView style={styles.container}>
-                {/*using a flatlist to display organizations, keyextractor to use the org_id as key*/}
+                {/*
+                    using a flatlist to display categories, keyextractor to use the categoy_id as key
+                    then passing the category_id that was clicked to next screen
+                */}
                 <FlatList
                     data={data}
                     numColumns={1}
                     keyExtractor={item => item.category_id}
                     renderItem={({item}) => (
-                    <TouchableOpacity style={styles.directoryButton} onPress={() => navigation.navigate("ResourceSpecificCategory")}>
+                    <TouchableOpacity style={styles.directoryButton} onPress={() => navigation.navigate("SpecificCategory",{category: item.category_id})}> 
                         <Text style={styles.title}>{item.name}</Text>
                     </TouchableOpacity>
                     )}
                 />
             </SafeAreaView>
         );
+    }
+    else{
+        return(
+            <SafeAreaView style = {styles.errorContainer}>
+                <Text style={styles.error}>No categories exist</Text>
+            </SafeAreaView>
+        );
+    }
 };
 const styles = StyleSheet.create({
     container: {
@@ -48,6 +66,16 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 30,
         color: '#232f46',
+    },
+    errorContainer: {
+        flex: 1, 
+        backgroundColor: "white",
+        alignItems: "center",
+        justifyContent: "center"
+    },
+    error: {
+        alignSelf: "center",
+        fontSize: 20,
     },
     directoryButton: {
         borderRadius: 16,
@@ -65,4 +93,4 @@ const styles = StyleSheet.create({
         elevation: 9,
     },
 });
-export default ResourceCategory
+export default OrganizationCategory

@@ -1,42 +1,83 @@
-import { title } from "process";
-import React from "react";
-import { View, StyleSheet, Text, Image, TouchableOpacity, Dimensions } from "react-native";
-import { white } from "react-native-paper/lib/typescript/styles/themes/v2/colors";
+import React, {useState, useEffect} from "react";
+import { View, StyleSheet, Text, Image, Dimensions, SafeAreaView, FlatList, TouchableOpacity } from "react-native";
+import {getResourceInfo } from "../api/resources";
+import { Resource } from "../api/types";
+import { MaterialIcons, Octicons, AntDesign } from '@expo/vector-icons';
+import UpdateResourceModal from "./UpdateResourceModal";
+import DeleteResource from "./DeleteResources";
+
+interface ResourceProps{
+    org_id: number;
+    resource_id: number;
+}
 
 //Component to display event information 
-const ResourcesCard = () => {
+const ResourcesCard:React.FC<ResourceProps> = ({resource_id, org_id}) => {
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [isDeleteVisible, setIsDeleteVisible] = useState(false);
+    const [data, setData] = useState<Resource[]>([]);
+        const fetchInfo = async () => {
+            try {
+                const resource = await getResourceInfo(resource_id);
+                setData(resource);
+            } catch (error) {
+                console.log(error);
+            }
+        }
+        useEffect(() => {
+            fetchInfo();
+        })
     return(
-        // Container
-        <View style={styles.cardContainer}>
-            {/*Event Name, Date, Time */}
-            <View style ={styles.headerContainer}>
-                <View>
-                    <Text style={styles.title}>Resource Name</Text>
-                    <Text style={styles.category}>Resource Category</Text>
+        <SafeAreaView>
+            <FlatList 
+            data={data}
+            keyExtractor={(item) => item.resource_id}
+            scrollEnabled= {false}
+            renderItem={({item}) => (
+                <View style={styles.cardContainer}>
+                    <View style ={styles.headerContainer}>
+                        <View>
+                            <Text style={styles.title}>{item.name}</Text>
+                        </View>
+                        <View style = {styles.editContainer}>
+                            <TouchableOpacity onPress={() => setIsModalVisible(true)}>
+                                    <AntDesign name="edit" size={30}/>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => setIsDeleteVisible(true)}>
+                                    <AntDesign name="delete" size={30}/>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                    {/* Short Tagline */}
+                    <View>
+                        <Text style={styles.tagline}>{item.tagline}</Text>
+                    </View>
+                    {/* Full Description */}
+                    <View>
+                        <Text style={styles.description}>{item.text_description}</Text>
+                    </View>
+                    {/*Optional Banner Image */}
+                    <View>
+                        <Image style={styles.imageStyle}source={require('../../assets/adaptive-icon.png')}/>
+                    </View>
+                    <UpdateResourceModal isVisible = {isModalVisible} resource_id = {resource_id} onClose={() => {
+                        setIsModalVisible(false);
+                        fetchInfo();
+                    }} />
+                    <DeleteResource isVisible = {isDeleteVisible} resource_id={resource_id} org_id={org_id} onClose={() => {
+                            setIsDeleteVisible(false);
+                    }} />
                 </View>
-            </View>
-            {/* Short Tagline */}
-            <View>
-                <Text style={styles.tagline}>Short Tagline</Text>
-            </View>
-            {/* Full Description */}
-            <View>
-                <Text style={styles.description}>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor 
-                    incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam
-                    , quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
-                    Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat
-                     nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia 
-                     deserunt mollit anim id est laborum.</Text>
-            </View>
-            {/*Optional Banner Image */}
-            <View>
-                <Image style={styles.imageStyle}source={require('../../assets/adaptive-icon.png')}/>
-            </View>
-        </View>
+            )}/>
+        </SafeAreaView>
     );
 };
 const deviceWidth = Math.round(Dimensions.get('window').width);
 const styles = StyleSheet.create({
+    editContainer: {
+        flexDirection: "row",
+        gap: 20,
+    },
     cardContainer: { 
         width: deviceWidth - 20,
         backgroundColor: 'white',
@@ -55,6 +96,7 @@ const styles = StyleSheet.create({
     },
     headerContainer:{
         flexDirection:'row',
+        gap: 20,
         justifyContent: 'space-between',
     },
     imageStyle: {

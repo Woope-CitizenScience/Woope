@@ -1,49 +1,87 @@
-import { title } from "process";
-import React from "react";
-import { View, StyleSheet, Text, Image, TouchableOpacity, Dimensions } from "react-native";
-import { white } from "react-native-paper/lib/typescript/styles/themes/v2/colors";
+import React,{useState,useEffect} from "react";
+import { View, StyleSheet, Text, Image, TouchableOpacity, Dimensions, SafeAreaView,FlatList } from "react-native";
+import { AntDesign } from '@expo/vector-icons';
+import UpdateEventModal from "./UpdateEventModal";
+import { getEventInfo, deleteEvent} from "../api/event";
 
+interface EventProps {
+    event_id: number;
+    org_id: number;
+    name: string;
+    tagline: string;
+    text_description: string;
+    time_begin: Date;
+    time_end: Date;
+}
 //Component to display event information 
-const EventCard = () => {
+const EventCard:React.FC<EventProps> = ({event_id, org_id}) => {
+    // let startDate = new Date(time_begin);
+    // let endDate = new Date(time_end);
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [isDeleteVisible, setIsDeleteVisible] = useState(false);
+    const [data, setData] = useState<EventProps[]>([]);
+    const fetchInfo = async () => {
+                try {
+                    const response = await getEventInfo(event_id);
+                    setData(response);
+                } catch (error) {
+                    console.log(error);
+                }
+            }
+            useEffect(() => {
+                fetchInfo();
+            })
     return(
         // Container
-        <View style={styles.cardContainer}>
-            {/*Event Name, Date, Time */}
-            <View style ={styles.headerContainer}>
-                <View>
-                    <Text style={styles.title}>Event Name</Text>
-                    <Text style={styles.category}>Monday January 1</Text>
-                    <Text style={styles.category}>HH:MM AM/PM - HH:MM AM/PM</Text>
-                    <Text style={styles.category}>Location</Text>
+        <SafeAreaView>
+            <FlatList
+                data={data}
+                keyExtractor={(item) => item.event_id}
+                scrollEnabled={false}
+                renderItem={({item}) => (
+            <View style={styles.cardContainer}>
+                {/*Event Name, Date, Time */}
+                <View style ={styles.headerContainer}>
+                    <View>
+                        <Text style={styles.title}>{item.name}</Text>
+                        <Text style={styles.category}>{new Date(item.time_begin).toLocaleDateString([],{weekday: 'long', month:'long', day:'2-digit', year:'numeric'})}</Text>
+                        <Text style={styles.category}>{new Date(item.time_begin).toLocaleTimeString([],{hour:'2-digit', minute:'2-digit'})} - {new Date(item.time_end).toLocaleTimeString([],{hour:'2-digit', minute:'2-digit'})}</Text>
+                        <Text style={styles.category}>Location</Text>
+                    </View>
+                    <View style = {styles.editContainer}>
+                        <TouchableOpacity onPress={() => setIsModalVisible(true)}>
+                                <AntDesign name="edit" size={30}/>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => deleteEvent(item.event_id, item.name)}>
+                                <AntDesign name="delete" size={30}/>
+                        </TouchableOpacity>
+                    </View>
                 </View>
+                {/*Organization Banner Image */}
+                <View>
+                    <Image style={styles.imageStyle}source={require('../../assets/adaptive-icon.png')}/>
+                </View>
+                {/* Short Tagline */}
+                <View>
+                    <Text style={styles.tagline}>{item.tagline}</Text>
+                </View>
+                {/* Full Description */}
+                <View>
+                    <Text style={styles.description}>{item.text_description}</Text>
+                </View>
+                {/* Container for Events and Posts Button */}
+                <View style={styles.buttonContainer}>
+                    {/* <TouchableOpacity style={styles.eventButton}>
+                        <Text>Add To Calendar</Text>
+                    </TouchableOpacity> */}
+                </View>
+                <UpdateEventModal event_id={event_id} time_begin={new Date(item.time_begin)} time_end={new Date(item.time_end)} text_description={item.text_description} tagline = {item.tagline} isVisible = {isModalVisible} onClose={() => {
+                            setIsModalVisible(false);
+                            fetchInfo();
+                        }} />
             </View>
-            {/*Organization Banner Image */}
-            <View>
-                <Image style={styles.imageStyle}source={require('../../assets/adaptive-icon.png')}/>
-            </View>
-            {/* Short Tagline */}
-            <View>
-                <Text style={styles.tagline}>Short Tagline</Text>
-            </View>
-            {/* Full Description */}
-            <View>
-                <Text style={styles.description}>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor 
-                    incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam
-                    , quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
-                    Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat
-                     nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia 
-                     deserunt mollit anim id est laborum.</Text>
-            </View>
-            {/* Container for Events and Posts Button */}
-            <View style={styles.buttonContainer}>
-                <TouchableOpacity style={styles.postButton}>
-                    <Text>View Full Details</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.eventButton}>
-                    <Text>Add To Calendar</Text>
-                </TouchableOpacity>
-            </View>
-        </View>
+            )}/>
+        </SafeAreaView>
     );
 };
 const deviceWidth = Math.round(Dimensions.get('window').width);
@@ -114,7 +152,6 @@ const styles = StyleSheet.create({
         padding: 10,
     },
     eventButton:{
-       
         padding:10,
         borderRadius:10,
         backgroundColor: 'white',
@@ -125,6 +162,22 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.25,
         shadowRadius: 5,
         elevation: 9,
+    },
+    editButton: {
+        padding:10,
+        borderRadius:10,
+        backgroundColor: 'lightyellow',
+        shadowOffset: {
+            width: 5,
+            height: 5,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 5,
+        elevation: 9,
+    },
+    editContainer: {
+        flexDirection: "row",
+        gap: 20,
     },
     postButton:{
         
