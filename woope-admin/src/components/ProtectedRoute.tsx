@@ -13,7 +13,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, isAuthenticat
   }
 
   if (userRole !== 1) { // Ensure userRole is 1 (System Admin)
-    return <Navigate to="/unauthorized" />; // Redirect to Unauthorized page if not admin
+    return <Navigate to="/" />; // Redirect to login page if not admin
   }
 
   return <>{children}</>;
