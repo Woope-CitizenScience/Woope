@@ -6,8 +6,10 @@ import Modal from "../components/Modal";
 import Dropdown from "../components/Dropdown";
 import Select from "../components/Select";
 import { getRoles } from "../api/roles";
+import { useNavigate } from "react-router-dom";
 
 function UserProfile() {
+  const navigate = useNavigate();
   const { userId } = useParams(); // Retrieve the 'id' parameter from the URL
   const [userOrg, setUserOrg] = useState<any>(null);
   const [userInfo, setUserInfo] = useState<any>(null);
@@ -24,7 +26,7 @@ function UserProfile() {
   const userDOB = userInfo ? userInfo.date_of_birth : null;
   const [selectedOrg, setSelectedOrg] = useState("");
   const [selectedRole, setSelectedRole] = useState("");
-  const orgName = userOrg ? userOrg.name : null;
+  const [orgName, setOrgName] = useState(""); //userOrg ? userOrg.name : null;
   const orgNames = orgs
     ? orgs.map((e: any) => {
         return e.name;
@@ -69,6 +71,7 @@ function UserProfile() {
         ? await getOrganizationById(userAdminsOrg)
         : null;
       setUserOrg(org[0]);
+      setOrgName(org[0].name);
     } catch (e) {
       console.error("Error fetching organization: " + e);
     }
@@ -104,6 +107,7 @@ function UserProfile() {
       await updateUserOrg(userId, selectedOrg);
       alert("User organization succesfully updated.");
     }
+    await fetchOrganization();
   };
 
   const handleRemoveOrg = async () => {
