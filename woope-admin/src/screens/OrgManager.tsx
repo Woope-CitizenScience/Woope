@@ -19,7 +19,7 @@ const OrgManager = () => {
   const [newOrgTagline, setNewOrgTagline] = useState<string>();
   const [newOrgDesc, setNewOrgDesc] = useState<string>();
   const [orgToDelete, setOrgToDelete] = useState<Organization | null>(null);
-  const tableHeaders = ["ID", "Name", "Tagline", "Delete Organization"];
+  const tableHeaders = ["ID", "Name", "Tagline", "Actions"];
 
   useEffect(() => {
     fetchOrganizations();

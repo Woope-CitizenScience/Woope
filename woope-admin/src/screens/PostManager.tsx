@@ -30,23 +30,22 @@ const PostManager = () => {
             post.user_id.toString(),
             post.content,
             <>
-              <Button
-                color="primary"
-                className="me-2"
+              <button
+                className="me-2 btn btn-primary"
                 onClick={() => handleEditPost(post)}
                 data-bs-toggle="modal"
                 data-bs-target="#editPostModal"
               >
                 Edit
-              </Button>
-              <Button
-                color="danger"
+              </button>
+              <button
+                className="btn btn-danger"
                 onClick={() => handleDeletePost(post)}
                 data-bs-toggle="modal"
                 data-bs-target="#deletePostModal"
               >
                 Delete
-              </Button>
+              </button>
             </>,
           ])
         );
@@ -168,7 +167,8 @@ const PostManager = () => {
         }
       />
 
-      <h1 className="py-2">Post Manager</h1>
+      <h1 className="pb-4">Post Manager</h1>
+      <hr></hr>
       <div className="row mb-3">
         <div className="col-sm-4">
           <input
