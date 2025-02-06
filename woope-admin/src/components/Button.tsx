@@ -4,7 +4,7 @@ interface Props {
   children: string;
   className?: string;
   color?: "primary" | "secondary" | "danger";
-  onClick: () => void;
+  onClick?: () => void;
 }
 
 const Button = ({ children, className, color = "primary", onClick }: Props) => {
