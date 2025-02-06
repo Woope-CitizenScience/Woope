@@ -66,23 +66,22 @@ const PostManager = () => {
           post.user_id.toString(),
           post.content,
           <>
-            <Button
-              color="primary"
-              className="me-2"
+            <button
+              className="me-2 btn btn-primary"
               onClick={() => handleEditPost(post)}
               data-bs-toggle="modal"
               data-bs-target="#editPostModal"
             >
               Edit
-            </Button>
-            <Button
-              color="danger"
+            </button>
+            <button
+              className="btn btn-danger"
               onClick={() => handleDeletePost(post)}
               data-bs-toggle="modal"
               data-bs-target="#deletePostModal"
             >
               Delete
-            </Button>
+            </button>
           </>,
         ])
       );
