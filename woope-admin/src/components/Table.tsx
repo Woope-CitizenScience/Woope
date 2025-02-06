@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 interface Props {
   headers: ReactNode[];
-  rows: string[][];
+  rows: ReactNode[][];
   navigateTo?: string;
 }
 
@@ -27,7 +27,7 @@ const Table = ({ headers, rows, navigateTo }: Props) => {
           {rows.map((row, index) => {
             return (
               <tr
-                onClick={() => navigate(navigateTo + "/" + row[0])}
+                // onClick={() => navigate(navigateTo + "/" + row[0])}
                 key={index}
               >
                 {row.map((e, index) => {
