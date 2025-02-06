@@ -10,7 +10,8 @@ import {
     addPostLike,
     removePostLike,
     getPostLikes,
-    getPostWithMedia
+    getPostWithMedia,
+    searchPosts
  } from '../models/posts';
 
 const router = require('express').Router();
@@ -192,5 +193,18 @@ router.get('/posts/user/:id/likes', async (req: express.Request, res: express.Re
     } 
     return; 
 })
+
+//search post for admin site
+router.get('/posts', async (req: express.Request, res: express.Response) => {
+    try {
+        const search = req.query.search ? String(req.query.search) : '';
+        const posts = await searchPosts(search);
+        res.status(200).json(posts);
+    } catch (error) {
+        res.status(500).json({ error: 'Error fetching posts' });
+    }
+})
+
+
 
 module.exports = router;
