@@ -3,10 +3,12 @@ import { useParams } from "react-router-dom";
 import { getUserByID, updateUserOrg, updateUserRole } from "../api/community";
 import { getOrganizationById, getOrganizations } from "../api/organizations";
 import Modal from "../components/Modal";
-import Dropdown from "../components/Dropdown";
 import Select from "../components/Select";
 import { getRoles } from "../api/roles";
 import { useNavigate } from "react-router-dom";
+import Post from "../components/Post";
+import { ForumPost } from "../interfaces/Posts";
+import { getPostsByUserId } from "../api/posts";
 
 function UserProfile() {
   const navigate = useNavigate();
@@ -15,6 +17,9 @@ function UserProfile() {
   const [userInfo, setUserInfo] = useState<any>(null);
   const [orgs, setOrgs] = useState<any>([]);
   const [roles, setRoles] = useState<any>([]);
+  const [posts, setPosts] = useState<ForumPost[]>([]);
+  const [postResults, setPostResults] = useState<ForumPost[]>([]);
+  const [searchInput, setSearchInput] = useState("");
   const userFirstName = userInfo ? userInfo.first_name : null;
   const userLastName = userInfo ? userInfo.last_name : null;
   const userFullName = userLastName + ", " + userFirstName;
@@ -54,6 +59,19 @@ function UserProfile() {
     fetchOrganizations();
     fetchRoles();
   }, [userId, userAdminsOrg]);
+
+  useEffect(() => {
+    fetchPosts();
+  }, [posts]);
+
+  const fetchPosts = async () => {
+    const res = await getPostsByUserId(Number(userId));
+
+    if (res) {
+      setPosts(res);
+      setPostResults(res);
+    }
+  };
 
   const fetchUser = async () => {
     try {
@@ -128,6 +146,20 @@ function UserProfile() {
       await updateUserRole(userId, selectedRole);
       alert("User role succesfully updated.");
     }
+  };
+
+  const handlePostSearch = () => {
+    const res = posts.filter((post) =>
+      post.content
+        .toLowerCase()
+        .trim()
+        .includes(searchInput.toLowerCase().trim())
+    );
+    setPostResults(res);
+  };
+
+  const handleInputChange = (event: React.FormEvent<HTMLInputElement>) => {
+    setSearchInput(event.currentTarget.value);
   };
 
   const formatDate = (date: string) => {
@@ -262,6 +294,7 @@ function UserProfile() {
         Update Role
       </button>
       <h2 className="pt-5">Summary</h2>
+      <hr></hr>
       <div className="grid p-2">
         <div className="row">
           <div className="col-6">
@@ -294,7 +327,36 @@ function UserProfile() {
           </div> */}
         </div>
       </div>
-      {/* <h2 className="pt-5">Posts</h2> */}
+      <h2 className="pt-5">Posts</h2>
+      <hr></hr>
+      <div className="py-3 row">
+        <div className="col-6">
+          <input
+            type="text"
+            className="form-control"
+            value={searchInput}
+            onChange={handleInputChange}
+            placeholder={`Search ${userFirstName} ${userLastName}'s Posts`}
+          ></input>
+        </div>
+        <div className="col-6">
+          <button className="btn btn-primary" onClick={handlePostSearch}>
+            Search
+          </button>
+        </div>
+      </div>
+      {postResults.map((post) => {
+        return (
+          <Post
+            postId={post.post_id}
+            userName={post.user_name}
+            content={post.content}
+            createdAt={formatDate(post.created_at)}
+            likeCount={post.likes_count}
+            isActive={post.is_active}
+          ></Post>
+        );
+      })}
     </div>
   );
 }
