@@ -319,7 +319,11 @@ function UserProfile() {
         <div className="row">
           <div className="col-6">
             <dt>Profile Created: </dt>
-            <dd>{formatDate(userCreatedAt)}</dd>
+            <dd>
+              {new Date(userCreatedAt).toLocaleDateString() +
+                " " +
+                new Date(userCreatedAt).toLocaleTimeString()}
+            </dd>
           </div>
           {/* <div className="col-6">
             <dt>Date of Birth: </dt>
@@ -351,7 +355,7 @@ function UserProfile() {
             postId={post.post_id}
             userName={post.user_name}
             content={post.content}
-            createdAt={formatDate(post.created_at)}
+            createdAt={post.created_at}
             likeCount={post.likes_count}
             isActive={post.is_active}
           ></Post>
