@@ -61,7 +61,11 @@ const Post = ({
             <p className="fw-light col">{`Likes: ${likeCount}`}</p>
           </div>
           <div className="col-2">
-            <p className="fw-light col">{createdAt}</p>
+            <p className="fw-light col">
+              {new Date(createdAt).toLocaleDateString() +
+                " " +
+                new Date(createdAt).toLocaleTimeString()}
+            </p>
           </div>
           <div className="col-8 text-end">
             <button
