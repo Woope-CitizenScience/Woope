@@ -1,5 +1,5 @@
 import express from 'express';
-import { 
+import {
     getPost,
     getPostById,
     getPostByUserId,
@@ -7,16 +7,17 @@ import {
     updatePost,
     deletePost,
     softDeletePost,
+    restorePost,
     addPostLike,
     removePostLike,
     getPostLikes,
     getPostWithMedia,
     searchPosts
- } from '../models/posts';
+} from '../models/posts';
 
 const router = require('express').Router();
 
-router.get('/postswithmedia/:id/', async (req: express.Request, res: express.Response) =>{
+router.get('/postswithmedia/:id/', async (req: express.Request, res: express.Response) => {
     try {
         const userId = Number(req.params.id);
         const posts = await getPostWithMedia(userId);
@@ -31,7 +32,7 @@ router.get('/postswithmedia/:id/', async (req: express.Request, res: express.Res
 })
 
 // Get all posts
-router.get('/posts/:id', async (req: express.Request, res: express.Response) =>{
+router.get('/posts/:id', async (req: express.Request, res: express.Response) => {
     try {
         const userId = Number(req.params.id);
         const posts = await getPost(userId);
@@ -135,6 +136,20 @@ router.delete('/posts/soft/:id', async (req: express.Request, res: express.Respo
     }
 });
 
+// Restore a soft deleted post
+router.put('/posts/restore/:id', async (req: express.Request, res: express.Response) => {
+    try {
+        const restoredPost = await restorePost(Number(req.params.id));
+        res.status(200).json(restorePost);
+    } catch (error) {
+        if (error instanceof Error) {
+            res.status(500).json(`Internal server error: ${error.message}`);
+        } else {
+            res.status(500).json('Internal server error: An unknown error occurred');
+        }
+    }
+});
+
 router.post('/posts/:id/like', async (req: express.Request, res: express.Response) => {
     try {
         const postId = Number(req.params.id);
@@ -179,7 +194,7 @@ router.get('/posts/:id/like', async (req: express.Request, res: express.Response
     }
 })
 
-router.get('/posts/user/:id/likes', async (req: express.Request, res: express.Response) =>{
+router.get('/posts/user/:id/likes', async (req: express.Request, res: express.Response) => {
     try {
         const userId = Number(req.params.id);
         const likes = await getPostLikes(userId);
@@ -190,8 +205,8 @@ router.get('/posts/user/:id/likes', async (req: express.Request, res: express.Re
         } else {
             res.status(500).json('Internal server error: An unknown error occurred');
         }
-    } 
-    return; 
+    }
+    return;
 })
 
 //search post for admin site
