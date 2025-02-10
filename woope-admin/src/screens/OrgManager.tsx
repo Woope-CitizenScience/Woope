@@ -19,6 +19,7 @@ const OrgManager = () => {
   const [newOrgTagline, setNewOrgTagline] = useState<string>();
   const [newOrgDesc, setNewOrgDesc] = useState<string>();
   const [orgToDelete, setOrgToDelete] = useState<Organization | null>(null);
+  // const [createOrgModal, setCreateOrgModal] = useState<boolean>(false);
   const tableHeaders = ["ID", "Name", "Tagline", "Actions"];
 
   useEffect(() => {
@@ -33,7 +34,8 @@ const OrgManager = () => {
     const res = organizations.filter((org: Organization) => {
       return org.name.toLowerCase().includes(searchInput.toLowerCase());
     });
-    setOrganizations(res);
+    // setOrganizations(res);
+    setSearchResults(mapOrgsToResults(res));
   };
 
   const fetchOrganizations = async () => {
@@ -78,6 +80,7 @@ const OrgManager = () => {
     setNewOrgName("");
     setNewOrgTagline("");
     setNewOrgDesc("");
+    // setCreateOrgModal((prev) => !prev);
   };
 
   const handleOpenDeleteModal = (orgId: number) => {
@@ -97,6 +100,8 @@ const OrgManager = () => {
       fetchOrganizations();
       if (res) {
         alert("New organization successfully created.");
+        // $("#createOrgModal").modal("hide");
+        // setCreateOrgModal(false);
       } else {
         alert("Something went wrong. No organization was created.");
       }
@@ -181,7 +186,7 @@ const OrgManager = () => {
           body={
             <>
               <div className="row">
-                <dt className="col-2">Name: </dt>
+                <dt className="col-2">Name*: </dt>
                 <input
                   className="col-8 ms-5"
                   value={newOrgName}
@@ -189,7 +194,7 @@ const OrgManager = () => {
                 ></input>
               </div>
               <div className="row pt-4">
-                <dt className="col-2">Tagline: </dt>
+                <dt className="col-2">Tagline*: </dt>
                 <input
                   className="col-8 ms-5"
                   value={newOrgTagline}
@@ -197,7 +202,7 @@ const OrgManager = () => {
                 ></input>
               </div>
               <hr></hr>
-              <h2>Description</h2>
+              <h2>Description*</h2>
               <div className="row pt-4">
                 <textarea
                   cols={40}
@@ -214,7 +219,7 @@ const OrgManager = () => {
                 type="button"
                 className="btn btn-primary"
                 onClick={handleCreateOrg}
-                data-bs-dismiss="modal"
+                // data-bs-dismiss="modal"
               >
                 Create
               </button>
