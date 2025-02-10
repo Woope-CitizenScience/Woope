@@ -236,6 +236,7 @@ const OrgManager = () => {
                 className="form-control"
                 value={searchInput}
                 onChange={handleSearchInputChange}
+                placeholder="Search Organizations By Name"
               />
             </div>
             <div className="col-sm-3">

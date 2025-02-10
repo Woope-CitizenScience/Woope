@@ -72,6 +72,7 @@ function UserManager() {
                 className="form-control"
                 value={searchInput}
                 onChange={handleInputChange}
+                placeholder="Search Users By Name"
               />
             </div>
             <div className="col-sm-3">

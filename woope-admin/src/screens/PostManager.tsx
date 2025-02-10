@@ -176,6 +176,7 @@ const PostManager = () => {
             className="form-control"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
+            placeholder="Search Posts By Content"
           />
         </div>
         <div className="col-sm-3">
