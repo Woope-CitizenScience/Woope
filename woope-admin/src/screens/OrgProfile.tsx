@@ -21,6 +21,19 @@ const OrgProfile = () => {
     setOrganization(res[0]);
   };
 
+  const formatLocalDateTime = (date: string | null) => {
+    if (!date) {
+      return "N/A";
+    }
+
+    const formatDate =
+      new Date(date).toLocaleDateString() +
+      " " +
+      new Date(date).toLocaleTimeString();
+
+    return formatDate;
+  };
+
   return (
     <>
       <h1 className="display-1">{orgName}</h1>
@@ -30,7 +43,7 @@ const OrgProfile = () => {
       <dt>Description:</dt>
       <dd>{description}</dd>
       <dt>Created at:</dt>
-      <dd>{createdAt}</dd>
+      <dd>{formatLocalDateTime(createdAt)}</dd>
     </>
   );
 };
