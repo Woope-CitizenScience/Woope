@@ -55,7 +55,12 @@ function UserManager() {
       <div className="container-lg">
         <h1 className="pb-4">User Administration</h1>
         <hr></hr>
-        <form>
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            handleSearch();
+          }}
+        >
           <div className="row mb-3">
             {/* <label htmlFor="userSearch" className="col-sm col-form-label">
               Find by:

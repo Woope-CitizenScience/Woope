@@ -228,7 +228,12 @@ const OrgManager = () => {
         ></Modal>
         <h1 className="pb-4">Organization Manager</h1>
         <hr></hr>
-        <form>
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            handleSearch();
+          }}
+        >
           <div className="row mb-3">
             <div className="col-sm-4">
               <input
