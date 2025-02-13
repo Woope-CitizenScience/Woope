@@ -7,13 +7,21 @@ interface ProtectedRouteProps {
   userRole: number | null;
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, isAuthenticated, userRole }) => {
-  if (!isAuthenticated) {
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
+  children,
+  isAuthenticated,
+  userRole,
+}) => {
+  const token = isAuthenticated || sessionStorage.getItem("accessToken"); // Persist authentication
+  const role = userRole ?? Number(sessionStorage.getItem("userRole")); // Persist role
+
+  if (!token) {
     return <Navigate to="/" />; // Redirect to login page if not logged in
   }
 
-  if (userRole !== 1) { // Ensure userRole is 1 (System Admin)
-    return <Navigate to="/" />; // Redirect to login page if not admin
+  if (role !== 1) {
+    // Ensure user is a System Admin
+    return <Navigate to="/" />; // Redirect non-admins to login
   }
 
   return <>{children}</>;
