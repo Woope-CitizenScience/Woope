@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./screens/Login";
 import Home from "./screens/Home";
@@ -13,6 +13,13 @@ import OrgProfile from "./screens/OrgProfile";
 
 function App() {
   const { userToken, userRole } = useContext(AuthContext);
+  const theme = localStorage.getItem("theme");
+
+  useEffect(() => {
+    if (theme) {
+      document.documentElement.setAttribute("data-bs-theme", theme);
+    }
+  }, []);
 
   return (
     <Router>
@@ -81,7 +88,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-        
       </Routes>
     </Router>
   );
