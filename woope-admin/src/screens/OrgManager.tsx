@@ -54,13 +54,16 @@ const OrgManager = () => {
     const orgList = orgs.map((org: Organization) => {
       return [
         <p className="pt-2">{org.org_id}</p>,
-        <button
+        /*<button
           type="button"
           className="btn btn-link"
           onClick={() => navigate(`/organizations/${org.org_id}`)}
         >
           {org.name}
-        </button>,
+        </button>*/
+        <div className="pt-2">
+          <a href={`/organizations/${org.org_id}`}>{org.name}</a>
+        </div>,
         <p className="pt-2">{org.tagline}</p>,
         <button
           type="button"
