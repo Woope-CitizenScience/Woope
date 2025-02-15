@@ -197,3 +197,14 @@ export const searchPosts = async (query: string): Promise<Post[]> => {
     throw error;
   }
 }
+
+export const getPostsByOrgId = async (org_id: number): Promise<Post[] | undefined> => {
+  try {
+    const response = await pool.query('SELECT * FROM posts WHERE org_id = $1', [org_id]);
+    return response.rows;
+  }
+  catch (e) {
+    console.log("Error getting posts by org id: " + e);
+  }
+
+}
