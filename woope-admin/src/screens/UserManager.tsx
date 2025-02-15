@@ -26,13 +26,18 @@ function UserManager() {
         const users = res.map((user: any) => {
           return [
             <p className="pt-2">{user.user_id}</p>,
-            <button
+            /*<button
               type="button"
               className="btn btn-link"
               onClick={() => navigate(`/users/${user.user_id}`)}
             >
               {user.last_name + ", " + user.first_name}
-            </button>,
+            </button>,*/
+            <div className="pt-2">
+              <a
+                href={`/users/${user.user_id}`}
+              >{`${user.last_name}, ${user.first_name}`}</a>
+            </div>,
             <p className="pt-2">{user.email}</p>,
             <p className="pt-2">{user.role}</p>,
             <p className="pt-2">{user.org}</p>,
