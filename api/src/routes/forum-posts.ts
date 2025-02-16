@@ -12,7 +12,8 @@ import {
     removePostLike,
     getPostLikes,
     getPostWithMedia,
-    searchPosts
+    searchPosts,
+    getPostsByOrgId
 } from '../models/posts';
 
 const router = require('express').Router();
@@ -68,6 +69,23 @@ router.get('/posts/user/:id', async (req: express.Request, res: express.Response
     try {
         const posts = await getPostByUserId(Number(req.params.id));
         if (posts.length === 0) {
+            return res.status(404).json('Posts not found');
+        }
+        res.status(200).json(posts);
+    } catch (error) {
+        if (error instanceof Error) {
+            res.status(500).json(`Internal server error: ${error.message}`);
+        } else {
+            res.status(500).json('Internal server error: An unknown error occurred');
+        }
+    }
+});
+
+// Get posts by Org ID
+router.get('/posts/org/:id', async (req: express.Request, res: express.Response) => {
+    try {
+        const posts = await getPostsByOrgId(Number(req.params.id));
+        if (!posts) {
             return res.status(404).json('Posts not found');
         }
         res.status(200).json(posts);
