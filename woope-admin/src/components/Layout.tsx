@@ -37,10 +37,16 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 </Link>
               </li>
               <li className="nav-item">
+                <Link className="nav-link" to="/pins">
+                  Pins
+                </Link>
+              </li>
+              <li className="nav-item">
                 <Link className="nav-link" to="/organizations">
                   Organizations
                 </Link>
               </li>
+
               <li className="nav-item dropdown">
                 <button
                   className="btn dropdown-toggle"

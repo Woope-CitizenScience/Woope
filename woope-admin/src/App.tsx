@@ -10,6 +10,7 @@ import UserProfile from "./screens/UserProfile";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthContext } from "./context/AuthContext";
 import OrgProfile from "./screens/OrgProfile";
+import PinManager from "./screens/PinManager";
 
 function App() {
   const { userToken, userRole } = useContext(AuthContext);
@@ -58,6 +59,17 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/pins"
+          element={
+            <ProtectedRoute isAuthenticated={!!userToken} userRole={userRole}>
+              <Layout>
+                <PinManager />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+
         <Route
           path="/organizations"
           element={
