@@ -31,3 +31,7 @@ export const restorePost = async (post_id: number) => {
 export const getPostsByUserId = async (user_id: number) => {
     return fetchAPI(`/forum/posts/user/${user_id}`);
 }
+
+export const getPostsByOrgId = async (org_id: number) => {
+    return fetchAPI(`/forum/posts/org/${org_id}`);
+}
