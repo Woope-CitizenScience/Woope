@@ -17,8 +17,6 @@ const Post = ({
   likeCount,
   isActive,
 }: Props) => {
-  const lineThrough = isActive ? "" : "text-decoration-line-through";
-
   const handleRestorePost = async () => {
     try {
       await restorePost(postId);
@@ -53,7 +51,9 @@ const Post = ({
           alt="Profile Picture"
         ></img> */}
         <h5>{userName}</h5>
-        <p className={lineThrough}>{content}</p>
+        <p className={isActive ? "" : "text-decoration-line-through"}>
+          {content}
+        </p>
       </div>
       <div className="card-footer">
         <div className="row">

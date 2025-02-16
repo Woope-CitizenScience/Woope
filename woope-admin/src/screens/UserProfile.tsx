@@ -62,14 +62,27 @@ function UserProfile() {
 
   useEffect(() => {
     fetchPosts();
-  }, [posts]);
+  }, []);
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      fetchPosts();
+      setPostResults(
+        posts.filter((post) =>
+          post.content.toLowerCase().includes(searchInput.toLowerCase().trim())
+        )
+      );
+    }, 300); // Delay filtering by 300ms to avoid excessive updates
+
+    return () => clearTimeout(timeoutId);
+  }, [searchInput, posts]);
 
   const fetchPosts = async () => {
     const res = await getPostsByUserId(Number(userId));
 
     if (res) {
       setPosts(res);
-      setPostResults(res);
+      // setPostResults(res);
     }
   };
 
@@ -159,23 +172,14 @@ function UserProfile() {
   };
 
   const handleInputChange = (event: React.FormEvent<HTMLInputElement>) => {
-    setSearchInput(event.currentTarget.value);
-  };
+    const value = event.currentTarget.value;
+    setSearchInput(value);
 
-  const formatDate = (date: string) => {
-    try {
-      if (!date) {
-        return "";
-      }
-      const values = date.split("-");
-      const year = values[0];
-      const month = values[1];
-      const day = values[2].slice(0, 2);
-      return month + "/" + day + "/" + year;
-    } catch (e) {
-      console.log(e);
-      return "";
-    }
+    // Automatically update filtered results
+    const res = posts.filter((post) =>
+      post.content.toLowerCase().includes(value.toLowerCase().trim())
+    );
+    setPostResults(res);
   };
 
   return (
@@ -303,7 +307,13 @@ function UserProfile() {
           </div>
           <div className="col-6">
             <dt>Organization: </dt>
-            <dd>{userAdminsOrg ? orgName : "N/A"}</dd>
+            <dd>
+              {userAdminsOrg ? (
+                <a href={`/organizations/${userAdminsOrg}`}>{orgName}</a>
+              ) : (
+                "N/A"
+              )}
+            </dd>
           </div>
         </div>
         <div className="row">
@@ -340,27 +350,37 @@ function UserProfile() {
             className="form-control"
             value={searchInput}
             onChange={handleInputChange}
-            placeholder={`Search ${userFirstName} ${userLastName}'s Posts`}
+            placeholder={`Search ${userFirstName}'s Posts by Content`}
           ></input>
         </div>
-        <div className="col-6">
+        {/* <div className="col-6">
           <button className="btn btn-primary" onClick={handlePostSearch}>
             Search
           </button>
-        </div>
+        </div> */}
       </div>
-      {postResults.map((post) => {
-        return (
+      {postResults.map(
+        ({
+          post_id,
+          user_name,
+          content,
+          created_at,
+          likes_count,
+          is_active,
+        }: ForumPost) => (
           <Post
-            postId={post.post_id}
-            userName={post.user_name}
-            content={post.content}
-            createdAt={post.created_at}
-            likeCount={post.likes_count}
-            isActive={post.is_active}
-          ></Post>
-        );
-      })}
+            postId={post_id}
+            userName={user_name}
+            content={content}
+            createdAt={created_at}
+            likeCount={likes_count}
+            isActive={is_active}
+          />
+        )
+      )}
+      {postResults.length === 0 && (
+        <p className="py-4">{`No results for "${searchInput}"`}</p>
+      )}
     </div>
   );
 }
