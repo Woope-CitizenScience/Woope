@@ -147,8 +147,11 @@ const OrgProfile = () => {
           />
         )
       )}
-      {postResults.length === 0 && (
+      {posts.length !== 0 && postResults.length === 0 && (
         <p className="py-4">{`No results for "${searchInput}"`}</p>
+      )}
+      {posts.length === 0 && (
+        <p className="py-4">{`Organization has no posts.`}</p>
       )}
     </>
   );
