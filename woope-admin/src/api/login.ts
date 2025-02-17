@@ -16,6 +16,9 @@
       throw new Error("Access denied. Admins only.");
     }
   
+    localStorage.setItem("token", data.accessToken); // store token in localstorage
+
+
     return data; // Includes accessToken, refreshToken, and role_id
   };
   
