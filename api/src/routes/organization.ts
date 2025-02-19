@@ -1,5 +1,5 @@
 import express from 'express';
-import {checkFollowed, createOrganization, deleteOrganization, featureOrganization, followOrganization, getCategory, getFeaturedOrganizations, getOrganizationById, getOrganizationByName, getOrganizations,getOrganizationsFollowed,getOrganizationsWithCategory, getOrganizationsWithCategoryId, removeFeature, unfollow, updateOrganization } from '../models/organizations';
+import {checkFollowed, createOrganization, deleteOrganization, featureOrganization, followOrganization, getCategory, getFeaturedOrganizations, getOrganizationById, getOrganizationByName, getOrganizations,getOrganizationsFollowed,getOrganizationsWithCategory, getOrganizationsWithCategoryId, removeFeature, unfollow, updateOrganization, updatePhoto } from '../models/organizations';
 
 const router = require('express').Router();
 
@@ -206,4 +206,17 @@ router.delete('/deleteorganization', async (req: express.Request, res: express.R
         }
     }
 });
+router.put('/updatephoto', async(req: express.Request, res: express.Response) => {
+    try{
+        const {name, image_path} = req.body;
+        const edit = await updatePhoto(name, image_path);
+        res.status(200).json(edit);
+    }catch(error){
+        if (error instanceof Error) {
+            res.status(500).json(`Internal server error: ${error.message}`);
+        } else {
+            res.status(500).json('Internal server error: An unknown error occurred');
+        }
+    }
+})
 module.exports = router;

@@ -64,3 +64,7 @@ export const unfollow = async (user_id: number, org_id: number) => {
 export const deleteOrganization = async (name: string) => {
     return fetchAPI(`/organizations/deleteorganization`, 'DELETE', {name});
 }
+//update an organizations photo provided its org id
+export const updateOrgPhoto = async (name: string, image_path: string) => {
+    return fetchAPI(`/organizations/updatephoto`, 'PUT', {name, image_path});
+}

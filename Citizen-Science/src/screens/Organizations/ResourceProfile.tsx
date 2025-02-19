@@ -10,6 +10,8 @@ import { shareAsync } from "expo-sharing";
 import { ResourceMedia } from "../../api/types";
 import { getResourceMedia, insertResourceMedia, deleteResourceMedia} from "../../api/resources";
 import { MaterialIcons, Octicons, AntDesign } from '@expo/vector-icons';
+import { submitForm } from "../../api/upload";
+
 export const ResourceProfile = ({route}) => {
     const [selectedDocuments, setSelectedDocuments] = useState<DocumentPicker.DocumentPickerResult>();
     const [uriRetrieved, setUriRetrieved] = useState("");
@@ -69,12 +71,14 @@ export const ResourceProfile = ({route}) => {
                 const assets = result.assets;
                 const file = assets[0];
                 const selectedFile = {
-                    name: file.name.split(".")[0],
+                    name: file.name,
                     uri: file.uri,
                     type: file.mimeType,
                     size: file.size
                 };
-                formData.append("selectedFile",selectedFile as any, selectedFile.name);
+                console.log(selectedFile);
+                formData.append("file", selectedFile as any, selectedFile.name);
+                submitForm("file", formData, (msg) => console.log(msg));
                 setUriRetrieved(file.uri);
                 insertMedia(route.params.resource_id, selectedFile.name, selectedFile.uri);
                 downloadFile();

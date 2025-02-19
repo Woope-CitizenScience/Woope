@@ -46,6 +46,7 @@ export type Organization = {
 	text_description: string;
 	name: string;
 	tagline: string;
+	image_path: string;
 }
 export interface OrganizationWithCategory{
     org_id: number,
@@ -63,6 +64,7 @@ export type Resource = {
 	name: string;
 	tagline: string;
 	text_description: string;
+	image_path: string;
 }
 export interface ResourceMedia{
     media_id: number;

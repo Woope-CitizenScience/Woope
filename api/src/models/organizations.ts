@@ -1,4 +1,4 @@
-import { Organization,OrganizationWithCategory,Category, OrganizationFollowed} from "../interfaces/Organization";
+import { Organization,OrganizationWithCategory,Category, OrganizationFollowed } from "../interfaces/Organization";
 const pool = require('../db');
 //get all organizations
 export const getOrganizations = async () : Promise<Organization[]>=> {
@@ -195,7 +195,7 @@ export const updateOrganization = async(name: string, tagline: string, text_desc
     try{
         let query;
         let values;
-        if(tagline && text_description){
+        if(tagline && text_description ){
             query = `
                 UPDATE public.organizations SET tagline = $1, text_description = $2 WHERE name = $3 RETURNING *
             `; 
@@ -221,6 +221,19 @@ export const updateOrganization = async(name: string, tagline: string, text_desc
     }
     catch(error){
         throw new Error("Error creating organizaton: " + (error as Error).message);
+    }
+}
+export const updatePhoto = async(name: string, image_path: string) =>{
+    try{
+            let query = `
+                UPDATE public.organizations SET image_path = $1 WHERE name = $2 RETURNING *
+            `; 
+            let values = [image_path, name];
+            const response = await pool.query(query,values);
+            return response.rows;
+    }
+    catch(error){
+        throw new Error("Error updating photo: " + (error as Error).message);
     }
 }
 //TODO: IMPLEMENT BETTER
@@ -252,6 +265,7 @@ export const unfollow = async(user_id: number, org_id: string) => {
         throw new Error("Error deleting resource: " + (error as Error).message);
     }
 }
+//deletes an organizataion given a name
 export const deleteOrganization = async(name: string) => {
     try {
         let query = `
@@ -263,3 +277,18 @@ export const deleteOrganization = async(name: string) => {
         throw new Error("Error deleting organization: " + (error as Error).message);
     }
 }
+// //file path for profile image
+// export const updatePhoto = async (path: string, org_id: number) => {
+//     try {
+//         let query = `
+//             UPDATE public.organization SET image_path = $1 WHERE org_id = $2 RETURNING *
+
+//         `
+//         let values = [path, org_id];
+//         const response = await pool.query(query,values);
+//         return response.rows;
+//     } catch (error) {
+//             throw new Error("Error creating organizaton: " + (error as Error).message);
+
+//     }
+// }

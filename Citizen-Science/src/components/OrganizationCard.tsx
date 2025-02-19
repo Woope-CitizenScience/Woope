@@ -12,6 +12,8 @@ import { Organization } from "../api/types";
 import {getOrganizationById, followOrganization, checkFollowed, unfollow} from "../api/organizations";
 import UpdateOrganizationModal from "../components/UpdateOrganizationModal";
 import { useNavigation } from "@react-navigation/native";
+import { AntDesign } from '@expo/vector-icons';
+
 interface OrganizationProps {
     org_id: number;
     user_id: number;
@@ -67,22 +69,34 @@ const OrganizationCard: React.FC<OrganizationProps> = ({org_id, user_id})=> {
                             <Text style={styles.title}>{item.name}</Text>
                             <Text style={styles.category}></Text>
                         </View>
-                        {isFollowed == false && <TouchableOpacity style={styles.follow} onPress={() => {
-                            followOrganization(user_id,item.org_id)
-                            setIsFollowed(true);
-                            }}>
-                            <Text>Follow</Text>
-                        </TouchableOpacity>}
-                        {isFollowed == true && <TouchableOpacity style={styles.follow} onPress={() => {
-                            unfollow(user_id,item.org_id)
-                            setIsFollowed(false);
-                            }}>
-                            <Text>Unfollow</Text>
-                        </TouchableOpacity>}
+                        
+                        <View style={styles.edit}>
+
+                            <TouchableOpacity onPress={() => setIsModalVisible(true)}>
+                                <AntDesign name="edit" color="brown" size={30}/>
+                            </TouchableOpacity>
+
+                            {isFollowed == false && <TouchableOpacity style={styles.follow} onPress={() => {
+                                followOrganization(user_id,item.org_id)
+                                setIsFollowed(true);
+                                }}>
+                                <Text>Follow</Text>
+                            </TouchableOpacity>}
+
+                            {isFollowed == true && <TouchableOpacity style={styles.follow} onPress={() => {
+                                unfollow(user_id,item.org_id)
+                                setIsFollowed(false);
+                                }}>
+                                <Text>Unfollow</Text>
+                            </TouchableOpacity>}
+
+                        
+                        
+                        </View>
                     </View>
                     {/*Organization Banner Image */}
                     <View>
-                        <Image style={styles.imageStyle} source={require('../../assets/adaptive-icon.png')}/>
+                       {item.image_path && <Image style={styles.imageStyle} source={{uri: process.env.EXPO_PUBLIC_API_URL + '/uploads/' + item.image_path}}/> }
                     </View>
                     {/* Short Tagline */}
                     <View>
@@ -101,13 +115,6 @@ const OrganizationCard: React.FC<OrganizationProps> = ({org_id, user_id})=> {
                             org_id: item.org_id
                         })}>
                             <Text>View Events</Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity 
-                        style={styles.editButton} 
-                        onPress={() => setIsModalVisible(true)}
-                        >
-                            <Text>Edit</Text>
                         </TouchableOpacity>
                     </View>
                     <UpdateOrganizationModal
@@ -150,7 +157,6 @@ const styles = StyleSheet.create({
     imageStyle: {
         height: 150,
         width: deviceWidth - 50,
-        opacity:.9,
         alignContent: 'center',
         alignSelf: 'center',
     },
@@ -205,17 +211,9 @@ const styles = StyleSheet.create({
         shadowRadius: 5,
         elevation: 9,
     },
-    editButton: {
-        padding:10,
-        borderRadius:10,
-        backgroundColor: 'lightyellow',
-        shadowOffset: {
-            width: 5,
-            height: 5,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 5,
-        elevation: 9,
+    edit: {
+        flexDirection: "row",
+        gap: 10,
     },
     postButton:{
         
