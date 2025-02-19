@@ -9,16 +9,9 @@ function UserManager() {
   const navigate = useNavigate();
   const [searchInput, setSearchInput] = useState("");
   const [searchResults, setSearchResults] = useState<string[][]>([]);
-  const findByOptions = ["Name", "Email", "Role", "Organization"];
+  // const findByOptions = ["Name", "Email", "Role", "Organization"];
   // const logicOptions = ["starts with", "contains", "is", "is not"];
-  const tableHeaders = [
-    "ID",
-    "First Name",
-    "Last Name",
-    "Email",
-    "Role",
-    "Organization",
-  ];
+  const tableHeaders = ["ID", "Name", "Email", "Role", "Organization"];
 
   const handleSearch = async () => {
     try {
@@ -26,10 +19,25 @@ function UserManager() {
       if (res === "No users found") {
         setSearchResults([]);
       } else {
-        const users = res.map(
-          (obj: { [s: string]: unknown } | ArrayLike<unknown>) =>
-            Object.values(obj).map((value) => String(value))
-        );
+        // const users = res.map(
+        //   (obj: { [s: string]: unknown } | ArrayLike<unknown>) =>
+        //     Object.values(obj).map((value) => String(value))
+        // );
+        const users = res.map((user: any) => {
+          return [
+            <p className="pt-2">{user.user_id}</p>,
+            <button
+              type="button"
+              className="btn btn-link"
+              onClick={() => navigate(`/users/${user.user_id}`)}
+            >
+              {user.last_name + ", " + user.first_name}
+            </button>,
+            <p className="pt-2">{user.email}</p>,
+            <p className="pt-2">{user.role}</p>,
+            <p className="pt-2">{user.org}</p>,
+          ];
+        });
         setSearchResults(users);
       }
     } catch (e) {
@@ -45,7 +53,8 @@ function UserManager() {
   return (
     <>
       <div className="container-lg">
-        <h1 className="py-2">User Administration</h1>
+        <h1 className="pb-4">User Administration</h1>
+        <hr></hr>
         <form>
           <div className="row mb-3">
             {/* <label htmlFor="userSearch" className="col-sm col-form-label">

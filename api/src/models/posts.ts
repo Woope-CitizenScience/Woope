@@ -173,3 +173,18 @@ export const getUserLikedPosts = async (user_id: number): Promise<Post[]> => {
     throw error;
   }
 }
+
+//search posts on admin site
+export const searchPosts = async (query: string): Promise<Post[]> => {
+  try {
+      const searchQuery = `%${query}%`;
+      const response = await pool.query(
+          'SELECT * FROM posts WHERE content ILIKE $1 ORDER BY created_at DESC',
+          [searchQuery]
+      );
+      return response.rows;
+  } catch (error) {
+      console.error('Error searching posts', error);
+      throw error;
+  }
+}

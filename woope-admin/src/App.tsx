@@ -9,6 +9,7 @@ import OrgManager from "./screens/OrgManager";
 import UserProfile from "./screens/UserProfile";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthContext } from "./context/AuthContext";
+import OrgProfile from "./screens/OrgProfile";
 
 function App() {
   const { userToken, userRole } = useContext(AuthContext);
@@ -61,6 +62,16 @@ function App() {
           }
         />
         <Route
+          path="/organizations/:id"
+          element={
+            <ProtectedRoute isAuthenticated={!!userToken} userRole={userRole}>
+              <Layout>
+                <OrgProfile />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/users/:userId"
           element={
             <ProtectedRoute isAuthenticated={!!userToken} userRole={userRole}>
@@ -70,8 +81,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        {/* Unauthorized Access Page */}
-        <Route path="/unauthorized" element={<div>Unauthorized Access</div>} />
+        
       </Routes>
     </Router>
   );
