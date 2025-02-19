@@ -10,7 +10,7 @@ let organizationRouter = require('../routes/organization')
 let resourceRouter = require('../routes/resource')
 let eventRouter = require('../routes/event')
 let rolesRouter = require('../routes/roles')
-let reportRouter = require('../routes/report'); // ✅ Import report routes
+let reportRouter = require('../routes/report'); 
 // add more routers here
 
 module.exports = function (app: express.Application) {
@@ -26,5 +26,5 @@ module.exports = function (app: express.Application) {
     app.use('/resources', resourceRouter);
     app.use('/events', eventRouter);
     app.use('/roles', rolesRouter);
-    app.use('/report', reportRouter); // ✅ Mount the report routes
+    app.use('/report', reportRouter); 
 };

@@ -27,7 +27,6 @@ export const ReportScreen = () => {
             Alert.alert('Success', 'Report created successfully!');
             setFormData({ label: '', title: '', description: '' });
         } catch (error) {
-            console.error('❌ Error creating report:', error);
             Alert.alert('Error', 'Failed to create the report. Please try again.');
         }
     };
