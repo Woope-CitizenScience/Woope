@@ -36,17 +36,17 @@ export const createPost = async (pin_id: number, user_id: number,
 ////////////////////////////////////////////////
 // New Pins 2024
 
-export const createPinNew = async (name: string, description: string, date: Date, tag: string, longitude: number, latitude: number) => {
+export const createPin = async (name: string, description: string, date: Date, tag: string, longitude: number, latitude: number) => {
     return fetchAPI('/pins/pinnew', 'POST', {name, description, date, tag, longitude, latitude});
 }
 
 // Fetch all pins
-export const getAllPinsNew = async () => {
+export const getPins = async () => {
     //console.log("getAllPinsNew fetch api called)");
     return fetchAPI('/pins/pinnew', 'GET'); // Fetches data from the /pins/pinnew endpoint
 };
 
-export const deletePinNew = async (pinId: number) => {
+export const deletePin = async (pinId: number) => {
     if (!pinId || isNaN(pinId)) {
         throw new Error(`Invalid pin ID: ${pinId}`);
     }
@@ -54,7 +54,7 @@ export const deletePinNew = async (pinId: number) => {
 };
 
 
-export const updatePinNew = async (
+export const updatePin = async (
     pinId: number,
     name: string,
     text_description: string,

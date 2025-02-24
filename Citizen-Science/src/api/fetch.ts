@@ -1,5 +1,6 @@
 import mime from "mime";
 import { PdfFile } from "./types";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 async function fetchAPIWithFiles(endpoint: string, method: string = 'POST', data: { text: string, images: string[], pdfs: PdfFile[] }) {
     const formData = new FormData();
@@ -35,9 +36,15 @@ async function fetchAPIWithFiles(endpoint: string, method: string = 'POST', data
 }
 
 export async function fetchAPI(endpoint: string, method: string = 'GET', body: any = null) {
+    const token = await AsyncStorage.getItem("accessToken"); // Store token in mobile storage
+
+
     const config: RequestInit = { 
         method,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json',
+                "Authorization": token ? `Bearer ${token}` : "" // Attach token
+
+         }
     };
 
     if (body) {
