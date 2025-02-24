@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@react-native-async-storage/async-storage": "^2.1.1",
     "@types/react-native-calendars": "^1.1264.7",
     "expo-camera": "^16.0.9",
     "expo-image-picker": "^16.0.3",
