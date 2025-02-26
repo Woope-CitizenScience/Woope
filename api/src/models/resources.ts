@@ -133,12 +133,12 @@ export const getResourceMedia = async (resource_id: number) : Promise<ResourceMe
         throw new Error("Error retrieving resources: " + (error as Error).message);
     }
 }
-export const insertResourceMedia = async(resource_id: number, name: string, uri: string) => {
+export const insertResourceMedia = async(resource_id: number, name: string, file_path: string) => {
     try {
         let query = `
-            INSERT INTO public.resource_media (resource_id, name, uri) VALUES ($1,$2,$3) RETURNING *
+            INSERT INTO public.resource_media (resource_id, name, file_path) VALUES ($1,$2,$3) RETURNING *
         `;
-        let values = [resource_id, name, uri];
+        let values = [resource_id, name, file_path];
         const response = await pool.query(query, values);
         return response.rows;
     } catch (error) {
@@ -154,5 +154,18 @@ export const deleteResourceMedia = async (media_id: number) => {
         await pool.query(query,values);
     } catch (error) {
         throw new Error("Error deleting file: " + (error as Error).message)
+    }
+}
+export const updatePhoto = async(resource_id: number, image_path: string) =>{
+    try{
+            let query = `
+                UPDATE public.resource SET image_path = $1 WHERE resource_id = $2 RETURNING *
+            `; 
+            let values = [image_path, resource_id];
+            const response = await pool.query(query,values);
+            return response.rows;
+    }
+    catch(error){
+        throw new Error("Error updating photo: " + (error as Error).message);
     }
 }

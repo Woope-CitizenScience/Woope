@@ -2,103 +2,149 @@
     This screen displays the information and files of the selected resource 
 */
 import React, {useEffect, useState}from "react";
-import { Text,View, SafeAreaView,ScrollView,StyleSheet,Image,StatusBar, TouchableOpacity, Button, FlatList} from "react-native";
+import { Text,View, SafeAreaView, ScrollView,StyleSheet, Image ,StatusBar, TouchableOpacity, Button, FlatList, TextInput, Modal} from "react-native";
 import ResourceCard from "../../components/ResourceCard";
 import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system';
-import { shareAsync } from "expo-sharing";
+import * as Sharing from "expo-sharing";
 import { ResourceMedia } from "../../api/types";
 import { getResourceMedia, insertResourceMedia, deleteResourceMedia} from "../../api/resources";
-import { MaterialIcons, Octicons, AntDesign } from '@expo/vector-icons';
-import { submitForm } from "../../api/upload";
+import { AntDesign } from '@expo/vector-icons';
+import { submitForm } from "../../api/upload"
+import { WebView } from "react-native-webview"
+
+const API_BASE = process.env.EXPO_PUBLIC_API_URL;
+
+interface ResourceInfo{
+    name: string;
+    uri: string;
+}
+interface FileName{
+    name: string;
+}
+
 
 export const ResourceProfile = ({route}) => {
-    const [selectedDocuments, setSelectedDocuments] = useState<DocumentPicker.DocumentPickerResult>();
-    const [uriRetrieved, setUriRetrieved] = useState("");
-    const [downloadProgress, setDownloadProgress] = useState(0);
-    const [download, setDownload] = useState();
+    const [selectedDocuments, setSelectedDocuments] = useState<ResourceInfo>({
+        name: "",
+        uri: "", 
+    });
+    const [fileName, setFileName] = useState<FileName>({
+        name: "",
+    });
+    const [deleteCheck, setDeleteCheck] = useState<boolean>(false);
     const [isDownloading, setIsDownloading] = useState(false);
-    const [isPaused, setIsPaused] = useState(false);
-    const filename: string = route.params.resource_id;
     const [resourceMedia, setResourceMedia] = useState<ResourceMedia[]>();
-    let docPath : string = route.params.resource_id.toString();
+    const [isModalVisible, setIsModalVisible] =useState<boolean>(false);
+    const [isWebModalVisible, setIsWebModalVisible] =useState<boolean>(false);
+    const [downloadInfo, setDownloadInfo] = useState<string>("")
     
-    useEffect(() => {
-        const downloadResumable = FileSystem.createDownloadResumable(
-            "https://file-examples.com/storage/fe602ed48f677b2319947f8/2018/04/file_example_MOV_1920_2_2MB.mov",
-            FileSystem.documentDirectory+filename,
-            {},
-            (progress) => {
-                const percentProgress = (progress.totalBytesWritten / progress.totalBytesExpectedToWrite * 100).toFixed(2);
-                setDownloadProgress(percentProgress);
-            });
-        setDownload(downloadResumable);
-    },[selectedDocuments])
-
-    //retrieves resource children given parent resource_id
     useEffect(() => {
         getResources();
-    })
+    },[isModalVisible, deleteCheck])
 
+    const handleInputChange = (field: keyof FileName, value: string) => {
+		setFileName(prevState => ({ ...prevState, [field]: value }));
+	};
+
+// retrieves resources given parent resource_id
     const getResources = async() => {
-        const response = await getResourceMedia(route.params.resource_id);
-        setResourceMedia(response);
-    }
-    const downloadFile = async() => {
-        setIsDownloading(true);
-        const {uri} = await download.downloadAsync();
-        console.log(uri);
-        
-        setIsDownloading(false);
-    };
-    const insertMedia = async(resource_id: number, name: string, uid: string) => {
         try {
-            await insertResourceMedia(resource_id, name, uid);
+            const response = await getResourceMedia(route.params.resource_id);
+            setResourceMedia(response);
         } catch (error) {
-            console.log("Error uploading media " + error);
+            console.log("Failed ot retrieve resources: " + error)
+        }
+        
+    }
+
+// uploading selected file to server
+    const uploadFile = async () => {
+        const formData = new FormData();
+        formData.append("file", selectedDocuments as any, selectedDocuments.name.toString());
+        console.log(formData);
+        submitForm("file", formData, (msg) => console.log(msg)); 
+        try {
+            let result = await insertResourceMedia(route.params.resource_id, fileName.name, selectedDocuments.name.toString())
+        } catch (error) {
+            console.log("File upload failed: " + error);
         }
     }
-    const save = (uri) => {
-        shareAsync(uri);
-    };
-    
+// uploading selected file path and info to database
+    const uploadPath = async () => {
+        try {
+            let result = await insertResourceMedia(route.params.resource_id, fileName.name , selectedDocuments.name)
+        } catch (error) {
+            console.log("Error uploading filepath to database: " + error)
+        }
+    }
+// prompts os document picker and grabs selected metadata
     const pickDocuments = async () => {
         try {
             const result = await DocumentPicker.getDocumentAsync();
-            if (!result.canceled) {
-                setSelectedDocuments(result);
-                const formData = new FormData();
-                const assets = result.assets;
-                const file = assets[0];
-                const selectedFile = {
-                    name: file.name,
-                    uri: file.uri,
-                    type: file.mimeType,
-                    size: file.size
-                };
-                console.log(selectedFile);
-                formData.append("file", selectedFile as any, selectedFile.name);
-                submitForm("file", formData, (msg) => console.log(msg));
-                setUriRetrieved(file.uri);
-                insertMedia(route.params.resource_id, selectedFile.name, selectedFile.uri);
-                downloadFile();
-            }else {
-            console.log("Document selection cancelled.");
-            }
-            } catch (error) {
-                console.log("Error picking documents:", error);
-            }
-        }; 
+                if (!result.canceled) {
+                    const file = result.assets[0];
+                    console.log(file);
+                    selectedDocuments.name = Date.now() + '--' + file.name;
+                    selectedDocuments.uri = file.uri;
+                }else {
+                console.log("Document selection cancelled.");
+                }
+        } catch (error) {
+            console.log("Error picking documents: " + error);
+        }
+    }; 
+// deletes specified resource media
+    const deleteMedia = async(media_id: number) => {
+        try {
+            let result = await deleteResourceMedia(media_id); 
+        } catch (error) {
+            console.log("Error deleting media: " + error);
+        }
+    }
+    const uploadPress = () => {
+        pickDocuments().then((value) => {
+            setIsModalVisible(true);
+        });
+    }
+    const save = () => {
+        uploadFile().then((value) => {
+            setIsModalVisible(false);
+        })
+    }
+    const pressDelete = (media_id: number) => {
+        deleteMedia(media_id)
+        setDeleteCheck(!deleteCheck)
+    }
+    const pressDownload = (file_path: string) => {
+        downloadFromUrl(file_path).then((value) => {
+        })
+    }
+
+    const downloadFromUrl = async (file_path: string) => {
+        try {
+            const url = API_BASE + "/uploads/" + file_path;
+            const result = await FileSystem.downloadAsync(
+            url,
+            FileSystem.cacheDirectory + file_path
+            )
+            saveFile(result.uri)
+        } catch (error) {
+            console.log("Error downloading file: " + error);
+        }
+    }
+
+    const saveFile = (url: string) => {
+        Sharing.shareAsync(url)
+    }
     return(
         <SafeAreaView style = {styles.container}>
                 {/* Resource Card */}
                 <ResourceCard resource_id={route.params.resource_id} org_id={route.params.org_id}/>
                 {/* Resources Container */}
-                <Button title="Upload Files" onPress={() => {pickDocuments()}}/>
-                <View>
-                    {isDownloading && <Text>Uploading: {downloadProgress}%</Text>}
-                </View>
+                <Button title="Upload Files" onPress={() => { uploadPress() }}/>
                     {/* Divider */}
+                    {/* !TODO: implement severside deletion logic */}
                 <FlatList 
                     style={styles.flatlist}
                     data={resourceMedia}
@@ -110,18 +156,50 @@ export const ResourceProfile = ({route}) => {
                             <View style={styles.directoryButton} >
                                 <Text style={styles.title}>{item.name}</Text>
                             </View>
-                            <TouchableOpacity>
+                            <TouchableOpacity onPress={() => {
+                                pressDownload(item.file_path);
+                            }}>
                                 <AntDesign name="download" size={30}/>
                             </TouchableOpacity>
+
+                            {/* <TouchableOpacity>
+                                <AntDesign name="eyeo" size={30}/>
+                            </TouchableOpacity> */}
+
                             <TouchableOpacity onPress={() => {
-                                deleteResourceMedia(item.media_id)
+                                pressDelete(item.media_id);
                             }}>
                                 <AntDesign color={"red"} name="close" size={30}/>
                             </TouchableOpacity>
-                            
                         </View>
                     )
                     }/>
+                    {/* Webview Modal */}
+                    {/* <Modal visible={isWebModalVisible} animationType="fade" transparent={true}>
+                        <WebView source={} ></WebView>
+                    </Modal> */}
+
+                    {/* Enter name of file modal */}
+                    <Modal visible={isModalVisible} animationType="fade" transparent={true}>
+                        <View style={styles.modalContainer}>
+                            <View style={styles.modal}>
+                                <Text>Enter Name Of File</Text>
+                                <TextInput onChangeText={(value) => handleInputChange("name", value)}
+                                    maxLength={20}
+                                    multiline={false}
+                                    scrollEnabled={false}
+                                    style = {styles.textbox}></TextInput>
+                                <View style={styles.confirm}> 
+                                    <TouchableOpacity onPress={() => setIsModalVisible(false)}>
+                                        <Text style = {styles.cancel}>Cancel</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => save()}>
+                                        <Text style = {styles.upload}>Upload</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        </View>
+                    </Modal>
         </SafeAreaView>
     );
 };
@@ -130,6 +208,12 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingTop: StatusBar.currentHeight,
         backgroundColor: "white",
+        
+    },
+    modalContainer: {
+        flex: 1,
+        backgroundColor: "white",
+        justifyContent: "center",
     },
     title: {
         fontSize: 15,
@@ -168,6 +252,36 @@ const styles = StyleSheet.create({
         alignItems: "center",
         gap: 10,
         marginHorizontal: 15,
+    },
+    textbox:{
+        borderRadius: 5,
+        borderWidth: 2,
+        flexDirection: "row",
+        borderColor: "lightblue",
+        backgroundColor: "white"
+    },
+    modal: {
+        backgroundColor: "white",
+        opacity: 1,
+        flexDirection: "column",
+        alignSelf: "center",
+        justifyContent: "center",
+        gap: 10,
+        padding: 30,
+        borderRadius: 10,
+    }, 
+    confirm: {
+        flexDirection: "row",
+        alignContent: "space-between",
+        gap: 30,
+    },
+    cancel: {
+        fontSize: 20,
+        color: "red"
+    }, 
+    upload: {
+        fontSize: 20,
+        color: "blue"
     }
 });
 export default ResourceProfile;

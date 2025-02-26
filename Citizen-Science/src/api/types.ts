@@ -67,10 +67,10 @@ export type Resource = {
 	image_path: string;
 }
 export interface ResourceMedia{
-    media_id: number;
+	media_id: number, 
     name: string;
-    uri: string;
-    type: string;
+    file_path: string;
+	uri: string; 
 }
 export interface Event{
     event_id: number,

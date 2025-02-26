@@ -1,4 +1,4 @@
-import { Organization,OrganizationWithCategory,Category, OrganizationFollowed } from "../interfaces/Organization";
+import { Organization,OrganizationWithCategory,Category } from "../interfaces/Organization";
 const pool = require('../db');
 //get all organizations
 export const getOrganizations = async () : Promise<Organization[]>=> {
@@ -236,20 +236,24 @@ export const updatePhoto = async(name: string, image_path: string) =>{
         throw new Error("Error updating photo: " + (error as Error).message);
     }
 }
-//TODO: IMPLEMENT BETTER
-//checks if followed by issuing an update statement, updating the row with the exact statement, if fails
-//the returned organization will be undefined
-//done this way since using a get with 2 parameters is apparently more complicated than it sounds
-export const checkFollowed = async(user_id: number, org_id: number): Promise<OrganizationFollowed> => {
+
+// checks if followed, returns {case: 1} if true and {case: 0} if false
+export const isFollowed = async(user_id: number, org_id: number) => {
     try {
         let query = `
-            UPDATE public.user_organization_follows SET user_id = $1, org_id = $2 WHERE user_id = $1 AND org_id = $2 RETURNING *
-        `
+            SELECT CASE WHEN EXISTS (
+                SELECT *
+                FROM user_organization_follows
+                WHERE user_id = $1 AND org_id = $2
+            )
+            THEN CAST(1 AS BIT)
+            ELSE CAST(0 AS BIT) 
+            END`
         let values = [user_id, org_id]
-        const response = await pool.query(query,values);
-        return response.rows;
+        const response = await pool.query(query,values)
+        return response.rows[0];
     } catch (error) {
-        throw new Error("Error checking follow: " + (error as Error).message);
+        throw new Error("Error checking following status: " + (error as Error).message)
     }
 }
 //remove a follow when given user id and group id 
@@ -277,18 +281,3 @@ export const deleteOrganization = async(name: string) => {
         throw new Error("Error deleting organization: " + (error as Error).message);
     }
 }
-// //file path for profile image
-// export const updatePhoto = async (path: string, org_id: number) => {
-//     try {
-//         let query = `
-//             UPDATE public.organization SET image_path = $1 WHERE org_id = $2 RETURNING *
-
-//         `
-//         let values = [path, org_id];
-//         const response = await pool.query(query,values);
-//         return response.rows;
-//     } catch (error) {
-//             throw new Error("Error creating organizaton: " + (error as Error).message);
-
-//     }
-// }

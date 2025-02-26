@@ -9,7 +9,7 @@ import React, { useState,useEffect } from "react";
 import * as ImagePicker from 'expo-image-picker';
 import { View, StyleSheet, Text, Image, TouchableOpacity, Dimensions, FlatList, SafeAreaView } from "react-native";
 import { Organization } from "../api/types";
-import {getOrganizationById, followOrganization, checkFollowed, unfollow} from "../api/organizations";
+import { getOrganizationById, followOrganization, unfollowOrganization, following} from "../api/organizations";
 import UpdateOrganizationModal from "../components/UpdateOrganizationModal";
 import { useNavigation } from "@react-navigation/native";
 import { AntDesign } from '@expo/vector-icons';
@@ -18,14 +18,26 @@ interface OrganizationProps {
     org_id: number;
     user_id: number;
 }
+interface FollowStatus {
+    case: number;
+}
 //Component to display organization information on their resource page
 const OrganizationCard: React.FC<OrganizationProps> = ({org_id, user_id})=> {
-    const [isModalVisible, setIsModalVisible] = useState(false);
-    const [data, setData] = useState<Organization[]>([]);
-    const [org, setOrg] = useState<OrganizationProps[]>();
-    const [isFollowed, setIsFollowed] = useState<boolean>();
     const navigation = useNavigation<any>();
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [data, setData] = useState<Organization[]>(
+        [{org_id: 0, name: "", text_description: "", tagline: "", image_path: ""}]
+    );
+    const [isFollowed, setIsFollowed] = useState<number>();
+    const [value, setValue] = useState<FollowStatus>();
     
+    useEffect(() => {
+        fetchInfo().then((value) => {
+            checkFollowed()
+        })
+    }, [isModalVisible, isFollowed])
+
+    // getting the information of the organization
     const fetchInfo = async () => {
         try {
             const organizationList = await getOrganizationById(org_id);
@@ -34,39 +46,46 @@ const OrganizationCard: React.FC<OrganizationProps> = ({org_id, user_id})=> {
             console.log(error);
         }
     }
-    const followedStatus = async (org_id: number, user_id: number) => {
+    const checkFollowed = async () => {
         try {
-            let response = await checkFollowed(user_id, org_id);
-            setOrg(response);
-            if(org[0].org_id !== undefined){
-                setIsFollowed(true);
-            }else{
-                setIsFollowed(false);
-            }
+            console.log("poop");
+            const response = await following(user_id,org_id);
+            setIsFollowed(response.case)
         } catch (error) {
-            setIsFollowed(false);
+            console.log("Error Checking follow status" + error)
         }
-        
-        
-    } 
-    useEffect(() => {
-        fetchInfo();
-        followedStatus(org_id, user_id);
-        console.log(1);
-    },[isModalVisible,isFollowed])
+    }
+    const pressFollow = () => {
+        follow();
+        setIsFollowed(1);
+    }
+    const pressUnfollow = () => {
+        unfollow();
+        setIsFollowed(0);
+    }
+    const follow = async() => {
+        try{
+            const response = await followOrganization(user_id, org_id);
+        }catch (error){
+            console.log("Error following organization: " + error);
+        }
+    }
+    const unfollow = async() => {
+        try {
+            const response = await unfollowOrganization(user_id, org_id);
+        } catch (error) {
+            console.log("Error unfollowing organization: " + error);
+        }
+    }
+
     return(
         // Container
         <SafeAreaView style={styles.container}> 
-            <FlatList
-            data={data}
-            keyExtractor={(item) => item.org_id}
-            scrollEnabled={false}
-            renderItem={({item}) =>(
                 <View style={styles.cardContainer}>
                     {/*Organization Name, Category, Follow Button */}
                     <View style ={styles.headerContainer}>
                         <View>
-                            <Text style={styles.title}>{item.name}</Text>
+                            <Text style={styles.title}>{data[0].name}</Text>
                             <Text style={styles.category}></Text>
                         </View>
                         
@@ -76,35 +95,35 @@ const OrganizationCard: React.FC<OrganizationProps> = ({org_id, user_id})=> {
                                 <AntDesign name="edit" color="brown" size={30}/>
                             </TouchableOpacity>
 
-                            {isFollowed == false && <TouchableOpacity style={styles.follow} onPress={() => {
-                                followOrganization(user_id,item.org_id)
-                                setIsFollowed(true);
+                            
+                            {(isFollowed == 0) &&
+                                <TouchableOpacity style={styles.follow} onPress={() => {
+                                    pressFollow();
                                 }}>
-                                <Text>Follow</Text>
-                            </TouchableOpacity>}
+                                    <Text>Follow</Text>
+                                </TouchableOpacity>
+                            }
 
-                            {isFollowed == true && <TouchableOpacity style={styles.follow} onPress={() => {
-                                unfollow(user_id,item.org_id)
-                                setIsFollowed(false);
+                            {(isFollowed == 1)&&
+                            <TouchableOpacity style={styles.follow} onPress={() => {
+                                    pressUnfollow();
                                 }}>
-                                <Text>Unfollow</Text>
-                            </TouchableOpacity>}
-
-                        
-                        
+                                 <Text>Unfollow</Text>
+                            </TouchableOpacity> 
+                            }
                         </View>
                     </View>
                     {/*Organization Banner Image */}
                     <View>
-                       {item.image_path && <Image style={styles.imageStyle} source={{uri: process.env.EXPO_PUBLIC_API_URL + '/uploads/' + item.image_path}}/> }
+                       {data[0].image_path && <Image style={styles.imageStyle} source={{uri: process.env.EXPO_PUBLIC_API_URL + '/uploads/' + data[0].image_path}}/> }
                     </View>
                     {/* Short Tagline */}
                     <View>
-                        <Text style = {styles.tagline}>{item.tagline}</Text>
+                        <Text style = {styles.tagline}>{data[0].tagline}</Text>
                     </View>
                     {/* Full Description */}
                     <View>
-                        <Text style = {styles.description}>{item.text_description}</Text>
+                        <Text style = {styles.description}>{data[0].text_description}</Text>
                     </View>
                     {/* Container for Events and Posts Button */}
                     <View style={styles.buttonContainer}>
@@ -112,7 +131,7 @@ const OrganizationCard: React.FC<OrganizationProps> = ({org_id, user_id})=> {
                             <Text>View Posts</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.eventButton} onPress={() => navigation.navigate("EventHome", {
-                            org_id: item.org_id
+                            org_id: org_id
                         })}>
                             <Text>View Events</Text>
                         </TouchableOpacity>
@@ -123,9 +142,8 @@ const OrganizationCard: React.FC<OrganizationProps> = ({org_id, user_id})=> {
                         setIsModalVisible(false);
                         fetchInfo();
                     }} 
-                    name={item.name}/>
+                    name={data[0].name}/>
                 </View>
-            )}/>
     </SafeAreaView>
     );
 };
@@ -191,7 +209,6 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.25,
         shadowRadius: 5,
         elevation: 9,
-
     },
     buttonContainer:{
         flexDirection:'row',
@@ -216,7 +233,6 @@ const styles = StyleSheet.create({
         gap: 10,
     },
     postButton:{
-        
         padding:10,
         borderRadius:10,
         backgroundColor:'white',
@@ -230,8 +246,6 @@ const styles = StyleSheet.create({
         elevation: 9,
         
     }
-    
-
 });
 
 export default OrganizationCard;

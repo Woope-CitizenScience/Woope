@@ -4,7 +4,7 @@
 
 import React, {useState,useEffect, useContext} from 'react';
 import { View, Text, SafeAreaView, FlatList, TouchableOpacity, StyleSheet, StatusBar, ScrollView } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import OrganizationCard from '../../components/OrganizationCard';
 import EventCard from '../../components/EventCard';
 import CreateResource from '../../components/CreateResource';
@@ -17,13 +17,22 @@ import {AccessToken} from "../../util/token";
 
 
 export const OrganizationProfile = ({route}) => {
-    const { userToken, setUserToken } = useContext(AuthContext);
+    const { userToken } = useContext(AuthContext);
     const decodedToken = userToken ? jwtDecode<AccessToken>(userToken) : null;
     const userId = decodedToken ? decodedToken.user_id : NaN;
     const navigation = useNavigation<any>();
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [resourceData, setResourceData] = useState<Resource[]>([]);
-    const fetchResources = async () => {
+    
+        //"refreshes page" when focused and when a resource is added
+        useFocusEffect(
+                    React.useCallback(() => {
+                        // grabs featured organizations, if any exist
+                        fetchResources();
+                    },[isModalVisible])  
+                );
+        //gets all resources specific to the organization
+        const fetchResources = async () => {
             try {
                 const resourceList = await getResourceById(route.params.org_id);
                 setResourceData(resourceList);
@@ -31,9 +40,6 @@ export const OrganizationProfile = ({route}) => {
                 console.log(error);
             }
         }
-        useEffect(() => {
-            fetchResources();
-        })
     return(
         <SafeAreaView style = {styles.container}>
             <ScrollView>
@@ -59,6 +65,7 @@ export const OrganizationProfile = ({route}) => {
                         </TouchableOpacity>
                     </View>
                 </View>
+                {/* List of all resources */}
                 <FlatList
                 data={resourceData}
                 scrollEnabled={false}
@@ -71,10 +78,10 @@ export const OrganizationProfile = ({route}) => {
                         <Text>{item.name}</Text>
                     </TouchableOpacity>
                 )}/>
+                {/* Create resource functionality */}
                 <CreateResource org_id={route.params.org_id} isVisible = {isModalVisible} onClose={() => 
                     {
-                    setIsModalVisible(false)
-                    fetchResources();
+                        setIsModalVisible(false)
                     }
                 }/>
             </ScrollView>

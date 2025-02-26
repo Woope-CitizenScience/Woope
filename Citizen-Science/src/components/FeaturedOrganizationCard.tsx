@@ -2,12 +2,14 @@ import React from "react";
 import { View, StyleSheet, Text, Image, TouchableOpacity, Dimensions } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 interface FeaturedOrganizationProps {
+    org_id: number;
     name: string;
     tagline: string;
     text_description: string;
+    image_path: string;
 }
 //Component to display organization information on their resource page
-const FeaturedOrganizationCard: React.FC<FeaturedOrganizationProps> = ({org_id, name, tagline, text_description}) => {
+const FeaturedOrganizationCard: React.FC<FeaturedOrganizationProps> = ({org_id, name, tagline, text_description, image_path}) => {
     const navigation = useNavigation<any>();
     return(
         // Container
@@ -21,7 +23,7 @@ const FeaturedOrganizationCard: React.FC<FeaturedOrganizationProps> = ({org_id, 
             </View>
             {/*Organization Banner Image */}
             <View>
-                <Image style={styles.imageStyle}source={require('../../assets/adaptive-icon.png')}/>
+                {image_path && <Image style={styles.imageStyle} source={{uri: process.env.EXPO_PUBLIC_API_URL + '/uploads/' + image_path}}/> }
             </View>
             {/* Short Tagline */}
             <View>

@@ -3,7 +3,7 @@
     Takes the organization name, whether its visible, and a function when it closes
 */
 import React, {useState} from "react";
-import {Modal, View, TextInput, Button, StyleSheet, SafeAreaView, Text, TouchableOpacity} from "react-native";
+import { Modal, View, TextInput, Button, StyleSheet, SafeAreaView, Text, TouchableOpacity} from "react-native";
 import { MaterialIcons } from '@expo/vector-icons';
 import { updateOrganization, updateOrgPhoto} from "../api/organizations";
 import * as ImagePicker from "expo-image-picker";
@@ -11,7 +11,6 @@ import { submitForm } from "../api/upload";
 interface OrganizationInfo {
     tagline: string;
     description: string;
-    filename: string;
 }
 interface ImageInfo {
     name: string;
@@ -26,7 +25,6 @@ const UpdateOrganizationModal: React.FC<ModalProps> = ({name, isVisible, onClose
     const [newInfo, setNewInfo] = useState<OrganizationInfo>({
         tagline: "",
         description: "",
-        filename: "",
     })
     const [imageInfo, setImageInfo] = useState<ImageInfo>({
         name: "",
@@ -63,8 +61,20 @@ const UpdateOrganizationModal: React.FC<ModalProps> = ({name, isVisible, onClose
     }
     // handles when the save button is pressed
     const handleSave = () => {
-        uploadPhoto();
-        updateInfo();
+        if(imageInfo.name){
+            uploadPhoto();
+            setImageInfo({ 
+                name: "",
+                uri: "",
+            })
+        }
+        if(newInfo.description || newInfo.tagline){
+            updateInfo();
+            setNewInfo({
+                tagline: "",
+                description: "",
+            })
+        }
     }
     
     const selectImage = async () => {
@@ -88,8 +98,6 @@ const UpdateOrganizationModal: React.FC<ModalProps> = ({name, isVisible, onClose
                     name: Date.now() + '--' + file.fileName,
                     uri: file.uri,
                 })
-                // set filename into new info to insert into database once submit is pressed
-                newInfo.filename = imageInfo.name;
             }else {
             console.log("Document selection cancelled.");
             }
