@@ -4,6 +4,7 @@ import Button from "../components/Button";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { searchUser } from "../api/community";
+import PageHeader from "../components/PageHeader";
 
 function UserManager() {
   const navigate = useNavigate();
@@ -58,7 +59,7 @@ function UserManager() {
   return (
     <>
       <div className="container-lg">
-        <h1 className="pb-4">User Administration</h1>
+        <PageHeader>User Administration</PageHeader>
         <hr></hr>
         <form
           onSubmit={(event) => {

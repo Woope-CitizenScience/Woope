@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { getPosts, searchPosts, updatePost, deletePost } from "../api/posts";
 import Button from "../components/Button";
 import Modal from "../components/Modal";
+import PageHeader from "../components/PageHeader";
 
 const PostManager = () => {
   const navigate = useNavigate();
@@ -167,7 +168,7 @@ const PostManager = () => {
         }
       />
 
-      <h1 className="pb-4">Post Manager</h1>
+      <PageHeader>Post Manager</PageHeader>
       <hr></hr>
       <div className="row mb-3">
         <div className="col-sm-4">

@@ -9,6 +9,7 @@ import {
 } from "../api/organizations";
 import { Organization } from "../interfaces/Organization";
 import Modal from "../components/Modal";
+import PageHeader from "../components/PageHeader";
 
 const OrgManager = () => {
   const navigate = useNavigate();
@@ -229,7 +230,7 @@ const OrgManager = () => {
             </>
           }
         ></Modal>
-        <h1 className="pb-4">Organization Manager</h1>
+        <PageHeader>Organization Manager</PageHeader>
         <hr></hr>
         <form
           onSubmit={(event) => {
