@@ -1,11 +1,32 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import blob from "../assets/blob.svg";
+import blobs from "../assets/blobs.svg";
+import poly from "../assets/poly.svg";
+import circle from "../assets/circle.svg";
+import waves from "../assets/waves4.svg";
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [background, setBackground] = useState("src/assets/blobs2.svg");
+
   const updateTheme = (theme: string) => {
     localStorage.setItem("theme", theme);
     document.documentElement.setAttribute("data-bs-theme", theme); // Save theme in local browser storage
   };
+
+  useEffect(() => {
+    setBackground("src/assets/blobs2.svg");
+  }, []);
+
+  const myStyle = {
+    backgroundImage: `url(${background})`,
+    height: "100vh",
+    // marginTop: "-70px",
+    // fontSize: "50px",
+    backgroundSize: "cover",
+    backgroundRepeat: "no-repeat",
+  };
+
   return (
     <div>
       <nav className="navbar navbar-expand-lg">
@@ -78,7 +99,9 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           </div>
         </div>
       </nav>
-      <div className="container mt-5">{children}</div>
+      <div className="containter p-5" style={myStyle}>
+        {children}
+      </div>
     </div>
   );
 };
