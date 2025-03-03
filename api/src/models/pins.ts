@@ -51,14 +51,15 @@ export const createPinNew = async (
     dateBegin: Date,
     label: string,
     longitude: number,
-    latitude: number
+    latitude: number,
+    imageUrl: String,
 ): Promise<PinNew> => {
     try {
         const response = await pool.query(
-            `INSERT INTO public.pins (name, text_description, dateBegin, label, longitude, latitude)
-             VALUES ($1, $2, $3, $4, $5, $6)
+            `INSERT INTO public.pins (name, text_description, dateBegin, label, longitude, latitude, image_url)
+             VALUES ($1, $2, $3, $4, $5, $6, $7)
              RETURNING *`,
-            [name, text_description, dateBegin, label, longitude, latitude]
+            [name, text_description, dateBegin, label, longitude, latitude, imageUrl]
         );
 
         console.log('Created Pin:', response.rows[0]); // Debug log for the created pin
@@ -71,21 +72,21 @@ export const createPinNew = async (
 
 
 // pinModel.ts
-export const getAllPinsNew = async ()  : Promise<PinNew> => {
-    try{
-    const queryText = `SELECT * FROM public.pins ORDER BY pin_id ASC`;
-    const { rows } = await pool.query(queryText); // Ensure no second argument is passed
+export const getAllPinsNew = async (): Promise<PinNew> => {
+    try {
+        const queryText = `SELECT * FROM public.pins ORDER BY pin_id ASC`;
+        const { rows } = await pool.query(queryText); // Ensure no second argument is passed
 
-    return rows;
+        return rows;
 
     }
-    catch(error){
+    catch (error) {
 
         throw new Error("Error retrieving organizations: " + (error as Error).message);
     }
-  };
+};
 
-  // Does not return anything
+// Does not return anything
 export const deletePinNew = async (pin_id: number): Promise<void> => {
     try {
         await pool.query('DELETE FROM pins WHERE pin_id = $1', [pin_id]);

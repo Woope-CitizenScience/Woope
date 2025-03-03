@@ -93,59 +93,58 @@ export const MapScreen = () => {
 	// Fetching Pins
 
 	const fetchPins = async () => {
-		try 
-		{
-		  const allPins = await getAllPinsNew();
-		  // console.log('\nFetched pins from the server:', allPins); // We do get the pin_id
-			
-		  // Confirmed correct format
-		  const transformedPins = allPins.map((pin) => ({
-			pin_id : pin.pin_id,
-			name: pin.name,
-			date: new Date(pin.datebegin).toISOString().split('T')[0],
-			description: pin.text_description,
-			tag: pin.label,
-			image: null, // Assuming no image is provided in the data
-			location: {
-			//   latitude: pin.latitude,
-			//   longitude: pin.longitude,
-			latitude: pin.longitude,
-			longitude: pin.latitude,
-			},
-		  }));
-	  
-		  // console.log('\nTransformed Pins:', transformedPins);
+		try {
+			const allPins = await getAllPinsNew();
+			// console.log('\nFetched pins from the server:', allPins); // We do get the pin_id
 
-		  setPins([...transformedPins]); // Spread operator ensures a new array
-          setFilteredPins([...transformedPins]);
+			// Confirmed correct format
+			const transformedPins = allPins.map((pin) => ({
+				pin_id: pin.pin_id,
+				name: pin.name,
+				date: new Date(pin.datebegin).toISOString().split('T')[0],
+				description: pin.text_description,
+				tag: pin.label,
+				image: null, // Assuming no image is provided in the data
+				location: {
+					//   latitude: pin.latitude,
+					//   longitude: pin.longitude,
+					latitude: pin.longitude,
+					longitude: pin.latitude,
+				},
+			}));
 
-		  //console.log('\nPins (from setPins) : ', pins)
-		  //console.log("\nFiltered Pins (from setFilteredPins):", filteredPins)
+			// console.log('\nTransformed Pins:', transformedPins);
 
-		  return transformedPins;
+			setPins([...transformedPins]); // Spread operator ensures a new array
+			setFilteredPins([...transformedPins]);
+
+			//console.log('\nPins (from setPins) : ', pins)
+			//console.log("\nFiltered Pins (from setFilteredPins):", filteredPins)
+
+			return transformedPins;
 
 		} catch (error) {
-		  console.error('Error fetching all pins:', error);
+			console.error('Error fetching all pins:', error);
 		}
-	  };
+	};
 
-	  // If fetchPins runs before the map is fully initialized, the pins might not render.
-	  useEffect(() => {
+	// If fetchPins runs before the map is fully initialized, the pins might not render.
+	useEffect(() => {
 		if (initialRegion) {
 			fetchPins();
 		}
 	}, [initialRegion]);
 
-	  useEffect(() => {
+	useEffect(() => {
 		fetchPins().then((pins) => {
 			//console.log(pins); // Access the resolved array
-		  });
-	  }, []);
+		});
+	}, []);
 
-	  useEffect(() => {
+	useEffect(() => {
 		//console.log('\nUpdated Pins:', pins);
 		//console.log('\nUpdated Filtered Pins:', filteredPins);
-	  }, [pins, filteredPins]);
+	}, [pins, filteredPins]);
 
 	// End Fetch Pins
 
@@ -210,68 +209,71 @@ export const MapScreen = () => {
 		isMarkerPressedRef.current = false; // Reset the flag
 		setIsMarkerPressed(false); // Reset marker pressed state
 	};
-	
+
 	const handleDeletePin = (pinId: number) => {
 		deletePinNew(pinId)
-        .then(() => {
-            console.log('Pin deleted successfully!');
-        })
+			.then(() => {
+				console.log('Pin deleted successfully!');
+			})
 	};
-	
+
 
 	const handleFormSubmit = async () => {
-		// Validate form before submission
 		if (!formData.name || !formData.date || !formData.description || !formData.tag) {
 			alert('Please fill out all fields before submitting.');
 			return;
 		}
-	
+
 		const pinLocation = formData.location || formLocation;
-	
 		if (!pinLocation) {
 			alert('No location available for this pin');
 			return;
 		}
-	
-		try {
-			// Call the API to create the pin in the database
-			const newPin = await createPinNew(
-				formData.name,
-				formData.description,
-				new Date(formData.date),
-				formData.tag,
-				pinLocation.latitude,
-				pinLocation.longitude
-			);
 
-			console.log('Response from createPinNew:', newPin);
-	
-			// Add the new pin with the correct `pin_id` to the state
-			setPins((prev) => [
-				...prev,
-				{
-					pin_id: newPin.pin_id, // Use the ID returned by the backend
-					name: newPin.name,
-					date: formData.date,
-					description: formData.description,
-					tag: formData.tag,
-					image: formData.image, // Use the image from the form
-					location: pinLocation,
-				},
-			]);
-	
-			// Reset the form and hide the modal
-			setFormData({ name: '', date: '', description: '', tag: 'General', image: null, location: null });
-			setFormLocation(null);
-			setModalVisible(false);
-	
-			alert('Pin created successfully!');
+		// ✅ Create FormData
+		const newFormData = new FormData();
+		newFormData.append("name", formData.name);
+		newFormData.append("description", formData.description);
+		newFormData.append("date", formData.date);
+		newFormData.append("tag", formData.tag);
+		newFormData.append("latitude", pinLocation.latitude.toString());
+		newFormData.append("longitude", pinLocation.longitude.toString());
+
+		// ✅ Ensure Image is Added to FormData
+		if (formData.image) {
+			let localUri = formData.image;
+			let fileType = localUri.split('.').pop();
+			newFormData.append("file", {
+				uri: localUri,
+				name: `photo.${fileType}`,
+				type: `image/${fileType}`,
+			});
+		}
+
+		try {
+			console.log("📤 Sending FormData to Backend...", newFormData);
+
+			const response = await fetch("http://localhost:3000/pinnew", {
+				method: "POST",
+				body: newFormData, // No need to manually set headers, `fetch` handles `multipart/form-data`
+			});
+
+			const responseText = await response.text(); // Capture raw response
+			console.log("🔍 Raw Response:", responseText);
+
+			if (!response.ok) {
+				throw new Error(`Server error: ${response.status}`);
+			}
+
+			const jsonResponse = JSON.parse(responseText);
+			console.log("✅ Parsed Response:", jsonResponse);
+			alert("Pin created successfully!");
 		} catch (error) {
-			console.error('Error creating pin:', error);
-			alert('Failed to create the pin. Please try again.');
+			console.error("❌ Error creating pin:", error);
+			alert("Failed to create the pin. Please try again.");
 		}
 	};
-	
+
 
 
 	const handlePickImage = async () => {
@@ -436,14 +438,14 @@ export const MapScreen = () => {
 			alert('Please fill out all fields before submitting.');
 			return;
 		}
-	
+
 		const pinLocation = formData.location || formLocation;
-	
+
 		if (!pinLocation) {
 			alert('No location available for this pin');
 			return;
 		}
-	
+
 		try {
 			// Call the API to update the pin in the database (assume updatePinNew exists)
 			const updatedPin = await updatePinNew(
@@ -461,43 +463,43 @@ export const MapScreen = () => {
 				updatedPin.date = new Date(updatedPin.datebegin).toISOString().split('T')[0]; // Format date correctly
 			}
 
-	
+
 			console.log('Response from updatePinNew:', updatedPin);
-	
+
 			// Update the pin in the frontend state
 			setPins((prev) =>
 				prev.map((pin) =>
 					pin.pin_id === updatedPin.pin_id
 						? {
-							  ...pin,
-							  name: updatedPin.name,
-							  date: updatedPin.date,
-							  description: updatedPin.description,
-							  tag: updatedPin.tag,
-							  location: {
-								  latitude: updatedPin.latitude,
-								  longitude: updatedPin.longitude,
-							  },
-						  }
+							...pin,
+							name: updatedPin.name,
+							date: updatedPin.date,
+							description: updatedPin.description,
+							tag: updatedPin.tag,
+							location: {
+								latitude: updatedPin.latitude,
+								longitude: updatedPin.longitude,
+							},
+						}
 						: pin
 				)
 			);
-	
+
 			// Reset the form and hide the modal
 			setFormData({ name: '', date: '', description: '', tag: 'General', image: null, location: null });
 			setFormLocation(null);
 			setModalVisible(false);
 			closeDetailsModal();
 			fetchPins();
-	
+
 			alert('Pin updated successfully!');
 		} catch (error) {
 			console.error('Error updating pin:', error);
 			alert('Failed to update the pin. Please try again.');
 		}
 	};
-	
-	
+
+
 
 	// HTML
 	return (
@@ -514,7 +516,7 @@ export const MapScreen = () => {
 					showsMyLocationButton
 					showsCompass
 				>
-					
+
 					{/* Render existing pins */}
 					{/*console.log('!!!!Contents of filteredPins:', filteredPins)*/}
 					{filteredPins.map((pin) => {
@@ -589,9 +591,9 @@ export const MapScreen = () => {
 			{/* Modal for Adding a New Pin */}
 			<Modal visible={modalVisible} animationType="slide" transparent={true}>
 				<View style={styles.modalContainer}>
-				<Text style={styles.modalTitle}>
-            		{isEditMode ? 'Update Pin' : 'Add a New Pin'}
-        		</Text>
+					<Text style={styles.modalTitle}>
+						{isEditMode ? 'Update Pin' : 'Add a New Pin'}
+					</Text>
 					<TextInput
 						style={styles.input}
 						placeholder="Name"
@@ -663,31 +665,31 @@ export const MapScreen = () => {
 
 					{/* Action Buttons */}
 					<View style={styles.buttonContainer}>
-						
-					<TouchableOpacity
-						style={styles.cancelButton}
-						onPress={() => {
-							setFormData({ 
-								name: '', 
-								date: '', 
-								description: '', 
-								tag: 'General', 
-								image: null, 
-								location: null 
-							}); // Clear form data
-							setModalVisible(false); // Close the modal
-						}}
-					>
-						<Text style={styles.buttonText}>Cancel</Text>
-					</TouchableOpacity>
+
+						<TouchableOpacity
+							style={styles.cancelButton}
+							onPress={() => {
+								setFormData({
+									name: '',
+									date: '',
+									description: '',
+									tag: 'General',
+									image: null,
+									location: null
+								}); // Clear form data
+								setModalVisible(false); // Close the modal
+							}}
+						>
+							<Text style={styles.buttonText}>Cancel</Text>
+						</TouchableOpacity>
 
 
-					<TouchableOpacity
-						style={styles.submitButton}
-						onPress={isEditMode ? handlePinUpdateFormSubmit : handleFormSubmit}
-					>
-						<Text style={styles.buttonText}>{isEditMode ? 'Update' : 'Submit'}</Text>
-					</TouchableOpacity>
+						<TouchableOpacity
+							style={styles.submitButton}
+							onPress={isEditMode ? handlePinUpdateFormSubmit : handleFormSubmit}
+						>
+							<Text style={styles.buttonText}>{isEditMode ? 'Update' : 'Submit'}</Text>
+						</TouchableOpacity>
 
 					</View>
 				</View>
@@ -696,7 +698,7 @@ export const MapScreen = () => {
 			<Modal visible={detailsVisible} animationType="slide" transparent={true}>
 				<View style={styles.detailsContainer}>
 					<View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center' }}>
-						
+
 						<TouchableOpacity
 							style={[styles.closeButton, { marginRight: 20 }]}
 
@@ -709,7 +711,7 @@ export const MapScreen = () => {
 								}, 200); // Adjust delay as needed
 								alert('Pin deleted successfully!');
 							}}
-							
+
 						>
 							<Text style={styles.deleteButtonText}>Delete</Text>
 						</TouchableOpacity>
@@ -717,10 +719,10 @@ export const MapScreen = () => {
 						<TouchableOpacity
 							style={[styles.closeButton, { marginRight: 20 }]}
 							//onPress={closeDetailsModal} // Close the modal
-							onPress={ () => {
+							onPress={() => {
 								handleEditPin();
 							}}
-							
+
 						>
 							<Text style={styles.closeButtonText}>Edit</Text>
 						</TouchableOpacity>
@@ -731,23 +733,23 @@ export const MapScreen = () => {
 						>
 							<Text style={styles.closeButtonText}>Close</Text>
 						</TouchableOpacity>
+					</View>
+					{selectedPin && (
+						<>
+							<Text style={styles.detailsTitle}>{selectedPin.name}</Text>
+							<Text style={styles.detailsDate}>Date: {selectedPin.date}</Text>
+							<Text style={styles.detailsDescription}>{selectedPin.description}</Text>
+							<Text style={styles.detailsTag}>Tag: {selectedPin.tag}</Text>
+							{selectedPin.image && (
+								<Image
+									source={{ uri: selectedPin.image }}
+									style={styles.detailsImage}
+								/>
+							)}
+						</>
+					)}
 				</View>
-		{selectedPin && (
-			<>
-				<Text style={styles.detailsTitle}>{selectedPin.name}</Text>
-				<Text style={styles.detailsDate}>Date: {selectedPin.date}</Text>
-				<Text style={styles.detailsDescription}>{selectedPin.description}</Text>
-				<Text style={styles.detailsTag}>Tag: {selectedPin.tag}</Text>
-				{selectedPin.image && (
-					<Image
-						source={{ uri: selectedPin.image }}
-						style={styles.detailsImage}
-					/>
-				)}
-			</>
-		)}
-	</View>
-</Modal>
+			</Modal>
 
 
 
