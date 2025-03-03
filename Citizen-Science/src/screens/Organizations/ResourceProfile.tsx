@@ -37,7 +37,9 @@ export const ResourceProfile = ({route}) => {
     const [resourceMedia, setResourceMedia] = useState<ResourceMedia[]>();
     const [isModalVisible, setIsModalVisible] =useState<boolean>(false);
     const [isWebModalVisible, setIsWebModalVisible] =useState<boolean>(false);
-    const [downloadInfo, setDownloadInfo] = useState<string>("")
+    const [downloadInfo, setDownloadInfo] = useState<string>("");
+    const [previewLink, setPreviewLink] = useState<string>("");
+    const [previewName, setPreviewName] = useState<string>("");
     
     useEffect(() => {
         getResources();
@@ -120,6 +122,11 @@ export const ResourceProfile = ({route}) => {
         downloadFromUrl(file_path).then((value) => {
         })
     }
+    const pressPreview = (file_path: string, name: string) => {
+        setPreviewLink(file_path);
+        setPreviewName(name);
+        setIsWebModalVisible(true);
+    }
 
     const downloadFromUrl = async (file_path: string) => {
         try {
@@ -162,9 +169,11 @@ export const ResourceProfile = ({route}) => {
                                 <AntDesign name="download" size={30}/>
                             </TouchableOpacity>
 
-                            {/* <TouchableOpacity>
+                            <TouchableOpacity onPress={() => {
+                                pressPreview(item.file_path, item.name);
+                            }}>
                                 <AntDesign name="eyeo" size={30}/>
-                            </TouchableOpacity> */}
+                            </TouchableOpacity> 
 
                             <TouchableOpacity onPress={() => {
                                 pressDelete(item.media_id);
@@ -174,11 +183,24 @@ export const ResourceProfile = ({route}) => {
                         </View>
                     )
                     }/>
-                    {/* Webview Modal */}
-                    {/* <Modal visible={isWebModalVisible} animationType="fade" transparent={true}>
-                        <WebView source={} ></WebView>
-                    </Modal> */}
 
+                    {/* Webview Modal */}
+                    <Modal visible={isWebModalVisible} animationType='slide' transparent={true}>
+                        <View style={styles.webContainer}>
+                            <View style={styles.webBar}>
+                                <Text style={styles.preview}>{previewName} Preview</Text>
+
+                                <TouchableOpacity onPress={()=> setIsWebModalVisible(false)}>
+                                    <Text style={styles.close}>Close</Text>
+                                </TouchableOpacity>
+                                
+                            </View>
+                            <View style = {styles.webContent}>
+                                <WebView source={{ uri: API_BASE + "/uploads/" + previewLink }} ></WebView>
+                            </View>
+                        </View>
+                    </Modal>
+                
                     {/* Enter name of file modal */}
                     <Modal visible={isModalVisible} animationType="fade" transparent={true}>
                         <View style={styles.modalContainer}>
@@ -213,7 +235,33 @@ const styles = StyleSheet.create({
     modalContainer: {
         flex: 1,
         backgroundColor: "white",
+        
+    },
+    webBar: {
+        paddingTop: 20,
+        flex: 1,
+        flexDirection: "row",
+        justifyContent: "space-between",
+        backgroundColor: "white",
+        borderBottomColor: "lightgrey",
+        borderBottomWidth: 1,
+    },
+    webModal: {
+        flex: 1,
+        backgroundColor: "white",
         justifyContent: "center",
+    },
+    webContent: {
+        flex: 20,
+        padding: 10,
+        borderRadius: 10,
+        
+    },
+    webContainer: {
+        flex: 1,
+        backgroundColor: "white",
+        marginTop: 20,
+        padding: 20,
     },
     title: {
         fontSize: 15,
@@ -282,6 +330,14 @@ const styles = StyleSheet.create({
     upload: {
         fontSize: 20,
         color: "blue"
+    },
+    close: {
+        fontSize: 20,
+        color: "red",
+    },
+    preview: {
+        fontSize: 20,
+        color: "grey"
     }
 });
 export default ResourceProfile;
