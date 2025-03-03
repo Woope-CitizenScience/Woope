@@ -5,6 +5,7 @@ export interface Pin {
     latitude: number,
     metadata: string,
     created_at: Date,
+    imageUrl: String,
     is_active: boolean,
 }
 export interface PinNew {
@@ -15,4 +16,5 @@ export interface PinNew {
     label: string,
     longitude: number,
     latitude: number,
+    imageUrl: String,
 }
