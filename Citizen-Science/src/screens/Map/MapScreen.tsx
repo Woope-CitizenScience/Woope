@@ -583,6 +583,9 @@ export const MapScreen = () => {
 				<TouchableOpacity style={styles.filterButton} onPress={() => setFilterTag('Workshop')}>
 					<Text style={styles.filterButtonText}>Workshop</Text>
 				</TouchableOpacity>
+				<TouchableOpacity style={styles.filterButton} onPress={() => setFilterTag('Hazard')}>
+					<Text style={styles.filterButtonText}>Hazard</Text>
+				</TouchableOpacity>
 			</ScrollView>
 
 
