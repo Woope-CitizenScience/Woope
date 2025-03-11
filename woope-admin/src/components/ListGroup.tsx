@@ -2,7 +2,7 @@ import { useState } from "react";
 
 interface Props {
   items: string[];
-  heading: string;
+  heading?: string;
   onSelectItem: (item: string) => void;
 }
 
@@ -17,13 +17,13 @@ function ListGroup({ items, heading, onSelectItem }: Props) {
           <li
             className={
               index === selectedState
-                ? "list-group-item active"
-                : "list-group-item"
+                ? "mb-2 list-group-item active"
+                : "mb-2 list-group-item"
             }
             key={item}
             onClick={() => {
-              setSelectedState(index);
-              onSelectItem(item);
+              setSelectedState(selectedState !== index ? index : -1);
+              onSelectItem(selectedState !== index ? item : "");
             }}
           >
             {item}
