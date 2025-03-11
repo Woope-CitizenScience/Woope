@@ -265,7 +265,16 @@ export const createOrganization = async (name: string, tagline: string, text_des
         throw new Error("Error creating organizaton: " + (error as Error).message);
     }
 }
-//update an organization
+
+/**
+ * Updates the details of an organization.
+ * @param {string} name - The name of the organization to update.
+ * @param {string} tagline - The new tagline.
+ * @param {string} text_description - The new text description.
+ * @returns {Promise<Organization[]>} The updated organization.
+ * @throws {Error} Throws an error if the database query fails.
+ */
+
 export const updateOrganization = async (name: string, tagline: string, text_description: string) => {
     try {
         let query;
@@ -298,6 +307,15 @@ export const updateOrganization = async (name: string, tagline: string, text_des
         throw new Error("Error creating organizaton: " + (error as Error).message);
     }
 }
+
+/**
+ * Updates the photo of an organization.
+ * @param {string} name - The name of the organization.
+ * @param {string} image_path - The path to the new image.
+ * @returns {Promise<Organization[]>} The updated organization.
+ * @throws {Error} Throws an error if the database query fails.
+ */
+
 export const updatePhoto = async (name: string, image_path: string) => {
     try {
         let query = `
@@ -312,7 +330,13 @@ export const updatePhoto = async (name: string, image_path: string) => {
     }
 }
 
-// checks if followed, returns {case: 1} if true and {case: 0} if false
+/**
+ * Checks if a user follows an organization.
+ * 
+ * @param user_id The id of the user
+ * @param org_id The id of the organization
+ * @returns `true` or `false` if the user follows the organization
+ */
 export const isFollowed = async (user_id: number, org_id: number) => {
     try {
         let query = `
@@ -331,7 +355,14 @@ export const isFollowed = async (user_id: number, org_id: number) => {
         throw new Error("Error checking following status: " + (error as Error).message)
     }
 }
-//remove a follow when given user id and group id 
+
+/**
+ * Remove a follow when given user id and group id 
+ * 
+ * @param user_id ID of the user
+ * @param org_id  ID of the organization
+ */
+
 export const unfollow = async (user_id: number, org_id: string) => {
     try {
         let query = `
