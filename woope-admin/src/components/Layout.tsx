@@ -1,10 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import blob from "../assets/blob.svg";
-import blobs from "../assets/blobs.svg";
-import poly from "../assets/poly.svg";
-import circle from "../assets/circle.svg";
-import waves from "../assets/waves4.svg";
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [background, setBackground] = useState("src/assets/blobs2.svg");
@@ -67,7 +62,11 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                   Organizations
                 </Link>
               </li>
-
+              <li className="nav-item">
+                <Link className="nav-link" to="/permissions">
+                  Permissions
+                </Link>
+              </li>
               <li className="nav-item dropdown">
                 <button
                   className="btn dropdown-toggle"
