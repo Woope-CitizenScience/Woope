@@ -1,15 +1,11 @@
-import { View, StyleSheet, Animated, LayoutAnimation } from "react-native";
+import { View, StyleSheet} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
 	responsiveHeight,
 	responsiveWidth,
 } from "react-native-responsive-dimensions";
 import IconButton from "./IconButton";
-import React, { useContext, useEffect, useRef, useState } from "react";
-import WelcomeBanner from "./WelcomeBanner";
-import { AuthContext } from "../util/AuthContext";
-import { jwtDecode } from "jwt-decode";
-import { AccessToken } from "../util/token";
+import React from "react";
 
 interface ScreenHeaderProps {
 	title: string;
@@ -17,63 +13,6 @@ interface ScreenHeaderProps {
 }
 
 const ScreenHeader: React.FC<ScreenHeaderProps> = ({ title, navigation }) => {
-	const { userToken } = useContext(AuthContext);
-	const decodedToken = userToken ? jwtDecode<AccessToken>(userToken) : null;
-	const firstName = decodedToken ? decodedToken.firstName : null;
-	const lastName = decodedToken ? decodedToken.lastName : null;
-
-	function checkNames(firstName: string | null, lastName: string | null) {
-		if (firstName === null && lastName === null) {
-			return "Community Forum";
-		} else if (firstName === null) {
-			return "" + lastName;
-		} else if (lastName === null) {
-			return "" + firstName;
-		} else {
-			return firstName + " " + lastName;
-		}
-	}
-
-	function WelcomeFadeAway() {
-		const [shouldRender, setShouldRender] = useState(true);
-		const position = useRef(new Animated.Value(0)).current;
-
-		{
-			/* Make this persit screen change or refresh */
-		}
-		useEffect(() => {
-			const timer = setTimeout(() => {
-				Animated.timing(position, {
-					toValue: responsiveHeight(-10),
-					duration: 600,
-					useNativeDriver: true,
-				}).start(() => {
-					LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-					setShouldRender(false);
-				});
-			}, 3500);
-			return () => clearTimeout(timer);
-		}, []);
-
-		const opacity = position.interpolate({
-			inputRange: [responsiveHeight(-5), 1],
-			outputRange: [0, 1],
-			extrapolate: "clamp",
-		});
-
-		if (!shouldRender) {
-			return null;
-		}
-
-		return (
-			<Animated.View
-				style={[{ zIndex: 1, transform: [{ translateY: position }], opacity }]}
-			>
-				<WelcomeBanner username={checkNames(firstName, lastName)} />
-			</Animated.View>
-		);
-	}
-
 	return (
 		<SafeAreaView>
 			<View
@@ -93,8 +32,8 @@ const ScreenHeader: React.FC<ScreenHeaderProps> = ({ title, navigation }) => {
 					}}
 					iconSize={responsiveHeight(4.5)}
 					iconColor={"black"}
-					paddingVertical={3}
-					paddingHorizontal={3}
+					paddingVertical={responsiveHeight(1)}
+					paddingHorizontal={responsiveHeight(1)}
 				></IconButton>
 
 				<IconButton
@@ -102,13 +41,12 @@ const ScreenHeader: React.FC<ScreenHeaderProps> = ({ title, navigation }) => {
 					onPress={function (): void {}}
 					iconSize={responsiveHeight(4.5)}
 					iconColor={"black"}
-					paddingVertical={3}
-					paddingHorizontal={3}
+					paddingVertical={responsiveHeight(1)}
+					paddingHorizontal={responsiveHeight(1)}
 				/>
 
 				{/* Maybe Add title */}
 			</View>
-			<WelcomeFadeAway />
 		</SafeAreaView>
 	);
 };

@@ -4,7 +4,7 @@
 Addressing environmental and socio-economic challenges in Standing Rock’s Lakota and Dakota Nations, focusing on people, land, water, and air.
 
 ## Local Setup
-- Install Node v16, I recommend using [Node Version Manager](https://github.com/nvm-sh/nvm)
+- Install Node v20, I recommend using [Node Version Manager](https://github.com/nvm-sh/nvm)
 - You will need to place `.env` files in the `api` and `Citizen-Science` directories with the following contents:
   - `api/.env`:
     ```
@@ -29,6 +29,15 @@ Addressing environmental and socio-economic challenges in Standing Rock’s Lako
 - Run `docker compose up` to start the API and PostgreSQL server
 - Once Postgres is running, run `npx db-migrate up` in the `api` directory to run the migrations
 - You can now access the API at `localhost:3000`, check `/health`
+
+### Admin Website Local Setup
+
+- From the `Woope` directory, `cd` into the `woope-admin` directory
+- `npm install` to install dependencies
+- Create a new `.env` file with the following contents:
+  - VITE_API_URL=http://localhost:3000
+- `npm run dev` to start the Vite server
+- In the terminal where it says Local: http://localhost:5173/, `ctrl + click` on the link to open the website in your default browser
 
 ## Challenges & Focus
 - **Challenges:** Poverty, unemployment, limited healthy living options, restricted data access.

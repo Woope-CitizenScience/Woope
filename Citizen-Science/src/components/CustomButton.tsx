@@ -1,5 +1,4 @@
 // CustomButton.tsx
-
 import React from 'react';
 import { TouchableOpacity, Text, ViewStyle } from 'react-native';
 import { ButtonProps } from '../types';
@@ -39,5 +38,4 @@ const CustomButton: React.FC<ButtonProps> = ({
         </TouchableOpacity>
     );
 };
-
 export default CustomButton;

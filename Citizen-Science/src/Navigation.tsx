@@ -1,15 +1,13 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { AuthContext } from './util/AuthContext';
-
 import WelcomeScreen from './screens/WelcomeScreen';
 import LoginScreen from './screens/LoginScreen';
 import SignupScreen from './screens/SignupScreen';
 import SplashScreen from "./screens/SplashScreen";
 import NavigationBar from "./components/NavigationBar";
-import HomeScreen from "./screens/HomeScreen";
-import {MapScreen} from "./screens/Map/MapScreen";
-import {SMapScreen} from "./screens/Map/SMapScreen";
+
+
 
 const Stack = createNativeStackNavigator();
 
@@ -31,11 +29,12 @@ const AppNavigation = () => {
 
 	return (
 		<Stack.Navigator screenOptions={{ headerShown: false }}>
+			
 			{userToken ? (
+				// User authentication/login is successful
 				<>
+					{/* View  components/navigationbar to see the rest of the screens, nested under their respective bottom tabs*/}
 					<Stack.Screen name="NavigationBar" component={NavigationBar} />
-					<Stack.Screen name="MapScreen" component={MapScreen} />
-					<Stack.Screen name="SMapScreen" component={SMapScreen} />
 				</>
 
 			) : (
