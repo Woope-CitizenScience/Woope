@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 interface Props {
   children?: string;
@@ -7,6 +7,7 @@ interface Props {
 }
 
 const Checkbox = ({ children, id, checked = false }: Props) => {
+  const [isChecked, setIsChecked] = useState(checked);
   return (
     <>
       <div className="form-check form-switch">
@@ -15,8 +16,12 @@ const Checkbox = ({ children, id, checked = false }: Props) => {
           type="checkbox"
           role="switch"
           id={id}
+          checked={isChecked}
+          onChange={() => {
+            setIsChecked(!isChecked);
+          }}
         />
-        <label className="form-check-label" htmlFor="flexSwitchCheckDefault">
+        <label className="form-check-label" htmlFor={id}>
           {children}
         </label>
       </div>
