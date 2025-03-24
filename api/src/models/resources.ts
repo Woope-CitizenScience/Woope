@@ -6,11 +6,6 @@ const p = require('path')
 
 const pool = require('../db');
 
-<<<<<<< HEAD
-//create a resource
-export const createResource = async(org_id: number, name: string, tagline: string, text_description: string) => {
-    if(!name){
-=======
 /**
  * Creates a new resource.
  * @param {number} org_id - Organization ID.
@@ -23,7 +18,6 @@ export const createResource = async(org_id: number, name: string, tagline: strin
 
 export const createResource = async (org_id: number, name: string, tagline: string, text_description: string) => {
     if (!name) {
->>>>>>> eebc83941f865eeb6002f2d1ca94a4a2c012eade
         throw new Error("A valid name is required");
     }
     try {
