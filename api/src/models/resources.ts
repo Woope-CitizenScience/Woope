@@ -1,5 +1,11 @@
+import { error } from "console";
 import { Resource, ResourceMedia } from "../interfaces/Resource";
+import * as fs from 'node:fs'
+
+const p = require('path')
+
 const pool = require('../db');
+
 //create a resource
 export const createResource = async(org_id: number, name: string, tagline: string, text_description: string) => {
     if(!name){
@@ -156,6 +162,15 @@ export const deleteResourceMedia = async (media_id: number) => {
         throw new Error("Error deleting file: " + (error as Error).message)
     }
 }
+
+export const serverDelete = async (path: string) => {
+    try {
+        fs.unlinkSync(p.join(__dirname, `./../../uploads/${path}`));
+    } catch (error) {
+        throw new Error("Error deleting file from server " + (error as Error).message)
+    }
+}
+
 export const updatePhoto = async(resource_id: number, image_path: string) =>{
     try{
             let query = `

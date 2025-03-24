@@ -48,7 +48,6 @@ const OrganizationCard: React.FC<OrganizationProps> = ({org_id, user_id})=> {
     }
     const checkFollowed = async () => {
         try {
-            console.log("poop");
             const response = await following(user_id,org_id);
             setIsFollowed(response.case)
         } catch (error) {

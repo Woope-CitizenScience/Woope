@@ -1,5 +1,5 @@
 import express from 'express';
-import { createResource, deleteResource, getResourceById, getResourceInfo, getResourceMedia, getResources, updateResource, insertResourceMedia, deleteResourceMedia, updatePhoto } from '../models/resources';
+import { createResource, deleteResource, getResourceById, getResourceInfo, getResourceMedia, getResources, updateResource, insertResourceMedia, deleteResourceMedia, updatePhoto, serverDelete } from '../models/resources';
 
 const router = require('express').Router();
 router.post('/create', async(req: express.Request, res: express.Response) => {
@@ -116,6 +116,19 @@ router.delete('/deleteMedia', async (req: express.Request, res: express.Response
         }
     }
 });
+router.delete('/serverDelete', async (req: express.Request, res: express.Response) => {
+    try {
+        const {path} = req.body;
+        await serverDelete(path);
+        res.status(204);
+    } catch (error) {
+        if (error instanceof Error) {
+            res.status(500).json(`Internal server error: ${error.message}`);
+        } else {
+            res.status(500).json('Internal server error: An unknown error occurred');
+        }
+    }
+})
 router.put('/updatephoto', async(req: express.Request, res: express.Response) => {
     try{
         const {resource_id, image_path} = req.body;

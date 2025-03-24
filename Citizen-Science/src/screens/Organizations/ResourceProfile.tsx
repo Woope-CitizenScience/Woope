@@ -12,6 +12,7 @@ import { getResourceMedia, insertResourceMedia, deleteResourceMedia} from "../..
 import { AntDesign } from '@expo/vector-icons';
 import { submitForm } from "../../api/upload"
 import { WebView } from "react-native-webview"
+import { serverDelete } from "../../api/upload";
 
 const API_BASE = process.env.EXPO_PUBLIC_API_URL;
 
@@ -86,7 +87,6 @@ export const ResourceProfile = ({route}) => {
             const result = await DocumentPicker.getDocumentAsync();
                 if (!result.canceled) {
                     const file = result.assets[0];
-                    console.log(file);
                     selectedDocuments.name = Date.now() + '--' + file.name;
                     selectedDocuments.uri = file.uri;
                 }else {
@@ -104,6 +104,14 @@ export const ResourceProfile = ({route}) => {
             console.log("Error deleting media: " + error);
         }
     }
+// deletes from server
+    const trueDelete = async(path: string) => {
+        try {
+            serverDelete(path);
+        } catch (error) {
+            console.log("Error deleting from server from frontend: " + error)
+        }
+    }
     const uploadPress = () => {
         pickDocuments().then((value) => {
             setIsModalVisible(true);
@@ -114,9 +122,12 @@ export const ResourceProfile = ({route}) => {
             setIsModalVisible(false);
         })
     }
-    const pressDelete = (media_id: number) => {
-        deleteMedia(media_id)
-        setDeleteCheck(!deleteCheck)
+    const pressDelete = (media_id: number, file_path: string) => {
+        deleteMedia(media_id);
+        console.log("ppop")
+        trueDelete(file_path);
+        console.log("pee")
+        setDeleteCheck(!deleteCheck);
     }
     const pressDownload = (file_path: string) => {
         downloadFromUrl(file_path).then((value) => {
@@ -176,7 +187,7 @@ export const ResourceProfile = ({route}) => {
                             </TouchableOpacity> 
 
                             <TouchableOpacity onPress={() => {
-                                pressDelete(item.media_id);
+                                pressDelete(item.media_id, item.file_path);
                             }}>
                                 <AntDesign color={"red"} name="close" size={30}/>
                             </TouchableOpacity>

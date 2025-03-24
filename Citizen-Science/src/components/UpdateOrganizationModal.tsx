@@ -36,13 +36,11 @@ const UpdateOrganizationModal: React.FC<ModalProps> = ({name, isVisible, onClose
     // uploads photo if one is selected and places filename in database
     const uploadPhoto = async () => {
          // upload to server
-            console.log("In If")
             const formData = new FormData();
             formData.append("file", imageInfo as any, imageInfo.name);
             submitForm("file", formData, (msg) => console.log(msg));
             // upload filename to database
             try {
-                console.log("In try")
                 const response = await updateOrgPhoto(name, imageInfo.name.toString());
             } catch (error) {
                 console.log('Error', error);
@@ -52,7 +50,6 @@ const UpdateOrganizationModal: React.FC<ModalProps> = ({name, isVisible, onClose
     // updates organization info in database if new info is entered
     const updateInfo = async () => {
             try {
-                console.log("tag")
                 // upload metadata to database
                 const response = await updateOrganization(name, newInfo.tagline, newInfo.description)
             }catch(error) {
