@@ -1,5 +1,14 @@
-import {Report} from "../interfaces/Report"; 
+import { Report } from "../interfaces/Report";
 const pool = require('../db');
+
+/**
+ * Creates a new report.
+ * @param {string} label - The label of the report (e.g., "Bug", "Feature Request").
+ * @param {string} title - The title of the report.
+ * @param {string} description - A detailed description of the report.
+ * @returns {Promise<Report>} The created report object.
+ * @throws Will throw an error if the report creation fails.
+ */
 
 export const createReport = async (
     label: string,
@@ -16,5 +25,5 @@ export const createReport = async (
         console.error('Error creating report', error);
         throw error
     }
-    
+
 };
