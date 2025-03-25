@@ -1,5 +1,5 @@
 import express from 'express';
-import { authenticateToken } from '../middleware/authMiddleware';
+import { authenticateToken, requirePermission } from '../middleware/authMiddleware';
 import {
     createPinNew,
     getAllPinsNew,
@@ -21,7 +21,7 @@ router.get('/pinnew', authenticateToken, async (req, res) => {
 });
 
 // Create a new pin 
-router.post('/pinnew', authenticateToken, async (req, res) => {
+router.post('/pinnew', authenticateToken, requirePermission('create_post'), async (req, res) => {
     try {
         const { name, text_description, dateBegin, label, longitude, latitude } = req.body;
 

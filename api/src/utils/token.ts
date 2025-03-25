@@ -21,7 +21,7 @@ export const createAccessToken = async (user: User) => {
             firstName: user.first_name,
             lastName: user.last_name,
             phoneNumber: user.phone_number,
-            permissions: user.permissions,
+            permissions: JSON.parse(user.permissions as string),
             org_id: user.org_id,
             org_name: user.org_name
         },

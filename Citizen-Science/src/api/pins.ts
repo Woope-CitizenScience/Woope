@@ -36,8 +36,8 @@ export const createPost = async (pin_id: number, user_id: number,
 ////////////////////////////////////////////////
 // New Pins 2024
 
-export const createPin = async (name: string, description: string, date: Date, tag: string, longitude: number, latitude: number) => {
-    return fetchAPI('/pins/pinnew', 'POST', {name, description, date, tag, longitude, latitude});
+export const createPin = async (name: string, description: string, dateBegin: Date, tag: string, longitude: number, latitude: number) => {
+    return fetchAPI('/pins/pinnew', 'POST', {name, description, dateBegin, tag, longitude, latitude});
 }
 
 // Fetch all pins
