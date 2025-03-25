@@ -60,7 +60,7 @@ const HomeScreen = () => {
   const [data, setData] = useState(null);
   const decodedToken = userToken ? jwtDecode<AccessToken>(userToken) : null;
   const userPermissions = decodedToken
-    ? JSON.parse(decodedToken?.permissions)
+    ? (decodedToken?.permissions)
     : null;
   const userCanDeleteAllPosts = userPermissions
     ? userPermissions.delete_all_posts

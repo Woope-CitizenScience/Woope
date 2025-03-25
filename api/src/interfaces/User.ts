@@ -12,6 +12,15 @@ export interface User {
     org_name: string;
 }
 
+export interface DecodedUserPayload {
+    user_id: number;
+    firstName: string;
+    lastName: string;
+    phoneNumber: string | null;
+    permissions: Record<string, boolean>;
+    org_id: number | null;
+    org_name: string | null;
+  }
 
 
   
