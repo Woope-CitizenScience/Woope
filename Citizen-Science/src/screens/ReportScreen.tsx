@@ -15,6 +15,7 @@ export const ReportScreen = () => {
         { label: 'Resources', value: 'Resources' },
         { label: 'Calendar', value: 'Calendar' },
         { label: 'Map', value: 'Map' },
+        { label: 'Other', value: 'Other' },
     ];
 
     const handleFormSubmit = async () => {
