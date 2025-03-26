@@ -52,7 +52,7 @@ export const createPinNew = async (
     label: string,
     longitude: number,
     latitude: number,
-    imageUrl: String,
+    imageUrl: String | null,
 ): Promise<PinNew> => {
     try {
         const response = await pool.query(
@@ -74,7 +74,7 @@ export const createPinNew = async (
 // pinModel.ts
 export const getAllPinsNew = async (): Promise<PinNew> => {
     try {
-        const queryText = `SELECT * FROM public.pins ORDER BY pin_id ASC`;
+        const queryText = `SELECT pin_id, name, text_description, datebegin, label, longitude, latitude, image_url FROM public.pins ORDER BY pin_id ASC`;
         const { rows } = await pool.query(queryText); // Ensure no second argument is passed
 
         return rows;

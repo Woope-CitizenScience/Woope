@@ -96,12 +96,17 @@ const router = express.Router();
 // new create pin NEW
 router.post('/pinNew', upload.single('file'), async (req: express.Request, res: express.Response) => {
     try {
-        if (!req.file) {
-            return res.status(400).json({ error: "No image received!" });
+        //if (!req.file) {
+        //    return res.status(400).json({ error: "No image received!" });
+        //}
+
+        if (!req.body.name || !req.body.date) {
+            return res.status(400).json({ error: "Missing required fields: name or date" });
         }
 
+
         // ✅ Construct the image URL
-        const imageUrl = `/uploads/${req.file.filename}`;
+        const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
 
         // ✅ Ensure imageUrl is passed to createPinNew
         const newPin = await createPinNew(

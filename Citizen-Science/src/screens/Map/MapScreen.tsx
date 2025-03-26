@@ -104,7 +104,7 @@ export const MapScreen = () => {
 				date: new Date(pin.datebegin).toISOString().split('T')[0],
 				description: pin.text_description,
 				tag: pin.label,
-				image: null, // Assuming no image is provided in the data
+				image: pin.image_url || null, // Assuming no image is provided in the data
 				location: {
 					//   latitude: pin.latitude,
 					//   longitude: pin.longitude,
@@ -220,60 +220,77 @@ export const MapScreen = () => {
 
 	const handleFormSubmit = async () => {
 		if (!formData.name || !formData.date || !formData.description || !formData.tag) {
-			alert('Please fill out all fields before submitting.');
+			alert("Please fill out all fields before submitting.");
 			return;
 		}
 
 		const pinLocation = formData.location || formLocation;
+
 		if (!pinLocation) {
-			alert('No location available for this pin');
+			alert("No location available for this pin");
 			return;
 		}
 
-		// ✅ Create FormData
-		const newFormData = new FormData();
-		newFormData.append("name", formData.name);
-		newFormData.append("description", formData.description);
-		newFormData.append("date", formData.date);
-		newFormData.append("tag", formData.tag);
-		newFormData.append("latitude", pinLocation.latitude.toString());
-		newFormData.append("longitude", pinLocation.longitude.toString());
+		console.log("📤 Sending Pin Data to Backend...");
+		console.log("📝 Form Data:", {
+			name: formData.name,
+			description: formData.description,
+			datebegin: formData.date, // ✅ Ensure this exists
+			tag: formData.tag,
+			longitude: pinLocation?.longitude, // ✅ Check these are defined
+			latitude: pinLocation?.latitude,
+			image: formData.image || null
+		});
 
-		// ✅ Ensure Image is Added to FormData
-		if (formData.image) {
-			let localUri = formData.image;
-			let fileType = localUri.split('.').pop();
-			newFormData.append("file", {
-				uri: localUri,
-				name: `photo.${fileType}`,
-				type: `image/${fileType}`,
-			});
+		if (!pinLocation.longitude || !pinLocation.latitude) {
+			console.error("❌ Error: Longitude or Latitude is undefined!");
+			alert("Error: Missing location data.");
+			return;
 		}
 
 		try {
-			console.log("📤 Sending FormData to Backend...", newFormData);
+			const newPin = await createPinNew(
+				formData.name,
+				formData.description,
+				new Date(formData.date),
+				formData.tag,
+				pinLocation.longitude,
+				pinLocation.latitude,
+				formData.image || null
+			);
 
-			const response = await fetch("http://localhost:3000/pinnew", {
-				method: "POST",
-				body: newFormData, // No need to manually set headers, `fetch` handles `multipart/form-data`
+			console.log("✅ Pin Created Successfully:", newPin);
+
+			setPins((prev) => [
+				...prev,
+				{
+					pin_id: newPin.pin_id,
+					name: newPin.name,
+					date: formData.date,
+					description: formData.description,
+					tag: formData.tag,
+					image: newPin.image_url || null,
+					location: pinLocation,
+				},
+			]);
+
+			setFormData({
+				name: "",
+				date: "",
+				description: "",
+				tag: "General",
+				image: null,
+				location: null,
 			});
+			setFormLocation(null);
+			setModalVisible(false);
 
-			const responseText = await response.text(); // Capture raw response
-			console.log("🔍 Raw Response:", responseText);
-
-			if (!response.ok) {
-				throw new Error(`Server error: ${response.status}`);
-			}
-
-			const jsonResponse = JSON.parse(responseText);
-			console.log("✅ Parsed Response:", jsonResponse);
 			alert("Pin created successfully!");
 		} catch (error) {
 			console.error("❌ Error creating pin:", error);
 			alert("Failed to create the pin. Please try again.");
 		}
 	};
-
 
 
 	const handlePickImage = async () => {
@@ -584,6 +601,9 @@ export const MapScreen = () => {
 				</TouchableOpacity>
 				<TouchableOpacity style={styles.filterButton} onPress={() => setFilterTag('Workshop')}>
 					<Text style={styles.filterButtonText}>Workshop</Text>
+				</TouchableOpacity>
+				<TouchableOpacity style={styles.filterButton} onPress={() => setFilterTag('Hazard')}>
+					<Text style={styles.filterButtonText}>Hazard</Text>
 				</TouchableOpacity>
 			</ScrollView>
 
