@@ -80,7 +80,7 @@ const OrganizationCard: React.FC<OrganizationProps> = ({org_id, user_id})=> {
     return(
         // Container
         <SafeAreaView style={styles.container}> 
-                <View style={styles.cardContainer}>
+                <View style={styles.postBox}>
                     {/*Organization Name, Category, Follow Button */}
                     <View style ={styles.headerContainer}>
                         <View>
@@ -244,7 +244,42 @@ const styles = StyleSheet.create({
         shadowRadius: 5,
         elevation: 9,
         
-    }
+    },
+    postBox: {
+        backgroundColor: "#B4D7EE",
+        borderRadius: 30,
+        paddingVertical: 20,
+        paddingHorizontal: 15,
+        justifyContent: "center",
+        alignSelf: "stretch",
+        marginHorizontal: 10,
+        marginBottom: 40,
+        borderWidth: 1,
+        borderColor: "#E7F3FD",
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.2,
+        shadowRadius: 6,
+        elevation: 5,
+        marginTop: 6,
+      },
+      postBoxInner: {
+        borderRadius: 20,
+        borderWidth: 1,
+        borderColor: "transparent",
+        alignSelf: "stretch",
+        borderBottomWidth: 1,
+        borderBottomColor: "#D1E3FA",
+      },
+      postBoxText: {
+        fontSize: 16,
+        color: "#333",
+        padding: 10,
+        backgroundColor: "#FFFFFF",
+        borderRadius: 18,
+        overflow: "hidden",
+        textAlign: "center",
+      }
 });
 
 export default OrganizationCard;
