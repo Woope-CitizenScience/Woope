@@ -97,19 +97,18 @@ export const MapScreen = () => {
 			const allPins = await getAllPinsNew();
 			// console.log('\nFetched pins from the server:', allPins); // We do get the pin_id
 
-			// Confirmed correct format
 			const transformedPins = allPins.map((pin) => ({
 				pin_id: pin.pin_id,
 				name: pin.name,
 				date: new Date(pin.datebegin).toISOString().split('T')[0],
 				description: pin.text_description,
 				tag: pin.label,
-				image: pin.image_url || null, // Assuming no image is provided in the data
+				image: pin.image_url
+					? `${process.env.EXPO_PUBLIC_API_URL}${pin.image_url}`
+					: null,
 				location: {
-					//   latitude: pin.latitude,
-					//   longitude: pin.longitude,
-					latitude: pin.longitude,
-					longitude: pin.latitude,
+					latitude: pin.latitude,
+					longitude: pin.longitude,
 				},
 			}));
 
