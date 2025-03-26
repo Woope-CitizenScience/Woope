@@ -25,6 +25,12 @@ type Event = {
     location: string;
 };
 
+/**
+ * 
+ * !TODO: REDO CALENDAR SCREEN TO INTERACT WITH DATABASE EVENTS, REMOVE HARDCODED EVENTS
+ * ?: CONSIDER USING SOMETHING OTHER THAN REACT NATIVE CALENDARS, might have to create one?? Either that or reevaluate 
+ * ?: usecases for the calendar page.
+ */
 
 const CalendarScreen: React.FC = () => {
 	// Todo, remove this after trip
