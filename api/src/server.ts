@@ -4,6 +4,8 @@ import { createPinNew } from './models/pins';
 const express = require('express')
 const cors = require('cors');
 const app = express()
+app.use(cors()); // Moved here
+
 const port = process.env.PORT || '3000'
 const multer = require('multer')
 const path = require('path');
@@ -50,8 +52,6 @@ const authRoutes = require('./routes/authentication');
 
 app.use('/', pinRoutes);
 app.use('/auth', authRoutes);
-
-app.use(cors());
 
 require('./startup/routes')(app);
 app.listen(port, () => console.log(`Server running on port ${port}`))
