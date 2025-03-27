@@ -86,6 +86,8 @@ export const MapScreen = () => {
 		{ label: 'Event', value: 'Event' },
 		{ label: 'Weather', value: 'Weather' },
 		{ label: 'Workshop', value: 'Workshop' },
+		{ label: 'Hazard', value: 'Hazard' },
+		{ label: 'Mutual Aid', value: 'Mutual Aid' },
 
 	]);
 
@@ -592,6 +594,9 @@ export const MapScreen = () => {
 				<TouchableOpacity style={styles.filterButton} onPress={() => setFilterTag('Hazard')}>
 					<Text style={styles.filterButtonText}>Hazard</Text>
 				</TouchableOpacity>
+				<TouchableOpacity style={styles.filterButton} onPress={() => setFilterTag('Mutual Aid')}>
+					<Text style={styles.filterButtonText}>Mutual Aid</Text>
+				</TouchableOpacity>
 			</ScrollView>
 
 
@@ -640,35 +645,96 @@ export const MapScreen = () => {
 						value={formData.description}
 						onChangeText={(text) => setFormData({ ...formData, description: text })}
 					/>
-					{/* Dropdown Picker for Tags */}
-					<DropDownPicker
-						open={dropdownOpen}
-						value={formData.tag}
-						items={tagItems}
-						setOpen={setDropdownOpen}
-						setValue={(callback) =>
-							setFormData({ ...formData, tag: callback(formData.tag) })
-						}
-						setItems={setTagItems}
-						style={styles.dropdown}
-					/>
+					{/* Tag Select */}
+					<View
+						style={{
+							width: '80%',
+							alignSelf: 'center',
+							backgroundColor: 'rgba(240,240,240,0.95)',
+							padding: 10,
+							borderRadius: 10,
+							marginBottom: 20,
+						}}
+					>
+						<Text style={{ marginBottom: 5, fontWeight: 'bold' }}>Tag</Text>
+						<View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+							{tagItems.map((item) => (
+								<TouchableOpacity
+									key={item.value}
+									onPress={() => setFormData({ ...formData, tag: item.value })}
+									style={{
+										backgroundColor: formData.tag === item.value ? '#007AFF' : '#e0e0e0',
+										paddingVertical: 6,
+										paddingHorizontal: 12,
+										borderRadius: 5,
+										marginRight: 8,
+										marginBottom: 8,
+									}}
+								>
+									<Text
+										style={{
+											color: formData.tag === item.value ? 'white' : 'black',
+										}}
+									>
+										{item.label}
+									</Text>
+								</TouchableOpacity>
+							))}
+						</View>
+					</View>
+
 					{/* Image Picker */}
-					<TouchableOpacity style={styles.imagePicker} onPress={handlePickImage}>
-						<Text style={styles.imagePickerText}>
-							{formData.image ? 'Change Image' : 'Add Image'}
-						</Text>
-					</TouchableOpacity>
+					<View
+						style={{
+							width: '80%',
+							alignSelf: 'center',
+							backgroundColor: 'rgba(240,240,240,0.95)',
+							padding: 10,
+							borderRadius: 10,
+							marginBottom: 20,
+						}}
+					>
+						<Text style={{ marginBottom: 10, fontWeight: 'bold' }}>Media</Text>
 
-					<TouchableOpacity style={styles.cameraButton} onPress={handleOpenCamera}>
-						<Text style={styles.cameraButtonText}>Open Camera</Text>
-					</TouchableOpacity>
-					{formData.image && (
-						<Image
-							source={{ uri: formData.image }}
-							style={{ width: 100, height: 100, marginTop: 10 }}
-						/>
-					)}
+						<View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+							<TouchableOpacity
+								style={{
+									backgroundColor: '#ccc',
+									padding: 10,
+									borderRadius: 5,
+									flex: 1,
+									marginRight: 5,
+								}}
+								onPress={handlePickImage}
+							>
+								<Text style={{ textAlign: 'center', color: '#000' }}>
+									{formData.image ? 'Change Image' : 'Add Image'}
+								</Text>
+							</TouchableOpacity>
 
+							<TouchableOpacity
+								style={{
+									backgroundColor: '#007AFF',
+									padding: 10,
+									borderRadius: 5,
+									flex: 1,
+									marginLeft: 5,
+								}}
+								onPress={handleOpenCamera}
+							>
+								<Text style={{ textAlign: 'center', color: '#fff', fontWeight: 'bold' }}>
+									Open Camera
+								</Text>
+							</TouchableOpacity>
+						</View>
+
+						{formData.image && (
+							<Image
+								source={{ uri: formData.image }}
+								style={{ width: 100, height: 100, marginTop: 10, alignSelf: 'center', borderRadius: 5 }}
+							/>
+						)}
+					</View>
 
 					{/* Action Buttons */}
 					<View style={styles.buttonContainer}>
