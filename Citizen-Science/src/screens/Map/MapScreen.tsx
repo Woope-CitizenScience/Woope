@@ -259,19 +259,7 @@ export const MapScreen = () => {
 			);
 
 			console.log("✅ Pin Created Successfully:", newPin);
-
-			setPins((prev) => [
-				...prev,
-				{
-					pin_id: newPin.pin_id,
-					name: newPin.name,
-					date: formData.date,
-					description: formData.description,
-					tag: formData.tag,
-					image: newPin.image_url || null,
-					location: pinLocation,
-				},
-			]);
+			await fetchPins(); // Refresh from backend to ensure image URLs are included
 
 			setFormData({
 				name: "",
