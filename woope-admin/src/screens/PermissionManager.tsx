@@ -229,7 +229,10 @@ const PermissionManager = () => {
             onSelectItem={handleSelectRole}
           ></RoleListGroup>
         </div>
-        <div className="col p-2 bg-body-tertiary rounded overflow-y-auto">
+        <div
+          className="col p-2 bg-body-tertiary rounded overflow-y-auto"
+          style={{ height: "400px", minHeight: "400px", maxHeight: "400px" }}
+        >
           <div className="row mt-2">
             <div className="col-7">
               <h2>Permissions</h2>
@@ -252,19 +255,6 @@ const PermissionManager = () => {
             </div>
           </div>
           <hr></hr>
-          {/* {selectedRole &&
-            permissions.map((e) => {
-              return (
-                <Checkbox id={"" + e.permission_id} checked={e.active}>
-                  {e.title}
-                </Checkbox>
-              );
-            })}
-          {!selectedRole && (
-            <p className="text-center">
-              Select roles from the list on the left to edit their permissions.
-            </p>
-          )} */}
           {!selectedRole && (
             <p className="text-center">
               Select roles from the list on the left to edit their permissions.
