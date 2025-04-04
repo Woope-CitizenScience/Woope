@@ -5,7 +5,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import Svg, { Path } from 'react-native-svg';
 import { mdiHome, mdiTestTube, mdiCalendar, mdiBookshelf, mdiMapMarker, mdiFileDocument } from '@mdi/js';
-import CalendarScreen from '../screens/CalendarScreen';
+import CalendarScreen from '../screens/Calendar/CalendarScreen';
 import CommunitySideMenu from './CommunitySideMenu';
 import { MapScreen } from '../screens/Map/MapScreen';
 
