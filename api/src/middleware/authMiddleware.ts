@@ -39,6 +39,6 @@ export const requirePermission = (permission: string) => {
 
 
 // Usage example:
-// router.get('/protected-route', authenticateToken, (req, res) => {
+// router.get('/protected-route', authenticateToken, requirePermission('permission_name'), (req, res) => {
 //   // Access req.user here
 // });
