@@ -42,7 +42,14 @@ export const registerUser = async (email: string, password: string, firstName: s
 		throw error;
 	}
 
-	return await response.json();
+	const data = await response.json();
+
+	await AsyncStorage.setItem("accessToken", data.accessToken);
+    await AsyncStorage.setItem("refreshToken", data.refreshToken);
+    await AsyncStorage.setItem("userRole", data.role_id.toString());
+
+
+	return data;
 }
 
 export const logoutUser = async (userId: number) => {
