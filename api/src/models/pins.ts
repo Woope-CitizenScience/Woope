@@ -51,14 +51,15 @@ export const createPinNew = async (
     dateBegin: Date,
     label: string,
     longitude: number,
-    latitude: number
+    latitude: number,
+    user_id: number
 ): Promise<PinNew> => {
     try {
         const response = await pool.query(
-            `INSERT INTO public.pins (name, text_description, dateBegin, label, longitude, latitude)
-             VALUES ($1, $2, $3, $4, $5, $6)
+            `INSERT INTO public.pins (name, text_description, dateBegin, label, longitude, latitude, user_id)
+             VALUES ($1, $2, $3, $4, $5, $6, $7)
              RETURNING *`,
-            [name, text_description, dateBegin, label, longitude, latitude]
+            [name, text_description, dateBegin, label, longitude, latitude, user_id]
         );
 
         console.log('Created Pin:', response.rows[0]); // Debug log for the created pin
@@ -68,6 +69,7 @@ export const createPinNew = async (
         throw error;
     }
 };
+
 
 
 // pinModel.ts
@@ -143,3 +145,16 @@ export const updatePinNew = async (
         throw error;
     }
 };
+
+export const getPinById = async (pin_id: number): Promise<PinNew | null> => {
+    try {
+      const queryText = `SELECT * FROM public.pins WHERE pin_id = $1`;
+      const { rows } = await pool.query(queryText, [pin_id]);
+  
+      if (rows.length === 0) return null;
+      return rows[0];
+    } catch (error) {
+      console.error("Error retrieving pin by ID:", error);
+      throw error;
+    }
+  };
