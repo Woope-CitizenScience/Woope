@@ -14,6 +14,7 @@ import {
 	Alert,
 } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
+import { KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, Platform } from 'react-native';
 import * as Location from 'expo-location';
 import * as ImagePicker from 'expo-image-picker';
 import * as Camera from 'expo-camera';
@@ -513,25 +514,25 @@ export const MapScreen = () => {
 	return (
 		<View style={styles.container}>
 			<TouchableOpacity
-	onPress={() => setFilterModalVisible(true)}
-	style={{
-		position: 'absolute',
-		bottom: 10, // distance from bottom, adjust if needed
-		right: 10,
-		backgroundColor: '#007AFF',
-		paddingVertical: 10,
-		paddingHorizontal: 16,
-		borderRadius: 8,
-		zIndex: 2,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.3,
-		shadowRadius: 4,
-		elevation: 4,
-	}}
->
-	<Text style={{ color: 'white', fontWeight: 'bold' }}>Filter</Text>
-</TouchableOpacity>
+				onPress={() => setFilterModalVisible(true)}
+				style={{
+					position: 'absolute',
+					bottom: 10, // distance from bottom, adjust if needed
+					right: 10,
+					backgroundColor: '#007AFF',
+					paddingVertical: 10,
+					paddingHorizontal: 16,
+					borderRadius: 8,
+					zIndex: 2,
+					shadowColor: '#000',
+					shadowOffset: { width: 0, height: 2 },
+					shadowOpacity: 0.3,
+					shadowRadius: 4,
+					elevation: 4,
+				}}
+			>
+				<Text style={{ color: 'white', fontWeight: 'bold' }}>Filter</Text>
+			</TouchableOpacity>
 
 
 			{/* Map */}
@@ -594,70 +595,70 @@ export const MapScreen = () => {
 
 			{/*filters buttons*/}
 			<Modal visible={filterModalVisible} animationType="slide" transparent={true}>
-	<View
-		style={{
-			flex: 1,
-			backgroundColor: 'rgba(0, 0, 0, 0.5)',
-			justifyContent: 'center',
-			alignItems: 'center',
-		}}
-	>
-		<View
-			style={{
-				width: '80%',
-				backgroundColor: 'white',
-				padding: 20,
-				borderRadius: 10,
-			}}
-		>
-			<Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>
-				Filter Pins by Tag
-			</Text>
-
-			<View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-				{[
-					{ label: 'All', value: 'All' },
-					...tagItems,
-				].map((item) => (
-					<TouchableOpacity
-						key={item.value}
-						onPress={() => {
-							setFilterTag(item.value);
-							setFilterModalVisible(false);
-						}}
+				<View
+					style={{
+						flex: 1,
+						backgroundColor: 'rgba(0, 0, 0, 0.5)',
+						justifyContent: 'center',
+						alignItems: 'center',
+					}}
+				>
+					<View
 						style={{
-							backgroundColor: filterTag === item.value ? '#007AFF' : '#e0e0e0',
-							paddingVertical: 6,
-							paddingHorizontal: 12,
-							borderRadius: 5,
-							marginRight: 8,
-							marginBottom: 8,
+							width: '80%',
+							backgroundColor: 'white',
+							padding: 20,
+							borderRadius: 10,
 						}}
 					>
-						<Text
-							style={{
-								color: filterTag === item.value ? 'white' : 'black',
-							}}
-						>
-							{item.label}
+						<Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>
+							Filter Pins by Tag
 						</Text>
-					</TouchableOpacity>
-				))}
-			</View>
 
-			<TouchableOpacity
-				onPress={() => setFilterModalVisible(false)}
-				style={{ marginTop: 15 }}
-			>
-				<Text style={{ textAlign: 'center', color: '#007AFF', fontWeight: 'bold' }}>
-					Close
-				</Text>
-			</TouchableOpacity>
-		</View>
-	</View>
-</Modal>
+						<View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+							{[
+								{ label: 'All', value: 'All' },
+								...tagItems,
+							].map((item) => (
+								<TouchableOpacity
+									key={item.value}
+									onPress={() => {
+										setFilterTag(item.value);
+										setFilterModalVisible(false);
+									}}
+									style={{
+										backgroundColor: filterTag === item.value ? '#007AFF' : '#e0e0e0',
+										paddingVertical: 6,
+										paddingHorizontal: 12,
+										borderRadius: 5,
+										marginRight: 8,
+										marginBottom: 8,
+									}}
+								>
+									<Text
+										style={{
+											color: filterTag === item.value ? 'white' : 'black',
+										}}
+									>
+										{item.label}
+									</Text>
+								</TouchableOpacity>
+							))}
+						</View>
 
-{/* 			<ScrollView
+						<TouchableOpacity
+							onPress={() => setFilterModalVisible(false)}
+							style={{ marginTop: 15 }}
+						>
+							<Text style={{ textAlign: 'center', color: '#007AFF', fontWeight: 'bold' }}>
+								Close
+							</Text>
+						</TouchableOpacity>
+					</View>
+				</View>
+			</Modal>
+
+			{/* 			<ScrollView
 				horizontal
 				showsHorizontalScrollIndicator={false}
 				contentContainerStyle={styles.filterContainer}
