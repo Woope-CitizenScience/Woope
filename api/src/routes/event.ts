@@ -1,5 +1,5 @@
 import express from 'express';
-import { getEvents, createEvents, getEventInfo, deleteEvent, updateEvent, getDates, getFollowedDates} from "../models/events";
+import { getEvents, createEvents, getEventInfo, deleteEvent, updateEvent, getDates, getFollowedDates, getDayEvents} from "../models/events";
 const router = require('express').Router();
 
 //get all events
@@ -82,6 +82,18 @@ router.get('/getdates/:month/:year', async(req: express.Request, res: express.Re
 router.get('/getfolloweddates/:month/:year/:user_id', async(req: express.Request, res: express.Response) => {
     try {
         const dates = await getFollowedDates(Number(req.params.month), Number(req.params.year), Number(req.params.user_id));
+        res.status(200).json(dates);
+    } catch (error) {
+        if (error instanceof Error) {
+            res.status(500).json(`Internal server error: ${error.message}`);
+        } else {
+            res.status(500).json('Internal server error: An unknown error occurred');
+        }
+    }
+});
+router.get('/getdayevents/:day/:month/:year/:user_id', async(req: express.Request, res: express.Response) => {
+    try {
+        const dates = await getDayEvents(Number(req.params.day), Number(req.params.month), Number(req.params.year), Number(req.params.user_id));
         res.status(200).json(dates);
     } catch (error) {
         if (error instanceof Error) {

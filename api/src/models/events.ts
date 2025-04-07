@@ -164,3 +164,16 @@ export const getFollowedDates = async (month: number, year: number, user_id: num
 
     }
 }
+export const getDayEvents = async (day: number, month: number, year: number, user_id: number) =>{
+    try {
+        let query;
+        let values;
+        query = `SELECT * FROM public.event INNER JOIN public.user_organization_follows ON public.event.org_id = public.user_organization_follows.org_id WHERE EXTRACT(DAY FROM public.event.time_begin) = $1 AND EXTRACT(MONTH FROM public.event.time_begin) = $2 AND EXTRACT(YEAR FROM public.event.time_begin) = $3`;
+        values = [day, month, year];
+        const response = await pool.query(query, values);
+        return response.rows;
+    } catch (error) {
+        throw new Error("Error retrieving events on date: " + (error as Error).message);
+
+    }
+}

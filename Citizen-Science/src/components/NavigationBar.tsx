@@ -21,7 +21,8 @@ import CreateOrganization from '../screens/Organizations/CreateOrganization';
 import CreateCategory from '../screens/Organizations/CreateCategory';
 import FeatureOrganization from '../screens/Organizations/FeatureOrganization';
 import EventHome from '../screens/Events/EventHome';
-import ReportScreen from '../screens/ReportScreen'
+import ReportScreen from '../screens/ReportScreen';
+import DateScreen from '../screens/Calendar/DateScreen';
 
 const Tab = createBottomTabNavigator();
 interface AnimatedTabIconProps {

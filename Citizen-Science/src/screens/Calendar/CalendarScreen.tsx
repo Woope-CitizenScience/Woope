@@ -4,12 +4,15 @@ import {Calendar, CalendarUtils} from 'react-native-calendars';
 import testIDs from './testIDs';
 import { getDates, getFollowedDates } from '../../api/event';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { addMonths, subMonths } from 'date-fns';
+import { addMonths, getDay, getMonth, getYear, subMonths } from 'date-fns';
+import { useNavigation } from '@react-navigation/native';
 import { AuthContext } from '../../util/AuthContext';
 import { jwtDecode } from 'jwt-decode';
 import { AccessToken } from '../../util/token';
 
 const CalendarScreen = () => {
+  const navigation = useNavigation<any>();
+  
   const { userToken, setUserToken } = useContext(AuthContext);
   const decodedToken = userToken ? jwtDecode<AccessToken>(userToken) : null;
   const userId = decodedToken ? decodedToken.user_id : NaN;
@@ -17,6 +20,8 @@ const CalendarScreen = () => {
   const [selectedValue, setSelectedValue] = useState(new Date());
   const [generalMarks, setGeneralMarks] = useState([]);
   const [followedMarks, setFollowedMarks] = useState([]);
+  
+  // gets 
   useEffect(()=> {
     getGeneralMarks().then(
      () => createMarks()
@@ -24,6 +29,7 @@ const CalendarScreen = () => {
     getFollowedMarks()
   },[selectedValue])
 
+  // creates event dots
   const createMarks = () => {
     let customDates = {};
     generalMarks.forEach(item => console.log(item));
@@ -31,10 +37,20 @@ const CalendarScreen = () => {
     console.log(generalMarks);
     console.log("test")
   }
+
+  // Navigates to day selected to display all events
   const onDayPress = useCallback((day) => {
     console.log(day);
+    console.log(day.month)
+    navigation.navigate("DateScreen", {
+        dayNum: day.day,
+        month: day.month,
+        year: day.year,
+        id: userId
+    })
   }, []);
 
+  // Calendar Render
   const renderCalendarWithSelectableDate = () => {
     return (
       <Fragment>
@@ -61,6 +77,7 @@ const CalendarScreen = () => {
     );
   };
 
+  // gets all days that have events
   const getGeneralMarks = async() => {
     try {
       let response = await getDates(selectedValue.getMonth() + 1, selectedValue.getFullYear());
@@ -69,6 +86,8 @@ const CalendarScreen = () => {
         console.log(error);
     }
   }
+
+  // gets all days with events that are FOLLOWED by USER
   const getFollowedMarks= async() => {
     try {
       let fmarks = await getFollowedDates(selectedValue.getMonth() + 1, selectedValue.getFullYear(), userId);
@@ -78,6 +97,7 @@ const CalendarScreen = () => {
     }
   }
 
+  // Renders the calendar
   const renderExamples = () => {
     return (
       <Fragment>
