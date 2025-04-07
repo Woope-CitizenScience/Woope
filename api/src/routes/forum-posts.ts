@@ -16,9 +16,12 @@ import {
     getPostsByOrgId
 } from '../models/posts';
 
+import { authenticateToken, requirePermission } from '../middleware/authMiddleware';
+import { requireOwnershipOrPermission } from '../middleware/requireOwnershipOrPermission';
+
 const router = require('express').Router();
 
-router.get('/postswithmedia/:id/', async (req: express.Request, res: express.Response) => {
+router.get('/postswithmedia/:id/', authenticateToken, async (req: express.Request, res: express.Response) => {
     try {
         const userId = Number(req.params.id);
         const posts = await getPostWithMedia(userId);
@@ -33,7 +36,7 @@ router.get('/postswithmedia/:id/', async (req: express.Request, res: express.Res
 })
 
 // Get all posts
-router.get('/posts/:id', async (req: express.Request, res: express.Response) => {
+router.get('/posts/:id', authenticateToken, async (req: express.Request, res: express.Response) => {
     try {
         const userId = Number(req.params.id);
         const posts = await getPost(userId);
@@ -48,10 +51,10 @@ router.get('/posts/:id', async (req: express.Request, res: express.Response) => 
 });
 
 // Get a post by ID
-router.get('/:id/posts', async (req: express.Request, res: express.Response) => {
+router.get('/:id/posts', authenticateToken, async (req: express.Request, res: express.Response) => {
     try {
         const post = await getPostById(Number(req.params.id));
-        if (!post || post.length === 0) {
+        if (!post) {
             return res.status(404).json('Post not found');
         }
         res.status(200).json(post);
@@ -65,7 +68,7 @@ router.get('/:id/posts', async (req: express.Request, res: express.Response) => 
 });
 
 // Get posts by User ID
-router.get('/posts/user/:id', async (req: express.Request, res: express.Response) => {
+router.get('/posts/user/:id', authenticateToken, async (req: express.Request, res: express.Response) => {
     try {
         const posts = await getPostByUserId(Number(req.params.id));
         if (posts.length === 0) {
@@ -82,7 +85,7 @@ router.get('/posts/user/:id', async (req: express.Request, res: express.Response
 });
 
 // Get posts by Org ID
-router.get('/posts/org/:id', async (req: express.Request, res: express.Response) => {
+router.get('/posts/org/:id', authenticateToken, async (req: express.Request, res: express.Response) => {
     try {
         const posts = await getPostsByOrgId(Number(req.params.id));
         if (!posts) {
@@ -99,7 +102,7 @@ router.get('/posts/org/:id', async (req: express.Request, res: express.Response)
 });
 
 // Create a new post
-router.post('/posts', async (req: express.Request, res: express.Response) => {
+router.post('/posts', authenticateToken, requirePermission('create_post'), async (req: express.Request, res: express.Response) => {
     try {
         const newPost = await createPost(Number(req.body.user_id), req.body.org_id, req.body.content);
         res.status(201).json(newPost);
@@ -113,7 +116,16 @@ router.post('/posts', async (req: express.Request, res: express.Response) => {
 });
 
 // Update a post
-router.put('/posts/:id', async (req: express.Request, res: express.Response) => {
+router.put('/posts/:id', authenticateToken,
+    requireOwnershipOrPermission({
+      fetchResource: getPostById,
+      permissionOwn: 'edit_own_post',
+      permissionAll: 'edit_all_posts',
+      extractUserId: (post) => post.user_id!,
+      idSource: 'params',
+      idKey: 'id',
+    }),
+     async (req: express.Request, res: express.Response) => {
     try {
         const updatedPost = await updatePost(Number(req.params.id), req.body.content);
         res.status(200).json(updatedPost);
@@ -127,7 +139,17 @@ router.put('/posts/:id', async (req: express.Request, res: express.Response) => 
 });
 
 // Delete a post
-router.delete('/posts/:id', async (req: express.Request, res: express.Response) => {
+router.delete('/posts/:id', 
+    authenticateToken,
+    requireOwnershipOrPermission({
+      fetchResource: getPostById,
+      permissionOwn: 'delete_own_post',
+      permissionAll: 'delete_all_posts',
+      extractUserId: (post) => post.user_id!,
+      idSource: 'params',
+      idKey: 'id',
+    }),
+     async (req: express.Request, res: express.Response) => {
     try {
         const deletedPost = await deletePost(Number(req.params.id));
         res.status(204);
@@ -141,7 +163,16 @@ router.delete('/posts/:id', async (req: express.Request, res: express.Response) 
 });
 
 // Soft delete a post
-router.delete('/posts/soft/:id', async (req: express.Request, res: express.Response) => {
+router.delete('/posts/soft/:id', 
+    authenticateToken,
+    requireOwnershipOrPermission({
+      fetchResource: getPostById,
+      permissionOwn: 'delete_own_post',
+      permissionAll: 'delete_all_posts',
+      extractUserId: (post) => post.user_id!,
+      idSource: 'params',
+      idKey: 'id',
+    }), async (req: express.Request, res: express.Response) => {
     try {
         const softDeletedPost = await softDeletePost(Number(req.params.id));
         res.status(200).json(softDeletedPost);
