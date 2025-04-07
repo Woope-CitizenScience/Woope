@@ -28,8 +28,8 @@ interface ForecastDictionary {
  */
 
 const getWeatherData = (): Promise<ForecastDictionary[]> => {
-    const point_x = 40.0853; // Hard-coded coordinates
-    const point_y = -100.6746;
+    const point_x = 46.8042; // Hard-coded coordinates
+    const point_y = -100.7878;
     const weather_api = 'https://api.weather.gov/points/';
     const initial_api = `${weather_api}${point_x},${point_y}`;
     return axios.get(initial_api)
