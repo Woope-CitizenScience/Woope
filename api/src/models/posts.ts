@@ -65,10 +65,10 @@ export const getPost = async (currentUserId: number): Promise<UserLikedPosts[]> 
   }));
 };
 
-export const getPostById = async (id: number): Promise<Post | null> => {
-  const response = await pool.query('SELECT * FROM posts WHERE post_id = $1', [id]);
+export const getPostById = async (post_id: number): Promise<Post | null> => {
+  const response = await pool.query('SELECT * FROM posts WHERE post_id = $1', [post_id]);
   return response.rows.length > 0 ? response.rows[0] : null;
-};
+}
 
 export const getPostByUserId = async (user_id: number): Promise<Post[]> => {
   const response = await pool.query('SELECT * FROM posts WHERE user_id = $1', [user_id]);
