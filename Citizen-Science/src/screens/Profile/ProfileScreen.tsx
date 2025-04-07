@@ -8,6 +8,7 @@ import {
   RefreshControl,
   ActivityIndicator,
   Dimensions,
+  Modal,
 } from "react-native";
 import {
   responsiveFontSize,
@@ -29,8 +30,10 @@ import { AuthContext } from "../../util/AuthContext";
 import { useFocusEffect } from "@react-navigation/native";
 import LikeButton from "../../components/LikeButton";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import { PdfFile, PostWithUsername } from "../../api/types";
-import { getPostById, getPostByUserId } from "../../api/posts";
+import { PdfFile, Post, Comment, PostWithUsername } from "../../api/types";
+import { deletePost, getPostById, getPostByUserId } from "../../api/posts";
+import { getComments, likeComment, unlikeComment } from "../../api/comments";
+import Comments from "../../components/Comments";
 
 interface ProfileScreenProps {
   route: any;
@@ -43,19 +46,25 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ route, navigation }) => {
   let { userToken } = useContext(AuthContext);
   const decodedToken = userToken ? jwtDecode<AccessToken>(userToken) : null;
   const currentUserID = decodedToken ? decodedToken.user_id : null;
-
   const [profileOwner, setProfileOwner] = useState(false);
-
   const [fullyLoaded, setFullyLoaded] = useState(false);
-
   const [editFirstName, setFirstName] = useState("");
   const [editLastName, setLastName] = useState("");
-
   const [posts, setPosts] = useState<any[]>([]);
-
   const [following, setFollowing] = useState(false);
   const [followerCount, setFollowerCount] = useState("");
   const [followingCount, setFollowingCount] = useState("");
+  const [visibleDropdown, setVisibleDropdown] = useState<string | null>(null);
+  const [error, setError] = useState("");
+  const [commentsMap, setCommentsMap] = useState<CommentsMap>({});
+  const [selectedPost, setSelectedPost] = useState<PostWithUsername | null>(
+      null
+    );
+  const [commentsModalVisible, setCommentsModalVisible] = useState(false);
+
+  interface CommentsMap {
+      [key: number]: Comment[];
+  }
 
   {
     /* Loads profile */
@@ -79,9 +88,10 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ route, navigation }) => {
       .catch((error) => {
         console.error("Error: ", error);
       });
-    getPostByUserId(userID).then((data) => {
-      setPosts(data);
-    });
+    // getPostByUserId(userID).then((data) => {
+    //   setPosts(data);
+    // });
+    fetchPosts()
     {
       /* Un-needed api calls if looking at own profile */
     }
@@ -102,10 +112,84 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ route, navigation }) => {
     }
   }, [userID, currentUserID]);
 
+  const fetchPosts = async () => {
+      try {
+        const postsList = await getPostByUserId(userID);
+        setPosts(postsList);
+        const commentsMap: CommentsMap = {};
+        for (const post of postsList) {
+          const postComments = await getComments(post.post_id);
+          commentsMap[post.post_id] = postComments;
+        }
+        setCommentsMap(commentsMap);
+      } catch (error) {
+        console.error(error);
+        setError("Failed to fetch posts.");
+      }
+    };
+
   {
     /* Reload profile upon focusing screen */
   }
   useFocusEffect(fetchProfile);
+
+  const handleDeletePost = async (postToDelete: PostWithUsername) => {
+      setVisibleDropdown(null);
+      if (userID === currentUserID) {
+        try {
+          deletePost(postToDelete.post_id);
+          setPosts((currentPosts) =>
+            currentPosts.filter((post) => post.post_id !== postToDelete.post_id)
+          );
+        } catch (error) {
+          console.error(error);
+          setError("Failed to delete post. Please try again.");
+        } finally {
+          getPostByUserId(userID).then((data) => {
+            setPosts(data);
+          });
+        }
+      }
+    };
+
+  const handleAddComment = (postId: number, newComment: Comment) => {
+      setPosts((posts) =>
+        posts.map((post) => {
+          if (post.post_id === postId) {
+            const updatedComments = post.comments
+              ? [...post.comments, newComment]
+              : [newComment];
+            return { ...post, comments: updatedComments };
+          }
+          return post;
+        })
+      );
+    fetchPosts();
+  };
+  
+  const handleDeleteComment = (postId: number, commentId: number) => {
+    fetchPosts();
+  };
+
+  const handleLikeComment = async (commentId: number) => {
+      try {
+        const response = await likeComment(commentId);
+        fetchPosts();
+      } catch (error) {
+        console.error(error);
+        setError("Failed to like post. Please try again.");
+      }
+  };
+
+  const handleUnlikeComment = async (commentId: number) => {
+      try {
+        unlikeComment(commentId);
+        fetchPosts();
+      } catch (error) {
+        console.error(error);
+        setError("Failed to unlike post. Please try again.");
+      }
+    };
 
   {
     /* Call followProfile api and client side update screen */
@@ -134,6 +218,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ route, navigation }) => {
       console.error("Errors: ", error);
     }
   };
+  
 
   if (!fullyLoaded) {
     return (
@@ -151,32 +236,43 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ route, navigation }) => {
     throw new Error("Function not implemented.");
   }
 
-  function toggleCommentsModal(
-    item:
-      | {
-          post_id: string;
-          content: string;
-          created_at: number;
-          image: string;
-          like_count: number;
-        }
-      | {
-          post_id: string;
-          content: string;
-          created_at: number;
-          image: string;
-          like_count?: undefined;
-        }
-  ): void {
-    throw new Error("Function not implemented.");
-  }
-
-  function setVisibleDropdown(arg0: string | null): void {
-    throw new Error("Function not implemented.");
-  }
+  const toggleCommentsModal = (post?: PostWithUsername) => {
+      setSelectedPost(post || null);
+      setCommentsModalVisible(!commentsModalVisible);
+    };
 
   return (
     <View style={styles.container}>
+      <Modal
+                visible={commentsModalVisible}
+                animationType="slide"
+                transparent={true}
+                onRequestClose={() => toggleCommentsModal()}
+              >
+                <View style={styles.centeredView}>
+                  <View style={styles.modalView}>
+                    <TouchableOpacity
+                      style={styles.closeButton}
+                      onPress={() => toggleCommentsModal()}
+                    >
+                      <Text style={styles.closeButtonText}>X</Text>
+                    </TouchableOpacity>
+                    {selectedPost && (
+                      <Comments
+                        comments={commentsMap[selectedPost.post_id] || []}
+                        postUserId={selectedPost.user_id}
+                        postId={selectedPost.post_id}
+                        userId={userID}
+                        orgId={NaN}
+                        onAddComment={handleAddComment}
+                        onDeleteComment={handleDeleteComment}
+                        onLikeComment={handleLikeComment}
+                        onUnlikeComment={handleUnlikeComment}
+                      />
+                    )}
+                  </View>
+                </View>
+              </Modal>
       <FlatList
         style={[{ width: responsiveWidth(100) }]}
         data={posts}
@@ -408,22 +504,22 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ route, navigation }) => {
                 </TouchableOpacity>
               </View>
             ))} */}
-            {/* <TouchableOpacity
+            <TouchableOpacity
               onPress={() => toggleCommentsModal(item)}
               style={styles.commentButton}
-            > */}
-            {/* <LikeButton
+            > 
+            <LikeButton
                 postId={item.post_id}
-                user_id={userId}
+                user_id={userID}
                 initialLikesCount={item.likes_count}
                 likedPost={item.user_liked}
-              /> */}
+              />
             <MaterialIcons name="comment" size={24} color="#007AFF" />
-            {/* <Text style={{ color: "#007AFF", marginLeft: 4 }}>
+            <Text style={{ color: "#007AFF", marginLeft: 4 }}>
                 {(commentsMap[item.post_id] || []).length}
-              </Text> */}
-            {/* </TouchableOpacity> */}
-            {/* {userCanModifyPost(item) && (
+              </Text> */
+            </TouchableOpacity>
+            {userID === currentUserID && (
               <TouchableOpacity
                 onPress={() =>
                   setVisibleDropdown(
@@ -434,17 +530,17 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ route, navigation }) => {
               >
                 <Text>...</Text>
               </TouchableOpacity>
-            )} */}
-            {/* {visibleDropdown === item.post_id && (
+            )}
+            {visibleDropdown === item.post_id && (
               <View style={styles.dropdownMenu}>
-                {userCanEditPost(item) && (
+                {/* {userID === currentUserID && (
                   <TouchableOpacity
                     onPress={() => startEditingPost(item.post_id)}
                   >
                     <Text style={styles.dropdownItem}>Edit</Text>
                   </TouchableOpacity>
-                )}
-                {userCanDeletePost(item) && (
+                )} */}
+                {userID === currentUserID && (
                   <TouchableOpacity
                     onPress={() => {
                       handleDeletePost(item);
@@ -454,7 +550,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ route, navigation }) => {
                   </TouchableOpacity>
                 )}
               </View>
-            )} */}
+            )}
           </View>
         )}
       />
@@ -463,6 +559,33 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ route, navigation }) => {
 };
 
 const styles = StyleSheet.create({
+  modalView: {
+    backgroundColor: "white",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 35,
+    paddingTop: 120,
+    width: "100%",
+    height: "100%",
+  },
+  closeButton: {
+    position: "absolute",
+    top: 60,
+    right: 20,
+    backgroundColor: "red",
+    padding: 10,
+    borderRadius: 10,
+  },
+  closeButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.8)",
+  },
   commentButton: {
     marginTop: 10,
     padding: 10,
