@@ -11,8 +11,9 @@ import ScreenTitle from "../components/ScreenTitle";
 import {responsiveFontSize, responsiveHeight, responsiveWidth} from "react-native-responsive-dimensions";
 import Blobs from "../components/Blobs";
 import {loginUser} from "../api/auth";
-import {storeToken} from "../util/token"
+//import {storeToken} from "../util/token"
 import { AuthContext } from "../util/AuthContext";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 type NavigationParam = {
@@ -32,10 +33,9 @@ const LoginScreen: React.FC = () => {
 		try {
 			const response = await loginUser(email, password);
 
-			await storeToken('accessToken', response.accessToken);
-			await storeToken('refreshToken', response.refreshToken);
+            const storedToken = await AsyncStorage.getItem("accessToken");
+            setUserToken(storedToken);
 
-			setUserToken(response.accessToken);
 		} catch (error) {
 			console.log('Login failed', error);
 		}

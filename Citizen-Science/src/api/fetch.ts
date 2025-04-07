@@ -1,5 +1,6 @@
 import mime from "mime";
 import { PdfFile } from "./types";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export async function fetchAPIWithFiles(
     endpoint: string,
@@ -56,9 +57,15 @@ export async function fetchAPIWithFiles(
 }
 
 export async function fetchAPI(endpoint: string, method: string = 'GET', body: any = null) {
-    const config: RequestInit = {
+
+    const token = await AsyncStorage.getItem("accessToken"); // Store token in mobile storage
+    const config: RequestInit = { 
+
         method,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json',
+                "Authorization": token ? `Bearer ${token}` : "" // Attach token
+
+         }
     };
 
     if (body) {

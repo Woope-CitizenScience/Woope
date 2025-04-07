@@ -24,6 +24,7 @@ export type PostWithUsername = {
 	user_id: number;
 	likes_count: number;
 	likedPost: boolean;
+	is_active: boolean;
 }
 
 export type Comment = {

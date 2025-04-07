@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./screens/Login";
 import Home from "./screens/Home";
@@ -10,9 +10,18 @@ import UserProfile from "./screens/UserProfile";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthContext } from "./context/AuthContext";
 import OrgProfile from "./screens/OrgProfile";
+import PinManager from "./screens/PinManager";
+import PermissionManager from "./screens/PermissionManager";
 
 function App() {
   const { userToken, userRole } = useContext(AuthContext);
+  const theme = localStorage.getItem("theme");
+
+  useEffect(() => {
+    if (theme) {
+      document.documentElement.setAttribute("data-bs-theme", theme);
+    }
+  }, []);
 
   return (
     <Router>
@@ -52,11 +61,32 @@ function App() {
           }
         />
         <Route
+          path="/pins"
+          element={
+            <ProtectedRoute isAuthenticated={!!userToken} userRole={userRole}>
+              <Layout>
+                <PinManager />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
           path="/organizations"
           element={
             <ProtectedRoute isAuthenticated={!!userToken} userRole={userRole}>
               <Layout>
                 <OrgManager />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/permissions"
+          element={
+            <ProtectedRoute isAuthenticated={!!userToken} userRole={userRole}>
+              <Layout>
+                <PermissionManager />
               </Layout>
             </ProtectedRoute>
           }
@@ -81,7 +111,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-        
       </Routes>
     </Router>
   );

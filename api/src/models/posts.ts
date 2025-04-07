@@ -77,14 +77,9 @@ export const getPost = async (currentUserId: number): Promise<UserLikedPosts[]> 
   }));
 };
 
-/**
- * Retrieves a post by its ID.
- * @param {number} id - The ID of the post.
- * @returns {Promise<Post | null>} The post if found, otherwise null.
- */
 
-export const getPostById = async (id: number): Promise<Post[] | null> => {
-  const response = await pool.query('SELECT * FROM posts WHERE id = $1', [id]);
+export const getPostById = async (post_id: number): Promise<Post | null> => {
+  const response = await pool.query('SELECT * FROM posts WHERE post_id = $1', [post_id]);
   return response.rows.length > 0 ? response.rows[0] : null;
 }
 
@@ -121,13 +116,6 @@ export const createPost = async (user_id: number, org_id: number | null, content
   }
 }
 
-/**
- * Updates a post's content.
- * @param {number} post_id - The ID of the post to update.
- * @param {string} content - The updated content.
- * @returns {Promise<Post>} The updated post.
- */
-
 export const updatePost = async (post_id: number, content: string): Promise<Post> => {
   try {
     const response = await pool.query(
@@ -155,10 +143,21 @@ export const softDeletePost = async (post_id: number): Promise<void> => {
   }
 }
 
+
+export const restorePost = async (post_id: number): Promise<void> => {
+  try {
+    await pool.query('UPDATE posts SET is_active = TRUE WHERE post_id = $1', [post_id]);
+  } catch (error) {
+    console.error(`Error soft deleting post with id ${post_id}`, error);
+    throw error;
+  }
+}
+
 /**
  * Permanently deletes a post and its associated likes.
  * @param {number} post_id - The ID of the post.
  */
+
 
 export const deletePost = async (post_id: number): Promise<void> => {
   const client = await pool.connect();
@@ -248,4 +247,15 @@ export const searchPosts = async (query: string): Promise<Post[]> => {
     console.error('Error searching posts', error);
     throw error;
   }
+}
+
+export const getPostsByOrgId = async (org_id: number): Promise<Post[] | undefined> => {
+  try {
+    const response = await pool.query('SELECT * FROM posts WHERE org_id = $1', [org_id]);
+    return response.rows;
+  }
+  catch (e) {
+    console.log("Error getting posts by org id: " + e);
+  }
+
 }

@@ -3,10 +3,12 @@ import { useParams } from "react-router-dom";
 import { getUserByID, updateUserOrg, updateUserRole } from "../api/community";
 import { getOrganizationById, getOrganizations } from "../api/organizations";
 import Modal from "../components/Modal";
-import Dropdown from "../components/Dropdown";
 import Select from "../components/Select";
 import { getRoles } from "../api/roles";
 import { useNavigate } from "react-router-dom";
+import Post from "../components/Post";
+import { ForumPost } from "../interfaces/Posts";
+import { getPostsByUserId } from "../api/posts";
 
 function UserProfile() {
   const navigate = useNavigate();
@@ -15,6 +17,9 @@ function UserProfile() {
   const [userInfo, setUserInfo] = useState<any>(null);
   const [orgs, setOrgs] = useState<any>([]);
   const [roles, setRoles] = useState<any>([]);
+  const [posts, setPosts] = useState<ForumPost[]>([]);
+  const [postResults, setPostResults] = useState<ForumPost[]>([]);
+  const [searchInput, setSearchInput] = useState("");
   const userFirstName = userInfo ? userInfo.first_name : null;
   const userLastName = userInfo ? userInfo.last_name : null;
   const userFullName = userLastName + ", " + userFirstName;
@@ -54,6 +59,32 @@ function UserProfile() {
     fetchOrganizations();
     fetchRoles();
   }, [userId, userAdminsOrg]);
+
+  useEffect(() => {
+    fetchPosts();
+  }, []);
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      fetchPosts();
+      setPostResults(
+        posts.filter((post) =>
+          post.content.toLowerCase().includes(searchInput.toLowerCase().trim())
+        )
+      );
+    }, 300); // Delay filtering by 300ms to avoid excessive updates
+
+    return () => clearTimeout(timeoutId);
+  }, [searchInput, posts]);
+
+  const fetchPosts = async () => {
+    const res = await getPostsByUserId(Number(userId));
+
+    if (res) {
+      setPosts(res);
+      // setPostResults(res);
+    }
+  };
 
   const fetchUser = async () => {
     try {
@@ -130,20 +161,25 @@ function UserProfile() {
     }
   };
 
-  const formatDate = (date: string) => {
-    try {
-      if (!date) {
-        return "";
-      }
-      const values = date.split("-");
-      const year = values[0];
-      const month = values[1];
-      const day = values[2].slice(0, 2);
-      return month + "/" + day + "/" + year;
-    } catch (e) {
-      console.log(e);
-      return "";
-    }
+  const handlePostSearch = () => {
+    const res = posts.filter((post) =>
+      post.content
+        .toLowerCase()
+        .trim()
+        .includes(searchInput.toLowerCase().trim())
+    );
+    setPostResults(res);
+  };
+
+  const handleInputChange = (event: React.FormEvent<HTMLInputElement>) => {
+    const value = event.currentTarget.value;
+    setSearchInput(value);
+
+    // Automatically update filtered results
+    const res = posts.filter((post) =>
+      post.content.toLowerCase().includes(value.toLowerCase().trim())
+    );
+    setPostResults(res);
   };
 
   return (
@@ -262,6 +298,7 @@ function UserProfile() {
         Update Role
       </button>
       <h2 className="pt-5">Summary</h2>
+      <hr></hr>
       <div className="grid p-2">
         <div className="row">
           <div className="col-6">
@@ -270,7 +307,13 @@ function UserProfile() {
           </div>
           <div className="col-6">
             <dt>Organization: </dt>
-            <dd>{userAdminsOrg ? orgName : "N/A"}</dd>
+            <dd>
+              {userAdminsOrg ? (
+                <a href={`/organizations/${userAdminsOrg}`}>{orgName}</a>
+              ) : (
+                "N/A"
+              )}
+            </dd>
           </div>
         </div>
         <div className="row">
@@ -286,7 +329,11 @@ function UserProfile() {
         <div className="row">
           <div className="col-6">
             <dt>Profile Created: </dt>
-            <dd>{formatDate(userCreatedAt)}</dd>
+            <dd>
+              {new Date(userCreatedAt).toLocaleDateString() +
+                " " +
+                new Date(userCreatedAt).toLocaleTimeString()}
+            </dd>
           </div>
           {/* <div className="col-6">
             <dt>Date of Birth: </dt>
@@ -294,7 +341,47 @@ function UserProfile() {
           </div> */}
         </div>
       </div>
-      {/* <h2 className="pt-5">Posts</h2> */}
+      <h2 className="pt-5">Posts</h2>
+      <hr></hr>
+      <div className="py-3 row">
+        <div className="col-6">
+          <input
+            type="text"
+            className="form-control"
+            value={searchInput}
+            onChange={handleInputChange}
+            placeholder={`Search ${userFirstName}'s Posts by Content`}
+          ></input>
+        </div>
+        {/* <div className="col-6">
+          <button className="btn btn-primary" onClick={handlePostSearch}>
+            Search
+          </button>
+        </div> */}
+      </div>
+      {postResults.map(
+        ({
+          post_id,
+          user_name,
+          content,
+          created_at,
+          likes_count,
+          is_active,
+        }: ForumPost) => (
+          <Post
+            postId={post_id}
+            userName={user_name}
+            content={content}
+            createdAt={created_at}
+            likeCount={likes_count}
+            isActive={is_active}
+          />
+        )
+      )}
+      {posts.length !== 0 && postResults.length === 0 && (
+        <p className="py-4">{`No results for "${searchInput}"`}</p>
+      )}
+      {posts.length === 0 && <p className="py-4">{`User has no posts.`}</p>}
     </div>
   );
 }

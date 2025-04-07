@@ -4,6 +4,7 @@ import Button from "../components/Button";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { searchUser } from "../api/community";
+import PageHeader from "../components/PageHeader";
 
 function UserManager() {
   const navigate = useNavigate();
@@ -26,13 +27,18 @@ function UserManager() {
         const users = res.map((user: any) => {
           return [
             <p className="pt-2">{user.user_id}</p>,
-            <button
+            /*<button
               type="button"
               className="btn btn-link"
               onClick={() => navigate(`/users/${user.user_id}`)}
             >
               {user.last_name + ", " + user.first_name}
-            </button>,
+            </button>,*/
+            <div className="pt-2">
+              <a
+                href={`/users/${user.user_id}`}
+              >{`${user.last_name}, ${user.first_name}`}</a>
+            </div>,
             <p className="pt-2">{user.email}</p>,
             <p className="pt-2">{user.role}</p>,
             <p className="pt-2">{user.org}</p>,
@@ -53,9 +59,14 @@ function UserManager() {
   return (
     <>
       <div className="container-lg">
-        <h1 className="pb-4">User Administration</h1>
+        <PageHeader>User Administration</PageHeader>
         <hr></hr>
-        <form>
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            handleSearch();
+          }}
+        >
           <div className="row mb-3">
             {/* <label htmlFor="userSearch" className="col-sm col-form-label">
               Find by:
@@ -72,6 +83,7 @@ function UserManager() {
                 className="form-control"
                 value={searchInput}
                 onChange={handleInputChange}
+                placeholder="Search Users By Name"
               />
             </div>
             <div className="col-sm-3">

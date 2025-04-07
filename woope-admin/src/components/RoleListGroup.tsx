@@ -1,17 +1,20 @@
-import { useState } from "react";
+import React, { useState } from "react";
 
-interface Props {
-  items: string[];
-  heading?: string;
-  onSelectItem: (item: string) => void;
+interface Role {
+  role_id: number;
+  name: string;
 }
 
-function ListGroup({ items, heading, onSelectItem }: Props) {
+interface Props {
+  items: Role[];
+  onSelectItem: (item: Role | null) => void;
+}
+
+const RoleListGroup = ({ items, onSelectItem }: Props) => {
   const [selectedState, setSelectedState] = useState(-1);
 
   return (
-    <>
-      <h1>{heading}</h1>
+    <div>
       {items.map((item, index) => (
         <ul className="list-group">
           <li
@@ -20,18 +23,18 @@ function ListGroup({ items, heading, onSelectItem }: Props) {
                 ? "mb-2 list-group-item active"
                 : "mb-2 list-group-item"
             }
-            key={item}
+            key={item.name}
             onClick={() => {
-              setSelectedState(selectedState !== index ? index : -1);
-              onSelectItem(selectedState !== index ? item : "");
+              setSelectedState(index);
+              onSelectItem(item);
             }}
           >
-            {item}
+            {item.name}
           </li>
         </ul>
       ))}
-    </>
+    </div>
   );
-}
+};
 
-export default ListGroup;
+export default RoleListGroup;

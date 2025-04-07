@@ -1,7 +1,12 @@
 export async function fetchAPI(endpoint: string, method: string = 'GET', body: any = null) {
+    const token = localStorage.getItem("token"); // Get token from local storage
+
     const config: RequestInit = { 
         method,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 
+            "Content-Type": "application/json",
+            "Authorization": token ? `Bearer ${token}` : "" // Attach token
+        }
     };
 
     if (body) {
@@ -13,7 +18,6 @@ export async function fetchAPI(endpoint: string, method: string = 'GET', body: a
     if (!response.ok) {
         const textResponse = await response.text();
         try {
-            console.log("Non-JSON response received:", textResponse);
             const errorResponse = JSON.parse(textResponse);
             throw new Error(errorResponse.error || response.statusText);
         } catch (error) {

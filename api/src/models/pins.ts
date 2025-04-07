@@ -83,6 +83,7 @@ export const createPinNew = async (
 };
 
 
+
 // pinModel.ts
 
 export const getAllPinsNew = async (): Promise<PinNew> => {
@@ -177,3 +178,16 @@ export const updatePinNew = async (
         throw error;
     }
 };
+
+export const getPinById = async (pin_id: number): Promise<PinNew | null> => {
+    try {
+      const queryText = `SELECT * FROM public.pins WHERE pin_id = $1`;
+      const { rows } = await pool.query(queryText, [pin_id]);
+  
+      if (rows.length === 0) return null;
+      return rows[0];
+    } catch (error) {
+      console.error("Error retrieving pin by ID:", error);
+      throw error;
+    }
+  };
