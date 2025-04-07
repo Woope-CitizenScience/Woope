@@ -7,7 +7,10 @@ import {
   updatePinNew,
   getPinById,
 } from '../models/pins';
+
 import { requireOwnershipOrPermission } from '../middleware/requireOwnershipOrPermission';
+import { upload } from '../server';
+
 
 const router = express.Router();
 
@@ -22,13 +25,39 @@ router.get('/pinnew', authenticateToken, async (req, res) => {
   }
 });
 
-// Create a new pin 
-router.post('/pinnew', authenticateToken, requirePermission('create_post'), async (req, res) => {
-  try {
-    const { name, text_description, dateBegin, label, longitude, latitude } = req.body;
+// new create pin NEW
+router.post('/pinNew', upload.single('file'), async (req: express.Request, res: express.Response) => {
+    try {
+        //if (!req.file) {
+        //    return res.status(400).json({ error: "No image received!" });
+        //}
 
-    if (!name || !longitude || !latitude) {
-      return res.status(400).json({ error: "Missing required fields" });
+        if (!req.body.name || !req.body.date) {
+            return res.status(400).json({ error: "Missing required fields: name or date" });
+        }
+
+
+        // ✅ Construct the image URL
+        const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
+
+        // ✅ Ensure imageUrl is passed to createPinNew
+        const newPin = await createPinNew(
+            req.body.name,
+            req.body.description,
+            req.body.date,
+            req.body.tag,
+            Number(req.body.longitude),
+            Number(req.body.latitude),
+            imageUrl // ✅ Now imageUrl is correctly defined
+        );
+
+        res.status(201).json(newPin);
+    } catch (error) {
+        if (error instanceof Error) {
+            res.status(500).json(`Internal server error: ${error.message}`);
+        } else {
+            res.status(500).json('Internal server error: An unknown error occurred');
+        }
     }
 
     const user_id = req.user?.user_id;

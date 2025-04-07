@@ -12,6 +12,7 @@ interface EventProps {
     text_description: string;
     time_begin: Date;
     time_end: Date;
+    image_path: string;
 }
 //Component to display event information 
 const EventCard:React.FC<EventProps> = ({event_id, org_id}) => {
@@ -59,7 +60,7 @@ const EventCard:React.FC<EventProps> = ({event_id, org_id}) => {
                 </View>
                 {/*Organization Banner Image */}
                 <View>
-                    <Image style={styles.imageStyle}source={require('../../assets/adaptive-icon.png')}/>
+                    {item.image_path && <Image style={styles.imageStyle}source={require('../../assets/adaptive-icon.png')}/>}
                 </View>
                 {/* Short Tagline */}
                 <View>

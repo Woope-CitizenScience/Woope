@@ -4,7 +4,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import Svg, { Path } from 'react-native-svg';
-import { mdiHome, mdiTestTube, mdiCalendar, mdiBookshelf, mdiMapMarker } from '@mdi/js';
+import { mdiHome, mdiTestTube, mdiCalendar, mdiBookshelf, mdiMapMarker, mdiFileDocument } from '@mdi/js';
 import CalendarScreen from '../screens/CalendarScreen';
 import CommunitySideMenu from './CommunitySideMenu';
 import { MapScreen } from '../screens/Map/MapScreen';
@@ -21,6 +21,7 @@ import CreateOrganization from '../screens/Organizations/CreateOrganization';
 import CreateCategory from '../screens/Organizations/CreateCategory';
 import FeatureOrganization from '../screens/Organizations/FeatureOrganization';
 import EventHome from '../screens/Events/EventHome';
+import ReportScreen from '../screens/ReportScreen'
 
 const Tab = createBottomTabNavigator();
 interface AnimatedTabIconProps {
@@ -80,11 +81,14 @@ const NavigationBar = () => {
                             case 'Calendar':
                                 IconPath = mdiCalendar;
                                 break;
-                            case 'Resource':
+                            case 'Resources':
                                 IconPath = mdiBookshelf;
                                 break;
                             case 'Map':
                                 IconPath = mdiMapMarker;
+                                break;
+                            case 'Report':
+                                IconPath = mdiFileDocument;
                                 break;
                             default:
                                 IconPath = mdiHome;
@@ -111,6 +115,7 @@ const NavigationBar = () => {
                 <Tab.Screen name="Calendar" component={CalendarScreen} />
                 <Tab.Screen name="Resources" component={ResourceStackScreen} />
                 <Tab.Screen name="Map" component={MapScreen} />
+                <Tab.Screen name="Report" component={ReportScreen} />
             </Tab.Navigator>
         </View>
     );

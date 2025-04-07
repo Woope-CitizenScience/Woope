@@ -5,7 +5,8 @@ CREATE TABLE IF NOT EXISTS organizations (
     tagline VARCHAR(50) DEFAULT '',
     text_description VARCHAR(500) DEFAULT '',
     is_featured BOOLEAN NOT NULL DEFAULT FALSE,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    image_path VARCHAR(500)
 );
 CREATE TABLE IF NOT EXISTS category (
     category_id SERIAL PRIMARY KEY,
