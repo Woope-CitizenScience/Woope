@@ -137,3 +137,30 @@ export const updateEvent = async (event_id: number, tagline: string, text_descri
         throw new Error("Error updating resource: " + (error as Error).message);
     }
 }
+export const getDates = async (month: number, year: number) =>{
+    
+    try {
+        let query;
+        let values;
+        
+        query = `SELECT DISTINCT DATE (public.event.time_begin) FROM public.event WHERE EXTRACT(MONTH FROM public.event.time_begin) = $1 AND EXTRACT(YEAR FROM public.event.time_begin) = $2`
+        values = [month, year]
+        const response = await pool.query(query, values)
+        return response.rows;
+    } catch (error) {
+        throw new Error("Error retrieving general marked dates: " + (error as Error).message);
+    }
+}
+export const getFollowedDates = async (month: number, year: number, user_id: number) => {
+    try {
+        let query;
+        let values;
+        query = `SELECT DISTINCT DATE(public.event.time_begin) FROM public.event INNER JOIN public.user_organization_follows ON public.event.org_id = public.user_organization_follows.org_id WHERE EXTRACT(MONTH FROM public.event.time_begin) = $1 AND EXTRACT(YEAR FROM public.event.time_begin) = $2 AND user_id = $3`
+        values = [month, year, user_id]
+        const response = await pool.query(query, values)
+        return response.rows
+    } catch (error) {
+        throw new Error("Error retrieving followed marked dates: " + (error as Error).message);
+
+    }
+}
