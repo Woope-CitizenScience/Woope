@@ -1,4 +1,4 @@
-import { fetchAPI } from "./fetch";
+import { fetchAPI, fetchAPIWithFiles } from "./fetch";
 
 export const createPost = async (pin_id: number, user_id: number,
     latitude: number, longitude: number, metadata?: string
@@ -8,8 +8,8 @@ export const createPost = async (pin_id: number, user_id: number,
         latitude, 'Longitude', longitude, 'metadata', metadata);
     return fetchAPI('/pins', 'POST', {
         pin_id, user_id, latitude, longitude, metadata
-     });
-}  
+    });
+}
 
 // Old Pins
 
@@ -36,14 +36,39 @@ export const createPost = async (pin_id: number, user_id: number,
 ////////////////////////////////////////////////
 // New Pins 2024
 
-export const createPinNew = async (name: string, description: string, date: Date, tag: string, longitude: number, latitude: number) => {
-    return fetchAPI('/pins/pinnew', 'POST', {name, description, date, tag, longitude, latitude});
-}
+//export const createPinNew = async (name: string, description: string, date: Date, tag: string, longitude: number, latitude: number) => {
+//    return fetchAPI('/pins/pinnew', 'POST', {name, description, date, tag, longitude, latitude});
+//}
+
+
+export const createPinNew = async (
+    name: string,
+    description: string,
+    date: Date,
+    tag: string,
+    longitude: number,
+    latitude: number,
+    imageUri?: string | null // Image is optional
+) => {
+    const data = {
+        name, // ✅ Use "name" instead of "text"
+        description, // ✅ Ensure description is passed
+        date: date.toISOString().split("T")[0], // ✅ Ensure date is properly formatted
+        tag,
+        longitude,
+        latitude,
+        images: imageUri ? [imageUri] : [] // ✅ Ensure images are passed as an array
+    };
+
+    return fetchAPIWithFiles('/pins/pinnew', 'POST', data);
+};
 
 // Fetch all pins
 export const getAllPinsNew = async () => {
-    //console.log("getAllPinsNew fetch api called)");
-    return fetchAPI('/pins/pinnew', 'GET'); // Fetches data from the /pins/pinnew endpoint
+    console.log("Fetching all pins...");
+    const response = await fetchAPI('/pins/pinnew', 'GET');
+    console.log("Fetched Pins Data:", response);
+    return response;
 };
 
 export const deletePinNew = async (pinId: number) => {
