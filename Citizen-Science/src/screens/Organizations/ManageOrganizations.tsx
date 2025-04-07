@@ -12,30 +12,24 @@ export const ManageOrganizations = () => {
         <SafeAreaView style={styles.container}>
             
             <View style = {styles.column}>
-                <View>
-                    <TouchableOpacity style={styles.postBox} onPress={() => navigation.navigate("CreateOrganization")}>
-                        <View style = {styles.postBoxInner}>
-                            <Text style={styles.postBoxText}>Create</Text>
-                        </View>
+                <View style = {styles.row}>
+                    <TouchableOpacity style={styles.directoryButtonTop} onPress={() => navigation.navigate("CreateOrganization")}>
+                        <Text style={styles.title}>Create</Text>
                     </TouchableOpacity>
                     {/* <TouchableOpacity style={styles.directoryButtonTop} onPress={() => navigation.navigate("CreateCategory")}>
                         <Text style={styles.title}>Categorize</Text>
                     </TouchableOpacity> */}
                 </View>
-                <View>
-                    <TouchableOpacity style={styles.postBox} onPress={() => navigation.navigate("FeatureOrganization")}>
-                        <View style = {styles.postBoxInner}>
-                            <Text style={styles.postBoxText}>Feature</Text>
-                        </View>
+                <View style = {styles.row}>
+                    <TouchableOpacity style={styles.directoryButton} onPress={() => navigation.navigate("FeatureOrganization")}>
+                        <Text style={styles.title}>Feature</Text>
                     </TouchableOpacity>
                     {/* <TouchableOpacity style={styles.directoryButton} onPress={() => navigation.navigate("CreateOrganization")}>
                         <Text style={styles.title}>Edit</Text>
                     </TouchableOpacity> */}
                 </View>
-                <TouchableOpacity style = {styles.postBox} onPress={() => setDeleteModal(true)}>
-                    <View style = {styles.postBoxInner}>
-                        <Text style ={styles.postBoxText}> Delete </Text>
-                    </View>
+                <TouchableOpacity style = {styles.deleteContainer} onPress={() => setDeleteModal(true)}>
+                        <Text style ={styles.delete}> Delete </Text>
                 </TouchableOpacity>
                 <DeleteOrganization isVisible={deleteModal} onClose={() => setDeleteModal(false)} />
             </View>
@@ -106,41 +100,6 @@ const styles = StyleSheet.create({
         color: "red",
         fontSize: 28,
         fontWeight: "bold"
-    },
-    postBox: {
-        backgroundColor: "#B4D7EE",
-        borderRadius: 30,
-        paddingVertical: 20,
-        paddingHorizontal: 15,
-        alignItems: "center",
-        justifyContent: "center",
-        alignSelf: "stretch",
-        marginHorizontal: 10,
-        borderWidth: 1,
-        borderColor: "#E7F3FD",
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
-        shadowRadius: 6,
-        elevation: 5,
-        marginTop: 6,
-    },
-    postBoxInner: {
-        borderRadius: 20,
-        borderWidth: 1,
-        borderColor: "transparent",
-        alignSelf: "stretch",
-        borderBottomWidth: 1,
-        borderBottomColor: "#D1E3FA",
-    },
-    postBoxText: {
-        fontSize: 16,
-        color: "#333",
-        padding: 10,
-        backgroundColor: "#FFFFFF",
-        borderRadius: 18,
-        overflow: "hidden",
-        textAlign: "center",
     }
 });
 export default ManageOrganizations;

@@ -1,21 +1,11 @@
 const pool = require('../db');
 
-/**
- * Creates a new comment in the database.
- *
- * @param content - The content of the comment.
- * @param user_id - The ID of the user creating the comment.
- * @param post_id - The ID of the post the comment is associated with.
- * @param org_id - The ID of the organization, if applicable (nullable).
- * @returns A promise that resolves to the created comment object, including the username.
- */
-
 export const createComment = async (
-    content: string, user_id:
-        number, post_id: number,
+    content: string, user_id: 
+    number, post_id: number, 
     org_id: number | null
 ): Promise<Comment> => {
-
+    
     const insertQuery = `
         INSERT INTO comments (content, user_id, post_id, parent_comment_id, org_id)
         VALUES ($1, $2, $3, $4, $5)
@@ -34,16 +24,10 @@ export const createComment = async (
 
     return {
         ...newComment,
-        username: username
+        username: username 
     };
 };
 
-/**
- * Retrieves all active comments for a given post.
- *
- * @param post_id - The ID of the post to fetch comments for.
- * @returns A promise that resolves to an array of comments.
- */
 
 export const getComments = async (post_id: number): Promise<Comment[]> => {
     const { rows } = await pool.query(
@@ -63,13 +47,6 @@ export const getComments = async (post_id: number): Promise<Comment[]> => {
     return rows;
 };
 
-/**
- * Updates the content of a comment.
- *
- * @param comment_id - The ID of the comment to update.
- * @param content - The new content for the comment.
- * @returns A promise that resolves to the updated comment object.
- */
 
 export const updateComment = async (comment_id: number, content: string): Promise<Comment> => {
     const { rows } = await pool.query(
@@ -78,13 +55,6 @@ export const updateComment = async (comment_id: number, content: string): Promis
     );
     return rows[0];
 }
-
-/**
- * Deletes a comment from the database.
- *
- * @param comment_id - The ID of the comment to delete.
- * @returns A promise that resolves when the deletion is complete.
- */
 
 export const deleteComment = async (comment_id: number): Promise<void> => {
     const client = await pool.connect();
@@ -100,13 +70,6 @@ export const deleteComment = async (comment_id: number): Promise<void> => {
     }
 }
 
-/**
- * Increments the like count for a comment.
- *
- * @param comment_id - The ID of the comment to like.
- * @returns A promise that resolves to the updated comment object.
- */
-
 export const addCommentLike = async (comment_id: number): Promise<Comment> => {
     const { rows } = await pool.query(
         'UPDATE comments SET likes_count = likes_count + 1 WHERE comment_id = $1 RETURNING *',
@@ -115,14 +78,7 @@ export const addCommentLike = async (comment_id: number): Promise<Comment> => {
     return rows[0];
 }
 
-/**
- * Decrements the like count for a comment.
- *
- * @param comment_id - The ID of the comment to unlike.
- * @returns A promise that resolves to the updated comment object.
- */
-
-export const removeCommentLike = async (comment_id: number): Promise<Comment> => {
+export const removeCommentLike  = async (comment_id: number): Promise<Comment> => {
     const { rows } = await pool.query(
         'UPDATE comments SET likes_count = likes_count - 1 WHERE comment_id = $1 RETURNING *',
         [comment_id]
