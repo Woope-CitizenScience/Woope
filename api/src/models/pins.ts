@@ -45,6 +45,18 @@ const pool = require('../db');
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // New Pins 2024
 
+/**
+ * Creates a new pin.
+ * @param {string} name - The name of the pin.
+ * @param {string} text_description - A description of the pin.
+ * @param {Date} dateBegin - The starting date associated with the pin.
+ * @param {string} label - A label categorizing the pin.
+ * @param {number} longitude - The longitude coordinate of the pin.
+ * @param {number} latitude - The latitude coordinate of the pin.
+ * @returns {Promise<PinNew>} The newly created pin.
+ * @throws {Error} Throws an error if the database operation fails.
+ */
+
 export const createPinNew = async (
     name: string,
     text_description: string,
@@ -72,11 +84,11 @@ export const createPinNew = async (
 
 
 // pinModel.ts
+
 export const getAllPinsNew = async (): Promise<PinNew> => {
     try {
         const queryText = `SELECT pin_id, name, text_description, datebegin, label, longitude, latitude, image_url FROM public.pins ORDER BY pin_id ASC`;
         const { rows } = await pool.query(queryText); // Ensure no second argument is passed
-
         return rows;
 
     }
@@ -86,7 +98,15 @@ export const getAllPinsNew = async (): Promise<PinNew> => {
     }
 };
 
+
 // Does not return anything
+/**
+ * Deletes a pin by its ID.
+ * @param {number} pin_id - The ID of the pin to be deleted.
+ * @returns {Promise<void>}
+ * @throws {Error} Throws an error if the deletion fails.
+ */
+
 export const deletePinNew = async (pin_id: number): Promise<void> => {
     try {
         await pool.query('DELETE FROM pins WHERE pin_id = $1', [pin_id]);
@@ -95,6 +115,19 @@ export const deletePinNew = async (pin_id: number): Promise<void> => {
         throw error;
     }
 };
+
+/**
+ * Updates an existing pin by its ID.
+ * @param {number} pin_id - The ID of the pin to update.
+ * @param {string} name - The updated name of the pin.
+ * @param {string} text_description - The updated description of the pin.
+ * @param {Date} dateBegin - The updated start date.
+ * @param {string} label - The updated label for the pin.
+ * @param {number} longitude - The updated longitude coordinate.
+ * @param {number} latitude - The updated latitude coordinate.
+ * @returns {Promise<PinNew>} The updated pin.
+ * @throws {Error} Throws an error if the update fails or the pin is not found.
+ */
 
 export const updatePinNew = async (
     pin_id: number,

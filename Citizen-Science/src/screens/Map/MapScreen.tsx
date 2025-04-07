@@ -86,12 +86,11 @@ export const MapScreen = () => {
 	const [dropdownOpen, setDropdownOpen] = useState(false);
 	const [tagItems, setTagItems] = useState([
 		{ label: 'General', value: 'General' },
-		{ label: 'Event', value: 'Event' },
 		{ label: 'Weather', value: 'Weather' },
+		{ label: 'Event', value: 'Event' },
 		{ label: 'Workshop', value: 'Workshop' },
 		{ label: 'Hazard', value: 'Hazard' },
 		{ label: 'Mutual Aid', value: 'Mutual Aid' },
-
 	]);
 
 
@@ -594,6 +593,7 @@ export const MapScreen = () => {
 			)}
 
 			{/*filters buttons*/}
+
 			<Modal visible={filterModalVisible} animationType="slide" transparent={true}>
 				<View
 					style={{
@@ -645,7 +645,6 @@ export const MapScreen = () => {
 								</TouchableOpacity>
 							))}
 						</View>
-
 						<TouchableOpacity
 							onPress={() => setFilterModalVisible(false)}
 							style={{ marginTop: 15 }}
@@ -794,7 +793,6 @@ export const MapScreen = () => {
 								/>
 							)}
 						</View>
-
 						{/* Action Buttons */}
 						<View style={styles.buttonContainer}>
 

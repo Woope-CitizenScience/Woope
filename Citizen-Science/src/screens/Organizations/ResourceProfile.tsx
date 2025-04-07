@@ -12,6 +12,7 @@ import { getResourceMedia, insertResourceMedia, deleteResourceMedia} from "../..
 import { AntDesign } from '@expo/vector-icons';
 import { submitForm } from "../../api/upload"
 import { WebView } from "react-native-webview"
+import { serverDelete } from "../../api/upload";
 
 const API_BASE = process.env.EXPO_PUBLIC_API_URL;
 
@@ -37,7 +38,9 @@ export const ResourceProfile = ({route}) => {
     const [resourceMedia, setResourceMedia] = useState<ResourceMedia[]>();
     const [isModalVisible, setIsModalVisible] =useState<boolean>(false);
     const [isWebModalVisible, setIsWebModalVisible] =useState<boolean>(false);
-    const [downloadInfo, setDownloadInfo] = useState<string>("")
+    const [downloadInfo, setDownloadInfo] = useState<string>("");
+    const [previewLink, setPreviewLink] = useState<string>("");
+    const [previewName, setPreviewName] = useState<string>("");
     
     useEffect(() => {
         getResources();
@@ -84,7 +87,6 @@ export const ResourceProfile = ({route}) => {
             const result = await DocumentPicker.getDocumentAsync();
                 if (!result.canceled) {
                     const file = result.assets[0];
-                    console.log(file);
                     selectedDocuments.name = Date.now() + '--' + file.name;
                     selectedDocuments.uri = file.uri;
                 }else {
@@ -102,6 +104,14 @@ export const ResourceProfile = ({route}) => {
             console.log("Error deleting media: " + error);
         }
     }
+// deletes from server
+    const trueDelete = async(path: string) => {
+        try {
+            serverDelete(path);
+        } catch (error) {
+            console.log("Error deleting from server from frontend: " + error)
+        }
+    }
     const uploadPress = () => {
         pickDocuments().then((value) => {
             setIsModalVisible(true);
@@ -112,13 +122,21 @@ export const ResourceProfile = ({route}) => {
             setIsModalVisible(false);
         })
     }
-    const pressDelete = (media_id: number) => {
-        deleteMedia(media_id)
-        setDeleteCheck(!deleteCheck)
+    const pressDelete = (media_id: number, file_path: string) => {
+        deleteMedia(media_id);
+        console.log("ppop")
+        trueDelete(file_path);
+        console.log("pee")
+        setDeleteCheck(!deleteCheck);
     }
     const pressDownload = (file_path: string) => {
         downloadFromUrl(file_path).then((value) => {
         })
+    }
+    const pressPreview = (file_path: string, name: string) => {
+        setPreviewLink(file_path);
+        setPreviewName(name);
+        setIsWebModalVisible(true);
     }
 
     const downloadFromUrl = async (file_path: string) => {
@@ -153,8 +171,10 @@ export const ResourceProfile = ({route}) => {
                     renderItem={({item}) => 
                     (
                         <View style={styles.mediarow}>
-                            <View style={styles.directoryButton} >
-                                <Text style={styles.title}>{item.name}</Text>
+                            <View style={styles.postBox}>
+                                <View style={styles.postBoxInner}>
+                                    <Text style={styles.postBoxText}>{item.name}</Text>
+                                </View>
                             </View>
                             <TouchableOpacity onPress={() => {
                                 pressDownload(item.file_path);
@@ -162,23 +182,38 @@ export const ResourceProfile = ({route}) => {
                                 <AntDesign name="download" size={30}/>
                             </TouchableOpacity>
 
-                            {/* <TouchableOpacity>
+                            <TouchableOpacity onPress={() => {
+                                pressPreview(item.file_path, item.name);
+                            }}>
                                 <AntDesign name="eyeo" size={30}/>
-                            </TouchableOpacity> */}
+                            </TouchableOpacity> 
 
                             <TouchableOpacity onPress={() => {
-                                pressDelete(item.media_id);
+                                pressDelete(item.media_id, item.file_path);
                             }}>
                                 <AntDesign color={"red"} name="close" size={30}/>
                             </TouchableOpacity>
                         </View>
                     )
                     }/>
-                    {/* Webview Modal */}
-                    {/* <Modal visible={isWebModalVisible} animationType="fade" transparent={true}>
-                        <WebView source={} ></WebView>
-                    </Modal> */}
 
+                    {/* Webview Modal */}
+                    <Modal visible={isWebModalVisible} animationType='slide' transparent={true}>
+                        <View style={styles.webContainer}>
+                            <View style={styles.webBar}>
+                                <Text style={styles.preview}>{previewName} Preview</Text>
+
+                                <TouchableOpacity onPress={()=> setIsWebModalVisible(false)}>
+                                    <Text style={styles.close}>Close</Text>
+                                </TouchableOpacity>
+                                
+                            </View>
+                            <View style = {styles.webContent}>
+                                <WebView source={{ uri: API_BASE + "/uploads/" + previewLink }} ></WebView>
+                            </View>
+                        </View>
+                    </Modal>
+                
                     {/* Enter name of file modal */}
                     <Modal visible={isModalVisible} animationType="fade" transparent={true}>
                         <View style={styles.modalContainer}>
@@ -214,6 +249,33 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: "white",
         justifyContent: "center",
+        
+    },
+    webBar: {
+        paddingTop: 20,
+        flex: 1,
+        flexDirection: "row",
+        justifyContent: "space-between",
+        backgroundColor: "white",
+        borderBottomColor: "lightgrey",
+        borderBottomWidth: 1,
+    },
+    webModal: {
+        flex: 1,
+        backgroundColor: "white",
+        justifyContent: "center",
+    },
+    webContent: {
+        flex: 20,
+        padding: 10,
+        borderRadius: 10,
+        
+    },
+    webContainer: {
+        flex: 1,
+        backgroundColor: "white",
+        marginTop: 20,
+        padding: 20,
     },
     title: {
         fontSize: 15,
@@ -282,6 +344,51 @@ const styles = StyleSheet.create({
     upload: {
         fontSize: 20,
         color: "blue"
-    }
+    },
+    close: {
+        fontSize: 20,
+        color: "red",
+    },
+    preview: {
+        fontSize: 20,
+        color: "grey"
+    },
+    postBox: {
+        flex: 1,
+        backgroundColor: "#B4D7EE",
+        borderRadius: 30,
+        paddingVertical: 20,
+        paddingHorizontal: 15,
+        alignItems: "center",
+        justifyContent: "center",
+        alignSelf: "stretch",
+        marginHorizontal: 10,
+        marginBottom: 10,
+        borderWidth: 1,
+        borderColor: "#E7F3FD",
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.2,
+        shadowRadius: 6,
+        elevation: 5,
+        marginTop: 6,
+      },
+      postBoxInner: {
+        borderRadius: 20,
+        borderWidth: 1,
+        borderColor: "transparent",
+        alignSelf: "stretch",
+        borderBottomWidth: 1,
+        borderBottomColor: "#D1E3FA",
+      },
+      postBoxText: {
+        fontSize: 16,
+        color: "#333",
+        padding: 10,
+        backgroundColor: "#FFFFFF",
+        borderRadius: 18,
+        overflow: "hidden",
+        textAlign: "center",
+      }
 });
 export default ResourceProfile;
