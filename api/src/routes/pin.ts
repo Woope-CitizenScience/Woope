@@ -116,7 +116,8 @@ router.post('/pinNew', upload.single('file'), async (req: express.Request, res: 
             req.body.tag,
             Number(req.body.longitude),
             Number(req.body.latitude),
-            imageUrl // ✅ Now imageUrl is correctly defined
+            imageUrl,
+            req.body.user_id,
         );
 
         res.status(201).json(newPin);
