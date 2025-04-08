@@ -4,7 +4,7 @@
 
 import React, {useState,useEffect, useContext} from 'react';
 import { View, Text, SafeAreaView, FlatList, TouchableOpacity, StyleSheet, StatusBar, ScrollView } from 'react-native';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import OrganizationCard from '../../components/OrganizationCard';
 import EventCard from '../../components/EventCard';
 import CreateResource from '../../components/CreateResource';
@@ -17,22 +17,13 @@ import {AccessToken} from "../../util/token";
 
 
 export const OrganizationProfile = ({route}) => {
-    const { userToken } = useContext(AuthContext);
+    const { userToken, setUserToken } = useContext(AuthContext);
     const decodedToken = userToken ? jwtDecode<AccessToken>(userToken) : null;
     const userId = decodedToken ? decodedToken.user_id : NaN;
     const navigation = useNavigation<any>();
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [resourceData, setResourceData] = useState<Resource[]>([]);
-    
-        //"refreshes page" when focused and when a resource is added
-        useFocusEffect(
-                    React.useCallback(() => {
-                        // grabs featured organizations, if any exist
-                        fetchResources();
-                    },[isModalVisible])  
-                );
-        //gets all resources specific to the organization
-        const fetchResources = async () => {
+    const fetchResources = async () => {
             try {
                 const resourceList = await getResourceById(route.params.org_id);
                 setResourceData(resourceList);
@@ -40,6 +31,9 @@ export const OrganizationProfile = ({route}) => {
                 console.log(error);
             }
         }
+        useEffect(() => {
+            fetchResources();
+        })
     return(
         <SafeAreaView style = {styles.container}>
             <ScrollView>
@@ -65,25 +59,22 @@ export const OrganizationProfile = ({route}) => {
                         </TouchableOpacity>
                     </View>
                 </View>
-                {/* List of all resources */}
                 <FlatList
                 data={resourceData}
                 scrollEnabled={false}
                 keyExtractor={(item) => item.resource_id} 
                 renderItem={({item}) => (
-                    <TouchableOpacity style={styles.postBox} onPress={() => navigation.navigate("ResourceProfile",{
+                    <TouchableOpacity style={styles.directoryButton} onPress={() => navigation.navigate("ResourceProfile",{
                         resource_id: item.resource_id,
                         org_id: item.org_id,
                     })}>
-                        <View style={styles.postBoxInner}>
-                            <Text style={styles.postBoxText}>{item.name}</Text>
-                        </View>
+                        <Text>{item.name}</Text>
                     </TouchableOpacity>
                 )}/>
-                {/* Create resource functionality */}
                 <CreateResource org_id={route.params.org_id} isVisible = {isModalVisible} onClose={() => 
                     {
-                        setIsModalVisible(false)
+                    setIsModalVisible(false)
+                    fetchResources();
                     }
                 }/>
             </ScrollView>
@@ -130,42 +121,7 @@ const styles = StyleSheet.create({
         borderBottomColor: 'lightgrey',
         borderBottomWidth: 2,
     },
-    postBox: {
-        backgroundColor: "#B4D7EE",
-        borderRadius: 30,
-        paddingVertical: 20,
-        paddingHorizontal: 15,
-        alignItems: "center",
-        justifyContent: "center",
-        alignSelf: "stretch",
-        marginHorizontal: 10,
-        marginBottom: 10,
-        borderWidth: 1,
-        borderColor: "#E7F3FD",
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
-        shadowRadius: 6,
-        elevation: 5,
-        marginTop: 6,
-    },
-    postBoxInner: {
-        borderRadius: 20,
-        borderWidth: 1,
-        borderColor: "transparent",
-        alignSelf: "stretch",
-        borderBottomWidth: 1,
-        borderBottomColor: "#D1E3FA",
-    },
-    postBoxText: {
-        fontSize: 16,
-        color: "#333",
-        padding: 10,
-        backgroundColor: "#FFFFFF",
-        borderRadius: 18,
-        overflow: "hidden",
-        textAlign: "center",
-    }
+    
     
 });
 export default OrganizationProfile

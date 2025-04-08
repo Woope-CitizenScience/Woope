@@ -29,14 +29,10 @@ export const getResourceMedia = async(resource_id: number) => {
     return fetchAPI(`/resources/getresourcesmedia/${resource_id}`, 'GET');
 }
 //insert resource media/children under a parent resource
-export const insertResourceMedia = async(resource_id: number, name: string, file_path: string) => {
-    return fetchAPI(`/resources/insertMedia`, 'POST', {resource_id, name, file_path});
+export const insertResourceMedia = async(resource_id: number, name: string, uid: string) => {
+    return fetchAPI(`/resources/insertMedia`, 'POST', {resource_id, name, uid});
 }
 //delete resource media
 export const deleteResourceMedia = async (media_id: number) => {
     return fetchAPI(`/resources/deleteMedia`, 'DELETE', {media_id});
-}
-//update photo filename
-export const updateResourcePhoto = async (resource_id: number, image_path: string) => {
-    return fetchAPI(`/resources/updatephoto`, 'PUT', {resource_id, image_path});
 }

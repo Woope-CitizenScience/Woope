@@ -7,7 +7,6 @@ CREATE TABLE IF NOT EXISTS event (
     tagline VARCHAR(50) DEFAULT '',
     time_begin TIMESTAMP NOT NULL,
     time_end TIMESTAMP NOT NULL,
-    image_path VARCHAR(500),
     location VARCHAR(50),
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

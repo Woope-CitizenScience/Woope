@@ -4,11 +4,9 @@
     "@types/react-native-calendars": "^1.1264.7",
     "expo-camera": "^16.0.9",
     "expo-image-picker": "^16.0.3",
-    "mime": "^4.0.1",
-    "multer": "^1.4.5-lts.2"
+    "mime": "^4.0.1"
   },
   "devDependencies": {
-    "@types/react": "^19.0.0",
-    "typedoc": "^0.27.9"
+    "@types/react": "^19.0.0"
   }
 }

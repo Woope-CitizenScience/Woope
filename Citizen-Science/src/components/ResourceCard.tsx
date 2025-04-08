@@ -2,7 +2,7 @@ import React, {useState, useEffect} from "react";
 import { View, StyleSheet, Text, Image, Dimensions, SafeAreaView, FlatList, TouchableOpacity } from "react-native";
 import {getResourceInfo } from "../api/resources";
 import { Resource } from "../api/types";
-import { AntDesign } from '@expo/vector-icons';
+import { MaterialIcons, Octicons, AntDesign } from '@expo/vector-icons';
 import UpdateResourceModal from "./UpdateResourceModal";
 import DeleteResource from "./DeleteResources";
 
@@ -58,7 +58,7 @@ const ResourcesCard:React.FC<ResourceProps> = ({resource_id, org_id}) => {
                     </View>
                     {/*Optional Banner Image */}
                     <View>
-                        { item.image_path && <Image style={styles.imageStyle} source={{uri: process.env.EXPO_PUBLIC_API_URL + '/uploads/' + item.image_path}}/>}
+                        <Image style={styles.imageStyle}source={require('../../assets/adaptive-icon.png')}/>
                     </View>
                     <UpdateResourceModal isVisible = {isModalVisible} resource_id = {resource_id} onClose={() => {
                         setIsModalVisible(false);

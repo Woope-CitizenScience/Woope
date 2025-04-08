@@ -7,8 +7,7 @@ export const config = {
     postgresPassword: process.env.DB_PASSWORD as string,
     postgresDB: process.env.DB_NAME as string,
     postgresHost: process.env.DB_HOST as string,
-    postgresPort: parseInt(process.env.POSTGRES_PORT as string, 10),
+    postgresPort: parseInt(process.env.POSTGRES_PORT as string,10),
 
     // ... other configurations ...
-    apiUrl: process.env.EXPO_PUBLIC_API_URL as string,
 };

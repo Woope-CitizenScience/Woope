@@ -2,15 +2,6 @@ import { User } from "../interfaces/User";
 
 const pool = require('../db');
 
-/**
- * Retrieves a user by their email or phone number.
- * 
- * @param {string} [email] - The email of the user to retrieve.
- * @param {string} [phoneNumber] - The phone number of the user to retrieve.
- * @returns {Promise<User | null>} - The user object if found, otherwise null.
- * @throws {Error} - If neither email nor phone number is provided, or if an error occurs during retrieval.
- */
-
 export const getUser = async (email?: string, phoneNumber?: string) => {
 	if (!email && !phoneNumber) {
 		throw new Error("Either an email or a phone number is required.");
@@ -65,13 +56,6 @@ export const getUser = async (email?: string, phoneNumber?: string) => {
 	}
 };
 
-/**
- * Retrieves a user by their refresh token.
- * 
- * @param {string} userId - The ID of the user to retrieve.
- * @returns {Promise<User | null>} - The user object if found, otherwise null.
- * @throws {Error} - If an error occurs during retrieval.
- */
 
 export const getUserByRefreshToken = async (userId: string): Promise<User | null> => {
 	try {
@@ -109,18 +93,6 @@ export const getUserByRefreshToken = async (userId: string): Promise<User | null
 	}
 };
 
-/**
- * Creates a new user with the provided details.
- * 
- * @param {string} email - The email of the new user.
- * @param {string} phoneNumber - The phone number of the new user.
- * @param {string} hashedPassword - The hashed password for the new user.
- * @param {string} firstName - The first name of the new user.
- * @param {string} lastName - The last name of the new user.
- * @param {string} dateOfBirth - The date of birth of the new user.
- * @returns {Promise<Object>} - The created user object.
- * @throws {Error} - If neither email nor phone number is provided, or if an error occurs during creation.
- */
 
 export const createUser = async (email: string, phoneNumber: string, hashedPassword: string, firstName: string, lastName: string, dateOfBirth: string) => {
 	if (!email && !phoneNumber) {
@@ -171,16 +143,6 @@ export const createUser = async (email: string, phoneNumber: string, hashedPassw
 	}
 };
 
-/**
- * Updates the first and last name of a user.
- * 
- * @param {string} userId - The ID of the user to update.
- * @param {string} firstName - The new first name.
- * @param {string} lastName - The new last name.
- * @returns {Promise<Object>} - The updated user object.
- * @throws {Error} - If an error occurs during the update.
- */
-
 export const updateName = async (userId: string, firstName: string, lastName: string) => {
 	try {
 		await pool.query('BEGIN');
@@ -204,14 +166,6 @@ export const updateName = async (userId: string, firstName: string, lastName: st
 	}
 };
 
-/**
- * Retrieves the full name of a user by their ID.
- * 
- * @param {string} userId - The ID of the user.
- * @returns {Promise<Object | null>} - The user's first and last name if found, otherwise null.
- * @throws {Error} - If an error occurs during retrieval.
- */
-
 export const getUserFullNameByID = async (userId: string) => {
 	try {
 		await pool.query('BEGIN');
@@ -230,14 +184,6 @@ export const getUserFullNameByID = async (userId: string) => {
 		throw new Error("Error getting user's name " + (error as Error).message);
 	}
 }
-
-/**
- * Retrieves detailed information about a user by their ID.
- * 
- * @param {string} userId - The ID of the user.
- * @returns {Promise<Array<Object> | null>} - The user's information if found, otherwise null.
- * @throws {Error} - If an error occurs during retrieval.
- */
 
 export const getUserByID = async (userId: string) => {
 	try {
@@ -266,14 +212,6 @@ export const getUserByID = async (userId: string) => {
 		throw new Error("Error getting user's info " + (error as Error).message);
 	}
 }
-
-/**
- * Searches for users by their full name.
- * 
- * @param {string} name - The name to search for.
- * @returns {Promise<Array<Object> | null>} - The list of users matching the search criteria if found, otherwise null.
- * @throws {Error} - If an error occurs during the search.
- */
 
 export const searchUsersWithName = async (name: string) => {
 	try {
@@ -305,13 +243,6 @@ export const searchUsersWithName = async (name: string) => {
 	}
 };
 
-/**
- * Retrieves the permissions of a user by their ID.
- * 
- * @param {number} userId - The ID of the user.
- * @returns {Promise<string>} - The user's permissions in JSON format.
- * @throws {Error} - If an error occurs during retrieval.
- */
 
 export const getUserPermissions = async (userId: number) => {
 	try {
@@ -341,17 +272,8 @@ export const getUserPermissions = async (userId: number) => {
 	}
 }
 
-/**
- * Updates the organization of a user.
- * 
- * @param {string} userId - The ID of the user to update.
- * @param {string | null} orgId - The new organization ID, or null to remove the organization.
- * @returns {Promise<Object>} - The updated user object.
- * @throws {Error} - If an error occurs during the update.
- */
-
-export const updateUserOrg = async (userId: string, orgId: string | null) => {
-	try {
+export const updateUserOrg = async(userId: string, orgId: string | null) => {
+	try{
 		const response = await pool.query(
 			`UPDATE users SET admins_org=$1 WHERE user_id=$2 RETURNING *`,
 			[orgId, userId]
@@ -359,23 +281,14 @@ export const updateUserOrg = async (userId: string, orgId: string | null) => {
 		console.log(response.rows[0])
 		return response.rows[0];
 	}
-	catch (error) {
+	catch(error){
 		console.error(`Error updating user with user id ${userId}`, error);
 		throw error;
 	}
 }
 
-/**
- * Updates the role of a user.
- * 
- * @param {string} userId - The ID of the user to update.
- * @param {string} roleId - The new role ID.
- * @returns {Promise<Object>} - The updated user object.
- * @throws {Error} - If an error occurs during the update.
- */
-
-export const updateUserRole = async (userId: string, roleId: string) => {
-	try {
+export const updateUserRole = async(userId: string, roleId: string) => {
+	try{
 		const response = await pool.query(
 			`UPDATE users SET role_id=$1 WHERE user_id=$2 RETURNING *`,
 			[roleId, userId]
@@ -383,7 +296,7 @@ export const updateUserRole = async (userId: string, roleId: string) => {
 		console.log(response.rows[0])
 		return response.rows[0];
 	}
-	catch (error) {
+	catch(error){
 		console.error(`Error updating user with user id ${userId}`, error);
 		throw error;
 	}

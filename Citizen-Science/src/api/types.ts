@@ -20,7 +20,7 @@ export type PostWithUsername = {
 	pdfs: PdfFile[];
 	comments: Comment[];
 	timestamp: number;
-	userName: string;
+	username: string;
 	user_id: number;
 	likes_count: number;
 	likedPost: boolean;
@@ -47,7 +47,6 @@ export type Organization = {
 	text_description: string;
 	name: string;
 	tagline: string;
-	image_path: string;
 }
 export interface OrganizationWithCategory {
 	org_id: number,
@@ -65,13 +64,12 @@ export type Resource = {
 	name: string;
 	tagline: string;
 	text_description: string;
-	image_path: string;
 }
 export interface ResourceMedia {
-	media_id: number,
+	media_id: number;
 	name: string;
-	file_path: string;
 	uri: string;
+	type: string;
 }
 export interface Event {
 	event_id: number,

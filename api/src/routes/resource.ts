@@ -1,5 +1,5 @@
 import express from 'express';
-import { createResource, deleteResource, getResourceById, getResourceInfo, getResourceMedia, getResources, updateResource, insertResourceMedia, deleteResourceMedia, updatePhoto, serverDelete } from '../models/resources';
+import { createResource, deleteResource, getResourceById, getResourceInfo, getResourceMedia, getResources, updateResource, insertResourceMedia, deleteResourceMedia } from '../models/resources';
 
 const router = require('express').Router();
 router.post('/create', async(req: express.Request, res: express.Response) => {
@@ -92,8 +92,8 @@ router.get('/getresourcesmedia/:resource_id', async(req: express.Request, res: e
 });
 router.post('/insertMedia', async(req: express.Request, res: express.Response) => {
     try{
-        const {resource_id, name, file_path} = req.body;
-        const newPost = await insertResourceMedia(resource_id,name,file_path);
+        const {resource_id, name, uid} = req.body;
+        const newPost = await insertResourceMedia(resource_id,name,uid);
         res.status(201).json(newPost);
     }catch(error){
         if (error instanceof Error) {
@@ -116,30 +116,4 @@ router.delete('/deleteMedia', async (req: express.Request, res: express.Response
         }
     }
 });
-router.delete('/serverDelete', async (req: express.Request, res: express.Response) => {
-    try {
-        const {path} = req.body;
-        await serverDelete(path);
-        res.status(204);
-    } catch (error) {
-        if (error instanceof Error) {
-            res.status(500).json(`Internal server error: ${error.message}`);
-        } else {
-            res.status(500).json('Internal server error: An unknown error occurred');
-        }
-    }
-})
-router.put('/updatephoto', async(req: express.Request, res: express.Response) => {
-    try{
-        const {resource_id, image_path} = req.body;
-        const edit = await updatePhoto(resource_id, image_path);
-        res.status(200).json(edit);
-    }catch(error){
-        if (error instanceof Error) {
-            res.status(500).json(`Internal server error: ${error.message}`);
-        } else {
-            res.status(500).json('Internal server error: An unknown error occurred');
-        }
-    }
-})
 module.exports = router;

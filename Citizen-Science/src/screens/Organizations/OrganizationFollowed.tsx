@@ -3,7 +3,7 @@
 */
 
 import React, {useState, useEffect, useContext}from 'react';
-import {Text, SafeAreaView, FlatList, TouchableOpacity, StyleSheet, StatusBar, View } from 'react-native';
+import {Text, SafeAreaView, FlatList, TouchableOpacity, StyleSheet, StatusBar } from 'react-native';
 import { Organization } from '../../api/types';
 import { getOrganizationsFollowed } from '../../api/organizations';
 import { useNavigation } from '@react-navigation/native';
@@ -37,13 +37,11 @@ export const OrganizationFollowed = () => {
                 numColumns={1}
                 keyExtractor={item => item.org_id}
                 renderItem={({item}) => (
-                <TouchableOpacity style={styles.postBox} onPress={() => navigation.navigate("OrganizationProfile", {
+                <TouchableOpacity style={styles.directoryButton} onPress={() => navigation.navigate("OrganizationProfile", {
                     org_id: item.org_id,
                     name: item.name
                 })}>
-                    <View style={styles.postBoxInner}>
-                        <Text style={styles.postBoxText}>{item.name}</Text>
-                    </View>
+                    <Text style={styles.title}>{item.name}</Text>
                 </TouchableOpacity>
                 )}
             />
@@ -95,41 +93,5 @@ const styles = StyleSheet.create({
         shadowRadius: 3,
         elevation: 9,
     },
-    postBox: {
-        backgroundColor: "#B4D7EE",
-        borderRadius: 30,
-        paddingVertical: 20,
-        paddingHorizontal: 15,
-        alignItems: "center",
-        justifyContent: "center",
-        alignSelf: "stretch",
-        marginHorizontal: 10,
-        marginBottom: 5,
-        borderWidth: 1,
-        borderColor: "#E7F3FD",
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
-        shadowRadius: 6,
-        elevation: 5,
-        marginTop: 6,
-    },
-    postBoxInner: {
-        borderRadius: 20,
-        borderWidth: 1,
-        borderColor: "transparent",
-        alignSelf: "stretch",
-        borderBottomWidth: 1,
-        borderBottomColor: "#D1E3FA",
-    },
-    postBoxText: {
-        fontSize: 16,
-        color: "#333",
-        padding: 10,
-        backgroundColor: "#FFFFFF",
-        borderRadius: 18,
-        overflow: "hidden",
-        textAlign: "center",
-    }
 });
 export default OrganizationFollowed

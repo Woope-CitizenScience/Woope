@@ -52,18 +52,15 @@ export const setFeatured = async(name: string) => {
 export const removeFeature = async(name: string) => {
     return fetchAPI(`/organizations/removefeatured`, 'PUT', {name});
 }
+//check if followed
+export const checkFollowed = async(user_id: number, org_id: number) =>{
+    return fetchAPI(`/organizations/checkfollow`, 'PUT', {user_id,org_id});
+}
 //unfollow an organization
-export const unfollowOrganization = async (user_id: number, org_id: number) => {
+export const unfollow = async (user_id: number, org_id: number) => {
     return fetchAPI(`/organizations/unfollow`, 'DELETE', {user_id, org_id});
 }
 //delete an organization
 export const deleteOrganization = async (name: string) => {
     return fetchAPI(`/organizations/deleteorganization`, 'DELETE', {name});
-}
-//update an organizations photo provided its org id
-export const updateOrgPhoto = async (name: string, image_path: string) => {
-    return fetchAPI(`/organizations/updatephoto`, 'PUT', {name, image_path});
-}
-export const following = async(user_id: number, org_id: number) => {
-    return fetchAPI(`/organizations/isfollowed/${user_id}/${org_id}`, 'GET');
 }

@@ -1,31 +1,18 @@
-import { Organization, OrganizationWithCategory, Category } from "../interfaces/Organization";
+import { Organization,OrganizationWithCategory,Category, OrganizationFollowed} from "../interfaces/Organization";
 const pool = require('../db');
-
-/**
- * Retrieves all organizations from the database.
- * @returns {Promise<Organization[]>} A list of all organizations.
- * @throws {Error} Throws an error if the database query fails.
- */
-
-export const getOrganizations = async (): Promise<Organization[]> => {
+//get all organizations
+export const getOrganizations = async () : Promise<Organization[]>=> {
     try {
-        let query = "SELECT * FROM public.organizations ORDER BY org_id ASC";
-        const orgs = await pool.query(query);
+       let query = "SELECT * FROM public.organizations ORDER BY org_id ASC";
+        const  orgs  = await pool.query(query);
         return orgs.rows;
     } catch (error) {
         throw new Error("Error retrieving organizations: " + (error as Error).message);
     }
 }
-
-/**
- * Retrieves organizations by a specific category.
- * @param {string} category - The category name.
- * @returns {Promise<OrganizationWithCategory[]>} A list of organizations under the specified category.
- * @throws {Error} Throws an error if the query fails.
- */
-
-export const getOrganizationsWithCategory = async (category: string): Promise<OrganizationWithCategory[]> => {
-    try {
+//get organizations by specific category
+export const getOrganizationsWithCategory = async (category: string) : Promise<OrganizationWithCategory[]> =>{
+    try{
         let query = `
             SELECT o.name, o.org_id, g.name
             FROM public.organizations o
@@ -34,20 +21,13 @@ export const getOrganizationsWithCategory = async (category: string): Promise<Or
             WHERE g.name = $1`;
         const orgs = await pool.query(query, [category]);
         return orgs.rows;
-    } catch (error) {
+    }catch(error){
         throw new Error("Error retrieving " + category + " organizations: " + (error as Error).message)
     }
 }
-
-/**
- * Retrieves organizations by a specific category ID.
- * @param {number} category_id - The category ID.
- * @returns {Promise<Organization[]>} A list of organizations within the specified category.
- * @throws {Error} Throws an error if the query fails.
- */
-
-export const getOrganizationsWithCategoryId = async (category_id: number): Promise<Organization[]> => {
-    try {
+// get organizations by specific category id
+export const getOrganizationsWithCategoryId = async (category_id: number) : Promise <Organization[]> => {
+    try{ 
         let query = `
             SELECT o.name, o.org_id, o.tagline, o.text_description
             FROM public.organizations o
@@ -57,21 +37,14 @@ export const getOrganizationsWithCategoryId = async (category_id: number): Promi
         const orgs = await pool.query(query, [category_id]);
         return orgs.rows;
 
-    } catch (error) {
+    }catch(error){
         throw new Error("Error retrieving selected categories organizations: " + (error as Error).message)
     }
 }
-
-/**
- * Retrieves organizations followed by a specific user.
- * @param {number} user_id - The user ID.
- * @returns {Promise<Organization[]>} A list of followed organizations.
- * @throws {Error} Throws an error if the query fails.
- */
-
-export const getOrganizationsFollowed = async (user_id: number): Promise<Organization[]> => {
+//get organizations followed by a user
+export const getOrganizationsFollowed = async (user_id: number) : Promise<Organization[]> => {
     try {
-        let query = `
+        let query =`
             SELECT o.name, o.org_id, o.text_description
             FROM public.organizations o
             INNER JOIN public.user_organization_follows f ON o.org_id = f.org_id
@@ -83,37 +56,21 @@ export const getOrganizationsFollowed = async (user_id: number): Promise<Organiz
         throw new Error("Error retrieving organizations: " + (error as Error).message);
     }
 }
-
-
-/**
- * Allows a user to follow an organization.
- * @param {number} user_id - The user ID.
- * @param {number} org_id - The organization ID.
- * @returns {Promise<object[]>} The newly created follow record.
- * @throws {Error} Throws an error if the query fails.
- */
-
+//follows an organization given a user id and org id
 export const followOrganization = async (user_id: number, org_id: number) => {
     try {
         let query = `
             INSERT INTO public.user_organization_follows (user_id, org_id) VALUES ($1, $2) RETURNING *
         `;
-        let values = [user_id, org_id];
-        const result = pool.query(query, values);
+        let values = [user_id,org_id];
+        const result = pool.query(query,values);
         return result.rows;
     } catch (error) {
         throw new Error("Error following organization " + (error as Error).message);
     }
 }
-
-/**
- * Retrieves an organization by its ID.
- * @param {number} org_id - The organization ID.
- * @returns {Promise<Organization[]>} The organization details.
- * @throws {Error} Throws an error if the query fails.
- */
-
-export const getOrganizationById = async (org_id: number): Promise<Organization[]> => {
+//get an organization given an organization id
+export const getOrganizationById = async (org_id: number) : Promise<Organization[]> => {
     try {
         let query = `
             SELECT * 
@@ -125,10 +82,8 @@ export const getOrganizationById = async (org_id: number): Promise<Organization[
         throw new Error("Error retrieving organization: " + (error as Error).message);
     }
 }
-
-
-
-export const getOrganizationByName = async (name: string): Promise<Organization[]> => {
+//get an organization given a name
+export const getOrganizationByName = async(name: string) : Promise<Organization[]> => {
     try {
         let query = `
             SELECT *
@@ -140,35 +95,22 @@ export const getOrganizationByName = async (name: string): Promise<Organization[
         throw new Error("Error retrieving organization: " + (error as Error).message);
     }
 }
-
-/**
- * Retrieves featured organizations.
- * @returns {Promise<Organization[]>} A list of featured organizations.
- * @throws {Error} Throws an error if the query fails.
- */
-
+//get featured organizations
 export const getFeaturedOrganizations = async (): Promise<Organization[]> => {
-    try {
+    try{
         let query = `
             SELECT *
             FROM public.organizations o
             WHERE o.is_featured = true`;
         const org = await pool.query(query);
         return org.rows;
-    } catch (error) {
+    }catch(error){
         throw new Error("Error retrieving organization: " + (error as Error).message);
     }
 }
-
-/**
- * Marks an organization as featured.
- * @param {string} name - The organization name.
- * @returns {Promise<object[]>} The updated organization record.
- * @throws {Error} Throws an error if the update fails.
- */
-
+//feature an organization given its name
 export const featureOrganization = async (name: string) => {
-    try {
+    try{
         let query = `
             UPDATE public.organizations 
             SET is_Featured = true 
@@ -177,19 +119,11 @@ export const featureOrganization = async (name: string) => {
         let values = [name];
         const org = await pool.query(query, values);
         return org.rows;
-    } catch (error) {
+    }catch(error){
         throw new Error("Error featuring organization: " + (error as Error).message);
     }
 }
-
-/**
- * Unmarks an organization as featured.
- * @param {string} name - The organization name.
- * @returns {Promise<object[]>} The updated organization record.
- * @throws {Error} Throws an error if the update fails.
- */
-
-export const removeFeature = async (name: string) => {
+export const removeFeature = async(name: string) => {
     try {
         let query = `
             UPDATE public.organizations 
@@ -205,9 +139,9 @@ export const removeFeature = async (name: string) => {
     }
 }
 //gets all organization categories
-export const getCategory = async (): Promise<Category[]> => {
-    try {
-        let query = `
+export const getCategory = async() : Promise<Category[]> => {
+    try{
+        let query =`
             SELECT *
             FROM public.category`;
         const category = await pool.query(query);
@@ -217,42 +151,33 @@ export const getCategory = async (): Promise<Category[]> => {
         throw new Error("Error retrieving categories: " + (error as Error).message);
     }
 }
-
-/**
- * Creates a new organization.
- * @param {string} name - The organization name.
- * @param {string} tagline - The organization's tagline.
- * @param {string} text_description - The organization's description.
- * @returns {Promise<object[]>} The newly created organization.
- * @throws {Error} Throws an error if the creation fails.
- */
-
-export const createOrganization = async (name: string, tagline: string, text_description: string) => {
-    if (!name) {
+//create an organization
+export const createOrganization = async(name: string, tagline: string, text_description: string) => {
+    if(!name){
         throw new Error("A valid name is required");
     }
-    try {
+    try{
         let query;
         let values;
-        if (tagline && text_description) {
+        if(tagline && text_description){
             query = `
                 INSERT INTO public.organizations (name, tagline, text_description) VALUES ($1,$2,$3) RETURNING *
-            `;
+            `; 
             values = [name, tagline, text_description];
         }
-        else if (tagline && !text_description) {
+        else if(tagline && !text_description){
             query = `
                 INSERT INTO public.organizations (name, tagline) VALUES ($1, $2) RETURNING *
             `;
             values = [name, tagline];
         }
-        else if (text_description && !tagline) {
+        else if(text_description && !tagline){
             query = `
                 INSERT INTO public.organizations (name, text_description) VALUES ($1,$2) RETURNING *
             `;
             values = [name, text_description];
         }
-        else {
+        else{
             query = `
                 INSERT INTO public.organizations (name) VALUES ($1) RETURNING *
             `;
@@ -261,135 +186,79 @@ export const createOrganization = async (name: string, tagline: string, text_des
         const response = await pool.query(query, values);
         return response.rows;
     }
-    catch (error) {
+    catch(error){
         throw new Error("Error creating organizaton: " + (error as Error).message);
     }
 }
-
-/**
- * Updates the details of an organization.
- * @param {string} name - The name of the organization to update.
- * @param {string} tagline - The new tagline.
- * @param {string} text_description - The new text description.
- * @returns {Promise<Organization[]>} The updated organization.
- * @throws {Error} Throws an error if the database query fails.
- */
-
-export const updateOrganization = async (name: string, tagline: string, text_description: string) => {
-    try {
+//update an organization
+export const updateOrganization = async(name: string, tagline: string, text_description: string) => {
+    try{
         let query;
         let values;
-        if (tagline && text_description) {
+        if(tagline && text_description){
             query = `
                 UPDATE public.organizations SET tagline = $1, text_description = $2 WHERE name = $3 RETURNING *
-            `;
+            `; 
             values = [tagline, text_description, name];
         }
-        else if (tagline && !text_description) {
+        else if(tagline && !text_description){
             query = `
                 UPDATE public.organizations SET tagline = $1 WHERE name = $2 RETURNING *
             `;
             values = [tagline, name];
         }
-        else if (text_description && !tagline) {
+        else if(text_description && !tagline){
             query = `
                 UPDATE public.organizations SET text_description = $1 WHERE name = $2 RETURNING *
             `;
             values = [text_description, name];
         }
-        else {
+        else{
             throw new Error("No fields entered, no changes were made")
         }
         const response = await pool.query(query, values);
         return response.rows;
     }
-    catch (error) {
+    catch(error){
         throw new Error("Error creating organizaton: " + (error as Error).message);
     }
 }
-
-/**
- * Updates the photo of an organization.
- * @param {string} name - The name of the organization.
- * @param {string} image_path - The path to the new image.
- * @returns {Promise<Organization[]>} The updated organization.
- * @throws {Error} Throws an error if the database query fails.
- */
-
-export const updatePhoto = async (name: string, image_path: string) => {
+//TODO: IMPLEMENT BETTER
+//checks if followed by issuing an update statement, updating the row with the exact statement, if fails
+//the returned organization will be undefined
+//done this way since using a get with 2 parameters is apparently more complicated than it sounds
+export const checkFollowed = async(user_id: number, org_id: number): Promise<OrganizationFollowed> => {
     try {
         let query = `
-                UPDATE public.organizations SET image_path = $1 WHERE name = $2 RETURNING *
-            `;
-        let values = [image_path, name];
-        const response = await pool.query(query, values);
-        return response.rows;
-    }
-    catch (error) {
-        throw new Error("Error updating photo: " + (error as Error).message);
-    }
-}
-
-/**
- * Checks if a user follows an organization.
- * 
- * @param user_id The id of the user
- * @param org_id The id of the organization
- * @returns `true` or `false` if the user follows the organization
- */
-export const isFollowed = async (user_id: number, org_id: number) => {
-    try {
-        let query = `
-            SELECT CASE WHEN EXISTS (
-                SELECT *
-                FROM user_organization_follows
-                WHERE user_id = $1 AND org_id = $2
-            )
-            THEN CAST(1 AS BIT)
-            ELSE CAST(0 AS BIT) 
-            END`
+            UPDATE public.user_organization_follows SET user_id = $1, org_id = $2 WHERE user_id = $1 AND org_id = $2 RETURNING *
+        `
         let values = [user_id, org_id]
-        const response = await pool.query(query, values)
-        return response.rows[0];
+        const response = await pool.query(query,values);
+        return response.rows;
     } catch (error) {
-        throw new Error("Error checking following status: " + (error as Error).message)
+        throw new Error("Error checking follow: " + (error as Error).message);
     }
 }
-
-/**
- * Remove a follow when given user id and group id 
- * 
- * @param user_id ID of the user
- * @param org_id  ID of the organization
- */
-
-export const unfollow = async (user_id: number, org_id: string) => {
+//remove a follow when given user id and group id 
+export const unfollow = async(user_id: number, org_id: string) => {
     try {
         let query = `
             DELETE FROM public.user_organization_follows WHERE user_id = $1 AND org_id = $2
             `;
         let values = [user_id, org_id];
-        await pool.query(query, values);
-
+        await pool.query(query,values);
+        
     } catch (error) {
         throw new Error("Error deleting resource: " + (error as Error).message);
     }
 }
-
-/**
- * Deletes an organization by name.
- * @param {string} name - The organization name.
- * @returns {Promise<void>}
- * @throws {Error} Throws an error if the deletion fails.
- */
-
-export const deleteOrganization = async (name: string) => {
+export const deleteOrganization = async(name: string) => {
     try {
         let query = `
             DELETE FROM public.organizations WHERE name = $1
         `
         let values = [name];
-        await pool.query(query, values);
+        await pool.query(query,values);
     } catch (error) {
         throw new Error("Error deleting organization: " + (error as Error).message);
     }

@@ -44,7 +44,6 @@ const Weather: React.FC = () => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.cityText}>Bismarck, North Dakota</Text>  {/* Hardcoded city name */}
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollView}>
                 {weatherData.map((data, index) => (
                     <View key={index} style={styles.weatherItem}>
@@ -123,12 +122,5 @@ const styles = StyleSheet.create({
         color: '#D8000C',
         textAlign: 'center',
     },
-    cityText: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        marginBottom: 10,
-        color: '#333',
-        textAlign: 'center',
-    },    
 });
 export default Weather;
