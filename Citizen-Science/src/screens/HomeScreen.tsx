@@ -60,7 +60,7 @@ const HomeScreen = () => {
   const [data, setData] = useState(null);
   const decodedToken = userToken ? jwtDecode<AccessToken>(userToken) : null;
   const userPermissions = decodedToken
-    ? JSON.parse(decodedToken?.permissions)
+    ? (decodedToken?.permissions)
     : null;
   const userCanDeleteAllPosts = userPermissions
     ? userPermissions.delete_all_posts
@@ -104,7 +104,10 @@ const HomeScreen = () => {
 
   const fetchPosts = async () => {
     try {
-      const postsList = await getAllPosts(userId);
+      let postsList = await getAllPosts(userId);
+      postsList = postsList.filter((post: PostWithUsername) => {
+        return post.is_active;
+      });
       setPosts(postsList);
       const commentsMap: CommentsMap = {};
       for (const post of postsList) {
@@ -377,7 +380,7 @@ const HomeScreen = () => {
     <>
       <WelcomeBanner />
       <SafeAreaView style={styles.flexContainer}>
-        {(userPermissions.create_org_posts && userOrgId) && (
+        {userPermissions.create_org_posts && userOrgId && (
           <FixedSwitch
             onValueChange={togglePostAsOrg}
             value={postAsOrganization}

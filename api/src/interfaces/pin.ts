@@ -9,6 +9,7 @@ export interface Pin {
     is_active: boolean,
 }
 export interface PinNew {
+    user_id: number | undefined;
     pin_id: number,
     name: string,
     text_description: string,
@@ -17,4 +18,5 @@ export interface PinNew {
     longitude: number,
     latitude: number,
     imageUrl: String,
+
 }

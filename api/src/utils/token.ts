@@ -1,13 +1,6 @@
 import jwt from 'jsonwebtoken';
-import { User } from '../interfaces/User';
-import { config } from "../config/config";
-
-/**
- * Generates a refresh token for a user.
- *
- * @param user - The user object containing user details.
- * @returns A promise that resolves to the generated refresh token as a string.
- */
+import {User} from '../interfaces/User';
+import {config} from "../config/config";
 
 export const createRefreshToken = async (user: User) => {
     return jwt.sign(
@@ -21,13 +14,6 @@ export const createRefreshToken = async (user: User) => {
     );
 };
 
-/**
- * Generates an access token for a user.
- *
- * @param user - The user object containing user details.
- * @returns A promise that resolves to the generated access token as a string.
- */
-
 export const createAccessToken = async (user: User) => {
     return jwt.sign(
         {
@@ -35,7 +21,9 @@ export const createAccessToken = async (user: User) => {
             firstName: user.first_name,
             lastName: user.last_name,
             phoneNumber: user.phone_number,
-            permissions: user.permissions,
+            permissions: typeof user.permissions === 'string'
+            ? JSON.parse(user.permissions)
+            : user.permissions,
             org_id: user.org_id,
             org_name: user.org_name
         },

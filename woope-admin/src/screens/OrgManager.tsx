@@ -9,6 +9,7 @@ import {
 } from "../api/organizations";
 import { Organization } from "../interfaces/Organization";
 import Modal from "../components/Modal";
+import PageHeader from "../components/PageHeader";
 
 const OrgManager = () => {
   const navigate = useNavigate();
@@ -19,6 +20,7 @@ const OrgManager = () => {
   const [newOrgTagline, setNewOrgTagline] = useState<string>();
   const [newOrgDesc, setNewOrgDesc] = useState<string>();
   const [orgToDelete, setOrgToDelete] = useState<Organization | null>(null);
+  // const [createOrgModal, setCreateOrgModal] = useState<boolean>(false);
   const tableHeaders = ["ID", "Name", "Tagline", "Actions"];
 
   useEffect(() => {
@@ -33,7 +35,8 @@ const OrgManager = () => {
     const res = organizations.filter((org: Organization) => {
       return org.name.toLowerCase().includes(searchInput.toLowerCase());
     });
-    setOrganizations(res);
+    // setOrganizations(res);
+    setSearchResults(mapOrgsToResults(res));
   };
 
   const fetchOrganizations = async () => {
@@ -52,13 +55,16 @@ const OrgManager = () => {
     const orgList = orgs.map((org: Organization) => {
       return [
         <p className="pt-2">{org.org_id}</p>,
-        <button
+        /*<button
           type="button"
           className="btn btn-link"
           onClick={() => navigate(`/organizations/${org.org_id}`)}
         >
           {org.name}
-        </button>,
+        </button>*/
+        <div className="pt-2">
+          <a href={`/organizations/${org.org_id}`}>{org.name}</a>
+        </div>,
         <p className="pt-2">{org.tagline}</p>,
         <button
           type="button"
@@ -78,6 +84,7 @@ const OrgManager = () => {
     setNewOrgName("");
     setNewOrgTagline("");
     setNewOrgDesc("");
+    // setCreateOrgModal((prev) => !prev);
   };
 
   const handleOpenDeleteModal = (orgId: number) => {
@@ -97,6 +104,8 @@ const OrgManager = () => {
       fetchOrganizations();
       if (res) {
         alert("New organization successfully created.");
+        // $("#createOrgModal").modal("hide");
+        // setCreateOrgModal(false);
       } else {
         alert("Something went wrong. No organization was created.");
       }
@@ -181,7 +190,7 @@ const OrgManager = () => {
           body={
             <>
               <div className="row">
-                <dt className="col-2">Name: </dt>
+                <dt className="col-2">Name*: </dt>
                 <input
                   className="col-8 ms-5"
                   value={newOrgName}
@@ -189,7 +198,7 @@ const OrgManager = () => {
                 ></input>
               </div>
               <div className="row pt-4">
-                <dt className="col-2">Tagline: </dt>
+                <dt className="col-2">Tagline*: </dt>
                 <input
                   className="col-8 ms-5"
                   value={newOrgTagline}
@@ -197,7 +206,7 @@ const OrgManager = () => {
                 ></input>
               </div>
               <hr></hr>
-              <h2>Description</h2>
+              <h2>Description*</h2>
               <div className="row pt-4">
                 <textarea
                   cols={40}
@@ -214,16 +223,21 @@ const OrgManager = () => {
                 type="button"
                 className="btn btn-primary"
                 onClick={handleCreateOrg}
-                data-bs-dismiss="modal"
+                // data-bs-dismiss="modal"
               >
                 Create
               </button>
             </>
           }
         ></Modal>
-        <h1 className="pb-4">Organization Manager</h1>
+        <PageHeader>Organization Manager</PageHeader>
         <hr></hr>
-        <form>
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            handleSearch();
+          }}
+        >
           <div className="row mb-3">
             <div className="col-sm-4">
               <input
@@ -231,6 +245,7 @@ const OrgManager = () => {
                 className="form-control"
                 value={searchInput}
                 onChange={handleSearchInputChange}
+                placeholder="Search Organizations By Name"
               />
             </div>
             <div className="col-sm-3">
