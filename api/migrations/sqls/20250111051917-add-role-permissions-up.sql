@@ -53,19 +53,11 @@ CREATE TABLE IF NOT EXISTS public.role_permissions
     CONSTRAINT role_permissions_permission_id_fkey FOREIGN KEY (permission_id)
         REFERENCES public.permissions (permission_id) MATCH SIMPLE
         ON UPDATE NO ACTION
-        ON DELETE NO ACTION,
-    CONSTRAINT role_permissions_permission_id_fkey1 FOREIGN KEY (permission_id)
-        REFERENCES public.permissions (permission_id) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION,
+        ON DELETE CASCADE,
     CONSTRAINT role_permissions_role_id_fkey FOREIGN KEY (role_id)
         REFERENCES public.roles (role_id) MATCH SIMPLE
         ON UPDATE NO ACTION
-        ON DELETE NO ACTION,
-    CONSTRAINT role_permissions_role_id_fkey1 FOREIGN KEY (role_id)
-        REFERENCES public.roles (role_id) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION
+        ON DELETE CASCADE
 )
 
 TABLESPACE pg_default;
