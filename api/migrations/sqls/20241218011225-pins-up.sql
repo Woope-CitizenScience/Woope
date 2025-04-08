@@ -9,5 +9,6 @@ CREATE TABLE IF NOT EXISTS pins (
     label VARCHAR(20),
     dateBegin TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    imageUrl VARCHAR(500),
     FOREIGN KEY (user_id) REFERENCES users(user_id)
 );

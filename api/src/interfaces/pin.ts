@@ -18,4 +18,5 @@ export interface PinNew {
     longitude: number,
     latitude: number,
     imageUrl: String,
+
 }

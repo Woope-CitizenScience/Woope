@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPinNew, getAllPinsNew, deletePinNew, updatePinNew } from '../../api/pins';
 
 import {
 	View,
@@ -21,7 +22,6 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as MediaLibrary from 'expo-media-library';
 import test from 'node:test';
-import { createPin, deletePin, getPins, updatePin } from '../../api/pins';
 
 const windowWidth = Dimensions.get('window').width;
 
@@ -125,6 +125,7 @@ export const MapScreen = () => {
 			//console.log("\nFiltered Pins (from setFilteredPins):", filteredPins)
 
 			return transformedPins;
+
 		} catch (error) {
 			console.error('Error fetching all pins:', error);
 		}
@@ -455,7 +456,7 @@ export const MapScreen = () => {
 
 		try {
 			// Call the API to update the pin in the database (assume updatePinNew exists)
-			const updatedPin = await updatePin(
+			const updatedPin = await updatePinNew(
 				selectedPin.pin_id, // Use the pin ID of the selected pin
 				formData.name,
 				formData.description,

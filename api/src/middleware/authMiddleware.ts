@@ -3,14 +3,6 @@ import jwt from 'jsonwebtoken';
 import { User, DecodedUserPayload } from "../interfaces/User";
 import { config } from "../config/config";
 
-declare global {
-  namespace Express {
-    interface Request {
-      user?: DecodedUserPayload;
-    }
-  }
-}
-
 /**
  * Middleware to authenticate a JWT token in the request header.
  * 
@@ -30,6 +22,14 @@ declare global {
  * @returns {void} - This function does not return a value directly but sends a response if the token is invalid.
  */
 
+declare global {
+  namespace Express {
+    interface Request {
+      user?: DecodedUserPayload;
+    }
+  }
+}
+
 export const authenticateToken = (req: express.Request, res: express.Response, next: express.NextFunction) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
@@ -42,6 +42,7 @@ export const authenticateToken = (req: express.Request, res: express.Response, n
     next();
   });
 };
+
 
 export const requirePermission = (permission: string) => {
   return (req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -60,4 +61,3 @@ export const requirePermission = (permission: string) => {
 // router.get('/protected-route', authenticateToken, requirePermission('permission_name'), (req, res) => {
 //   // Access req.user here
 // });
-
