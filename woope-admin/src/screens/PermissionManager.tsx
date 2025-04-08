@@ -38,11 +38,8 @@ const PermissionManager = () => {
 
   useEffect(() => {
     fetchPermissions();
-  }, []);
-
-  useEffect(() => {
     fetchRoles();
-  }, [roles]);
+  }, []);
 
   const fetchRoles = async () => {
     try {
@@ -124,6 +121,8 @@ const PermissionManager = () => {
     });
 
     setRoleCreated(true);
+
+    fetchRoles()
   };
 
   const handleDeleteRole = async () => {
@@ -138,6 +137,8 @@ const PermissionManager = () => {
     });
     await deleteRole(selectedRole?.role_id);
     setSelectedRole(null);
+
+    fetchRoles();
   };
 
   const handleNameInputChange = (event: React.FormEvent<HTMLInputElement>) => {
