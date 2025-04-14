@@ -1,6 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-
 export const loginUser = async (email: string, password: string) => {
 	const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/auth/login`, {
 		method: 'POST',
@@ -16,23 +15,41 @@ export const loginUser = async (email: string, password: string) => {
 		error.name = `HTTP Error ${response.status}`;
 		throw error;
 	}
+
 	const data = await response.json();
 
-	await AsyncStorage.setItem("accessToken", data.accessToken);
-    await AsyncStorage.setItem("refreshToken", data.refreshToken);
-    await AsyncStorage.setItem("userRole", data.role_id.toString());
-
+	// Store token in AsyncStorage
+	if (data?.accessToken) {
+		await AsyncStorage.setItem("accessToken", data.accessToken);
+		console.log(" Access token stored (login).");
+	} else {
+		console.warn(" No access token in login response.");
+	}
 
 	return data;
-}
+};
 
-export const registerUser = async (email: string, password: string, firstName: string, lastName: string, dateOfBirth: string, phoneNumber?: string) => {
+export const registerUser = async (
+	email: string,
+	password: string,
+	firstName: string,
+	lastName: string,
+	dateOfBirth: string,
+	phoneNumber?: string
+) => {
 	const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/auth/register`, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
 		},
-		body: JSON.stringify({ email, phoneNumber, password, firstName, lastName, dateOfBirth}),
+		body: JSON.stringify({
+			email,
+			phoneNumber,
+			password,
+			firstName,
+			lastName,
+			dateOfBirth
+		}),
 	});
 
 	if (!response.ok) {
@@ -44,18 +61,18 @@ export const registerUser = async (email: string, password: string, firstName: s
 
 	const data = await response.json();
 
-	await AsyncStorage.setItem("accessToken", data.accessToken);
-    await AsyncStorage.setItem("refreshToken", data.refreshToken);
-    await AsyncStorage.setItem("userRole", data.role_id.toString());
-
+	//  Store token in AsyncStorage
+	if (data?.accessToken) {
+		await AsyncStorage.setItem("accessToken", data.accessToken);
+		console.log(" Access token stored (register).");
+	} else {
+		console.warn(" No access token in register response.");
+	}
 
 	return data;
-}
+};
 
 export const logoutUser = async (userId: number) => {
-	const user_id = await AsyncStorage.getItem("user_id");
-
-
 	const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/auth/logout`, {
 		method: 'POST',
 		headers: {
@@ -71,7 +88,7 @@ export const logoutUser = async (userId: number) => {
 		throw error;
 	}
 
+	// Clear token from AsyncStorage
 	await AsyncStorage.removeItem("accessToken");
-    await AsyncStorage.removeItem("refreshToken");
-    await AsyncStorage.removeItem("userRole");
-}
+	console.log("👋 Access token removed (logout).");
+};

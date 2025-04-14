@@ -1,13 +1,10 @@
 import express from 'express';
-
-import { requireOwnershipOrPermission,  } from '../middleware/requireOwnershipOrPermission';
-import { authenticateToken, requirePermission } from '../middleware/authMiddleware';
 import {createOrganization, deleteOrganization, featureOrganization, followOrganization, getCategory, getFeaturedOrganizations, getOrganizationById, getOrganizationByName, getOrganizations,getOrganizationsFollowed,getOrganizationsWithCategory, getOrganizationsWithCategoryId, removeFeature, unfollow, updateOrganization, updatePhoto, isFollowed } from '../models/organizations';
 
 const router = require('express').Router();
 
 //get all organizations
-router.get('/organizations', authenticateToken, async(req: express.Request, res: express.Response) => {
+router.get('/organizations', async(req: express.Request, res: express.Response) => {
     try{
         const orgs = await getOrganizations();
         res.status(200).json(orgs);
@@ -20,7 +17,7 @@ router.get('/organizations', authenticateToken, async(req: express.Request, res:
     }    
 });
 //get all categories
-router.get('/category', authenticateToken,  async(req: express.Request, res:express.Response) => {
+router.get('/category', async(req: express.Request, res:express.Response) => {
     try{
         const category = await getCategory();
         res.status(200).json(category);
@@ -33,7 +30,7 @@ router.get('/category', authenticateToken,  async(req: express.Request, res:expr
     }
 });
 //get all organizations by specific category
-router.get('/organizationsbycategory/:category_name', authenticateToken, async(req: express.Request, res: express.Response) => {
+router.get('/organizationsbycategory/:category_name', async(req: express.Request, res: express.Response) => {
     try {
         const orgs = await getOrganizationsWithCategory(req.params.category_name);
         res.status(200).json(orgs);
@@ -45,7 +42,7 @@ router.get('/organizationsbycategory/:category_name', authenticateToken, async(r
         }
     }
 });
-router.get('/organizationsbycategoryid/:category_id', authenticateToken, async(req: express.Request, res: express.Response) => {
+router.get('/organizationsbycategoryid/:category_id', async(req: express.Request, res: express.Response) => {
     try {
         const orgs = await getOrganizationsWithCategoryId(Number(req.params.category_id));
         res.status(200).json(orgs);
@@ -57,7 +54,7 @@ router.get('/organizationsbycategoryid/:category_id', authenticateToken, async(r
         }
     }
 });
-router.get('/organizationsbyfollowed/:user_id', authenticateToken, async(req: express.Request, res: express.Response) => {
+router.get('/organizationsbyfollowed/:user_id', async(req: express.Request, res: express.Response) => {
     try {
         const orgs = await getOrganizationsFollowed(Number(req.params.user_id));
         res.status(200).json(orgs);
@@ -69,7 +66,7 @@ router.get('/organizationsbyfollowed/:user_id', authenticateToken, async(req: ex
         }
     }
 });
-router.get('/organizationsbyid/:org_id', authenticateToken, async(req: express.Request, res: express.Response) => {
+router.get('/organizationsbyid/:org_id', async(req: express.Request, res: express.Response) => {
     try{
         const org = await getOrganizationById(Number(req.params.org_id));
         res.status(200).json(org);
@@ -81,7 +78,7 @@ router.get('/organizationsbyid/:org_id', authenticateToken, async(req: express.R
         }
     }
 })
-router.get('/organizationsbyname/:name', authenticateToken, async(req: express.Request, res: express.Response) => {
+router.get('/organizationsbyname/:name', async(req: express.Request, res: express.Response) => {
     try{
         const org = await getOrganizationByName(req.params.name);
         res.status(200).json(org);
@@ -93,7 +90,7 @@ router.get('/organizationsbyname/:name', authenticateToken, async(req: express.R
         }
     }
 })
-router.get('/featuredorganizations', authenticateToken, async(req: express.Request, res: express.Response) => {
+router.get('/featuredorganizations', async(req: express.Request, res: express.Response) => {
     try{
         const org = await getFeaturedOrganizations();
         res.status(200).json(org);
@@ -105,7 +102,7 @@ router.get('/featuredorganizations', authenticateToken, async(req: express.Reque
         }
     }
 })
-router.post('/create', authenticateToken, requirePermission('edit_organization'), async(req: express.Request, res: express.Response) => {
+router.post('/create', async(req: express.Request, res: express.Response) => {
     try{
         const {name, tagline, text_description} = req.body;
         const newPost = await createOrganization(name,tagline,text_description);
@@ -131,7 +128,7 @@ router.post('/follow', async(req: express.Request, res: express.Response) => {
         }
     }
 });
-router.put('/update', authenticateToken, requirePermission('edit_all_events'),  async(req: express.Request, res: express.Response) => {
+router.put('/update', async(req: express.Request, res: express.Response) => {
     try{
         const {name, tagline, text_description} = req.body;
         const edit = await updateOrganization(name,tagline,text_description);
@@ -144,7 +141,7 @@ router.put('/update', authenticateToken, requirePermission('edit_all_events'),  
         }
     }
 })
-router.put('/setfeatured', authenticateToken, requirePermission('edit_organization'), async(req: express.Request, res: express.Response) => {
+router.put('/setfeatured', async(req: express.Request, res: express.Response) => {
     try{
         const {name} = req.body;
         const edit = await featureOrganization(name);
@@ -157,7 +154,7 @@ router.put('/setfeatured', authenticateToken, requirePermission('edit_organizati
         }
     }
 })
-router.put('/removefeatured', authenticateToken, requirePermission('edit_organization'), async(req: express.Request, res: express.Response) => {
+router.put('/removefeatured', async(req: express.Request, res: express.Response) => {
     try{
         const {name} = req.body
         const edit = await removeFeature(name);
@@ -170,7 +167,6 @@ router.put('/removefeatured', authenticateToken, requirePermission('edit_organiz
         }
     }
 });
-
 router.delete('/unfollow', async (req: express.Request, res: express.Response) => {
     try {
         const {user_id, org_id} = req.body;
@@ -184,7 +180,7 @@ router.delete('/unfollow', async (req: express.Request, res: express.Response) =
         }
     }
 });
-router.delete('/deleteorganization', authenticateToken, requirePermission('delete_all_events'), async (req: express.Request, res: express.Response) => {
+router.delete('/deleteorganization', async (req: express.Request, res: express.Response) => {
     try {
         const {name} = req.body;
         await deleteOrganization(name);
