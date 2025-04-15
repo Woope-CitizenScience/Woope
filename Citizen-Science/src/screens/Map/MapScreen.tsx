@@ -107,8 +107,8 @@ export const MapScreen = () => {
 				date: new Date(pin.datebegin).toISOString().split('T')[0],
 				description: pin.text_description,
 				tag: pin.label,
-				image: pin.image_url
-					? `${process.env.EXPO_PUBLIC_API_URL}${pin.image_url}`
+				image: pin.imageurl
+					? `${process.env.EXPO_PUBLIC_API_URL}${pin.imageurl}`
 					: null,
 				location: {
 					latitude: pin.latitude,
