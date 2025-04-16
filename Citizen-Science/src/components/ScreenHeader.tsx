@@ -36,14 +36,14 @@ const ScreenHeader: React.FC<ScreenHeaderProps> = ({ title, navigation }) => {
 					paddingHorizontal={responsiveHeight(1)}
 				></IconButton>
 
-				<IconButton
+				{/* <IconButton
 					iconName={"person"}
-					onPress={function (): void {}}
+					onPress={() => nav.navigate("EventHome")}
 					iconSize={responsiveHeight(4.5)}
 					iconColor={"black"}
 					paddingVertical={responsiveHeight(1)}
 					paddingHorizontal={responsiveHeight(1)}
-				/>
+				/> */}
 
 				{/* Maybe Add title */}
 			</View>
