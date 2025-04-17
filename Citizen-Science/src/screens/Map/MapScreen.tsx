@@ -552,10 +552,10 @@ export const MapScreen = () => {
 						//console.log('Rendering Marker:', pin); // Log each pin being rendered
 						return (
 							<Marker
-								key={`${pin.name}-${pin.location.latitude}-${pin.location.longitude}`}
-								coordinate={pin.location}
-								title={pin.name}
-								description={pin.description}
+							key={`pin-${pin.pin_id}`} // changed so key is now unique and not depending on coordinates
+							coordinate={pin.location}
+								// title={pin.name}   got rid of this to get rid of bubble info that stays after pressin pin
+								// description={pin.description}
 								onPress={() => handleMarkerPress(pin)} // Handle marker press for viewing pin
 							>
 								{/* Render the pin's image if it exists */}
@@ -576,8 +576,8 @@ export const MapScreen = () => {
 								latitude: formData.location.latitude,
 								longitude: formData.location.longitude,
 							}}
-							title="Photo Location"
-							description="Location where this photo was taken"
+							// title="Photo Location" got rid of this to get rid of bubble info that stays after pressin pin
+							// description="Location where this photo was taken"
 						>
 							{formData.image && (
 								<Image
@@ -1024,10 +1024,11 @@ const styles = StyleSheet.create({
 	},
 	detailsImage: {
 		width: '100%',
-		height: 200,
-		borderRadius: 10,
+		height: 300, // changed to display more of the image
+		borderRadius: 12,
 		marginTop: 10,
-	},
+		resizeMode: 'cover',
+	},	
 	detailsTitle: {
 		fontSize: 22,
 		fontWeight: 'bold',
