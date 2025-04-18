@@ -27,5 +27,5 @@ export const getFollowedDates = async(month: number, year: number, user_id: numb
     return fetchAPI(`/events/getfolloweddates/${month}/${year}/${user_id}`, 'GET');
 }
 export const getDayEvents = async(day: number, month: number, year: number, user_id: number) => {
-    return fetchAPI(`/events/getdayevents/${day}/${month}/${year}/${user_id}`, 'GET')
+    return fetchAPI(`/events/getdayevents/${day}/${month}/${year}/${user_id}`, 'GET');
 }

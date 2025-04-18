@@ -11,7 +11,6 @@ const DateScreen = ({route}) => {
         fetchEvents()
     }, )
     const [eventData, setEventData] = useState<Event[]>([]);
-    
     // retrieve all events from the given date
     const fetchEvents = async () => {
         try {
@@ -88,5 +87,4 @@ const styles = StyleSheet.create({
     
     
 });
-
 export default DateScreen;
