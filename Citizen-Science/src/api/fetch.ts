@@ -80,15 +80,26 @@ export async function fetchAPI(endpoint: string, method: string = 'GET', body: a
     const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}${endpoint}`, config);
 
     if (!response.ok) {
-        const textResponse = await response.text();
-        try {
-            console.log("Non-JSON response received:", textResponse);
-            const errorResponse = JSON.parse(textResponse);
-            throw new Error(errorResponse.error || response.statusText);
-        } catch (error) {
-            throw new Error('The server returned an unexpected response.');
-        }
+      const textResponse = await response.text();
+      try {
+        console.log("Non-JSON response received:", textResponse);
+        const errorResponse = JSON.parse(textResponse);
+        throw new Error(errorResponse.error || response.statusText);
+      } catch (error) {
+        throw new Error(textResponse || 'The server returned an unexpected response.');
+      }
     }
-
-    return await response.json();
+    
+    // handle 204 No Content (successful DELETE)
+    if (response.status === 204) {
+      return;
+    }
+    
+    const contentType = response.headers.get("content-type");
+    if (contentType?.includes("application/json")) {
+      return await response.json();
+    }
+    
+    return;
+    
 }
