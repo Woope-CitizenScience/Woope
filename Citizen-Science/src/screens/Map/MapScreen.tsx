@@ -213,12 +213,18 @@ export const MapScreen = () => {
 		setIsMarkerPressed(false); // Reset marker pressed state
 	};
 
-	const handleDeletePin = (pinId: number) => {
-		deletePinNew(pinId)
-			.then(() => {
-				console.log('Pin deleted successfully!');
-			})
+	const handleDeletePin = async (pinId: number): Promise<boolean> => {
+		try {
+			await deletePinNew(pinId); // The API call
+			console.log('Pin deleted successfully!');
+			return true;
+		} catch (error) {
+			console.error('Failed to delete pin:', error);
+			alert("You don't have permission to delete this pin.");
+			return false;
+		}
 	};
+	
 
 
 	const handleFormSubmit = async () => {
@@ -426,6 +432,8 @@ export const MapScreen = () => {
 
 	const handleEditPin = () => {
 		if (selectedPin) {
+			setSelectedPin(selectedPin); // keep pin
+			setDetailsVisible(false); 
 			setFormData({
 				name: selectedPin.name,
 				date: selectedPin.date,
@@ -462,8 +470,8 @@ export const MapScreen = () => {
 				formData.description,
 				new Date(formData.date),
 				formData.tag,
-				pinLocation.latitude,
-				pinLocation.longitude
+				pinLocation.longitude, // changed to match backend
+				pinLocation.latitude  // changed to match backend
 			);
 
 			// Ensure date parsing is valid
@@ -552,10 +560,10 @@ export const MapScreen = () => {
 						//console.log('Rendering Marker:', pin); // Log each pin being rendered
 						return (
 							<Marker
-								key={`${pin.name}-${pin.location.latitude}-${pin.location.longitude}`}
-								coordinate={pin.location}
-								title={pin.name}
-								description={pin.description}
+							key={`pin-${pin.pin_id}`} // changed so key is now unique and not depending on coordinates
+							coordinate={pin.location}
+								// title={pin.name}   got rid of this to get rid of bubble info that stays after pressin pin
+								// description={pin.description}
 								onPress={() => handleMarkerPress(pin)} // Handle marker press for viewing pin
 							>
 								{/* Render the pin's image if it exists */}
@@ -576,8 +584,8 @@ export const MapScreen = () => {
 								latitude: formData.location.latitude,
 								longitude: formData.location.longitude,
 							}}
-							title="Photo Location"
-							description="Location where this photo was taken"
+							// title="Photo Location" got rid of this to get rid of bubble info that stays after pressin pin
+							// description="Location where this photo was taken"
 						>
 							{formData.image && (
 								<Image
@@ -832,31 +840,36 @@ export const MapScreen = () => {
 
 						<TouchableOpacity
 							style={[styles.closeButton, { marginRight: 20 }]}
-
 							onPress={async () => {
-								console.log('Selected Pin for deletion:', selectedPin.pin_id); // Debug log
-								await handleDeletePin(selectedPin.pin_id); // Ensure deletion is complete
-								closeDetailsModal(); // Close modal immediately after deletion
-								setTimeout(() => {
-									fetchPins(); // Refresh pins with a slight delay to ensure backend updates
-								}, 200); // Adjust delay as needed
-								alert('Pin deleted successfully!');
-							}}
+								console.log('Selected Pin for deletion:', selectedPin.pin_id);
 
+								const success = await handleDeletePin(selectedPin.pin_id);
+
+								if (success) {
+									closeDetailsModal();
+									setTimeout(() => {
+										fetchPins();
+									}, 200);
+									alert('Pin deleted successfully!');
+								}
+							}}
 						>
 							<Text style={styles.deleteButtonText}>Delete</Text>
 						</TouchableOpacity>
 
+
 						<TouchableOpacity
 							style={[styles.closeButton, { marginRight: 20 }]}
-							//onPress={closeDetailsModal} // Close the modal
 							onPress={() => {
-								handleEditPin();
+								closeDetailsModal();
+								setTimeout(() => {
+									handleEditPin();   
+								}, 200); 
 							}}
-
 						>
 							<Text style={styles.closeButtonText}>Edit</Text>
 						</TouchableOpacity>
+
 
 						<TouchableOpacity
 							style={styles.closeButton}
@@ -1024,10 +1037,11 @@ const styles = StyleSheet.create({
 	},
 	detailsImage: {
 		width: '100%',
-		height: 200,
-		borderRadius: 10,
+		height: 300, // changed to display more of the image
+		borderRadius: 12,
 		marginTop: 10,
-	},
+		resizeMode: 'cover',
+	},	
 	detailsTitle: {
 		fontSize: 22,
 		fontWeight: 'bold',

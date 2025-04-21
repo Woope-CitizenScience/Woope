@@ -44,7 +44,7 @@ const Weather: React.FC = () => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.cityText}>Bismarck, North Dakota</Text>  {/* Hardcoded city name */}
+            <Text style={styles.cityText}>Bismarck, North Dakota {/*hardcoded city name */} </Text> 
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollView}>
                 {weatherData.map((data, index) => (
                     <View key={index} style={styles.weatherItem}>

@@ -65,9 +65,9 @@ export const createPinNew = async (
 
 // Fetch all pins
 export const getAllPinsNew = async () => {
-    console.log("Fetching all pins...");
+    // console.log("Fetching all pins...");
     const response = await fetchAPI('/pins/pinnew', 'GET');
-    console.log("Fetched Pins Data:", response);
+    // console.log("Fetched Pins Data:", response);
     return response;
 };
 
