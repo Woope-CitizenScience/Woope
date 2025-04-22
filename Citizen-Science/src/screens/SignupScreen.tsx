@@ -68,20 +68,26 @@ const SignupScreen = () => {
 		setUserInfo(prevState => ({ ...prevState, [field]: value }));
 	};
 
-    const handleSignUpPress = async () => {
-	    if (validate()) {
-		    try {
-			    const response = await registerUser(userInfo.email, userInfo.password, userInfo.firstName, userInfo.lastName, userInfo.dateOfBirth);
-
-			    await storeToken('accessToken', response.accessToken);
-			    await storeToken('refreshToken', response.refreshToken);
-
+	const handleSignUpPress = async () => {
+		if (validate()) {
+			try {
+				const response = await registerUser(
+					userInfo.email,
+					userInfo.password,
+					userInfo.firstName,
+					userInfo.lastName,
+					userInfo.dateOfBirth
+				);
+	
+				await storeToken('accessToken', response.accessToken);
+				await storeToken('refreshToken', response.refreshToken);
+	
 				setUserToken(response.accessToken);
-		    } catch (error) {
-			    console.log('Signup failed', error);
-		    }
-	    }
-    };
+			} catch (error) {
+				console.log('Signup failed', error);
+			}
+		}
+	};
 	const validate = (): boolean => {
 		let newErrors: Errors = {};
 		let isValid = true;
