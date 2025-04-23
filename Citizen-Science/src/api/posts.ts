@@ -1,45 +1,94 @@
 import { fetchAPI } from "./fetch";
 
-export const createPost = async (user_id: number, org_id: number | null, content: string) => {
-    return fetchAPI('/forum/posts', 'POST', { user_id, org_id, content });
-}
+// Create Post
+export const createPost = async (
+  user_id: number,
+  org_id: number | null,
+  content: string,
+  setUserToken: (token: string | null) => void
+) => {
+  return fetchAPI('/forum/posts', 'POST', { user_id, org_id, content }, setUserToken);
+};
 
-export const getAllPosts = async (id: number) => {
-    return fetchAPI(`/forum/posts/${id}`, 'GET');
-}
+// Get all posts
+export const getAllPosts = async (
+  id: number,
+  setUserToken: (token: string | null) => void
+) => {
+  return fetchAPI(`/forum/posts/${id}`, 'GET', null, setUserToken);
+};
 
-export const getAllPostsWithMedia = async (id: number) => {
-    return fetchAPI(`/forum/posts/${id}/media`, 'GET');
-}
+// Get posts with media
+export const getAllPostsWithMedia = async (
+  id: number,
+  setUserToken: (token: string | null) => void
+) => {
+  return fetchAPI(`/forum/posts/${id}/media`, 'GET', null, setUserToken);
+};
 
-export const getPostById = async (id: number) => {
-    return fetchAPI(`/forum/posts/${id}`, 'GET');
-}
+// Get single post by ID
+export const getPostById = async (
+  id: number,
+  setUserToken: (token: string | null) => void
+) => {
+  return fetchAPI(`/forum/posts/${id}`, 'GET', null, setUserToken);
+};
 
-export const getPostByUserId = async (userId: number) => {
-    return fetchAPI(`/forum/posts/user/${userId}`, 'GET');
-}
+// Get posts by user ID
+export const getPostByUserId = async (
+  userId: number,
+  setUserToken: (token: string | null) => void
+) => {
+  return fetchAPI(`/forum/posts/user/${userId}`, 'GET', null, setUserToken);
+};
 
-export const deletePost = async (id: number) => {
-    return fetchAPI(`/forum/posts/${id}`, 'DELETE');
-}
+// Delete post
+export const deletePost = async (
+  id: number,
+  setUserToken: (token: string | null) => void
+) => {
+  return fetchAPI(`/forum/posts/${id}`, 'DELETE', null, setUserToken);
+};
 
-export const updatePost = async (id: number, content: string) => {
-    return fetchAPI(`/forum/posts/${id}`, 'PUT', { content });
-}
+// Update post
+export const updatePost = async (
+  id: number,
+  content: string,
+  setUserToken: (token: string | null) => void
+) => {
+  return fetchAPI(`/forum/posts/${id}`, 'PUT', { content }, setUserToken);
+};
 
-export const likePost = async (id: number, user_id: number) => {
-    return fetchAPI(`/forum/posts/${id}/like`, 'POST', {user_id});
-}
+// Like a post
+export const likePost = async (
+  id: number,
+  user_id: number,
+  setUserToken: (token: string | null) => void
+) => {
+  return fetchAPI(`/forum/posts/${id}/like`, 'POST', { user_id }, setUserToken);
+};
 
-export const unlikePost = async (id: number, user_id: number) => {
-    return fetchAPI(`/forum/posts/${id}/like`, 'DELETE', {user_id});
-}
+// Unlike a post
+export const unlikePost = async (
+  id: number,
+  user_id: number,
+  setUserToken: (token: string | null) => void
+) => {
+  return fetchAPI(`/forum/posts/${id}/like`, 'DELETE', { user_id }, setUserToken);
+};
 
-export const getPostLikes = async (id: number) => {
-    return fetchAPI(`/forum/posts/${id}/likes`, 'GET');
-}
+// Get likes for a post
+export const getPostLikes = async (
+  id: number,
+  setUserToken: (token: string | null) => void
+) => {
+  return fetchAPI(`/forum/posts/${id}/likes`, 'GET', null, setUserToken);
+};
 
-export const getUserLikedPosts = async (id: number) => {
-    return fetchAPI(`/forum/posts/user/${id}/likes`, 'GET');
-}
+// Get all posts liked by user
+export const getUserLikedPosts = async (
+  id: number,
+  setUserToken: (token: string | null) => void
+) => {
+  return fetchAPI(`/forum/posts/user/${id}/likes`, 'GET', null, setUserToken);
+};

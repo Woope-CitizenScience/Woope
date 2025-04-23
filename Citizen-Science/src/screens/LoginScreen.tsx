@@ -29,17 +29,15 @@ const LoginScreen: React.FC = () => {
 	const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 	const { setUserToken } = useContext(AuthContext);
-	const handleLoginPress = async () => {
-		try {
-			const response = await loginUser(email, password);
-
-            const storedToken = await AsyncStorage.getItem("accessToken");
-            setUserToken(storedToken);
-
-		} catch (error) {
-			console.log('Login failed', error);
-		}
-	};
+    const handleLoginPress = async () => {
+        try {
+            const response = await loginUser(email, password);
+            setUserToken(response.accessToken); // Use the token directly
+        } catch (error) {
+            console.log('Login failed', error);
+        }
+    };
+    
 
     return (
         <KeyboardAvoidingView

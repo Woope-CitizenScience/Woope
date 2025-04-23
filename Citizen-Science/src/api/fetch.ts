@@ -1,105 +1,126 @@
 import mime from "mime";
-import { PdfFile } from "./types";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from 'expo-secure-store';
+import { refreshAccessToken } from "../util/fetchWithToken";
 
+// File upload API with token + refresh fallback
 export async function fetchAPIWithFiles(
-    endpoint: string,
-    method: string = "POST",
-    data: {
-      name: string;
-      description: string;
-      date: Date | string;
-      tag: string;
-      longitude: number;
-      latitude: number;
-      images?: string[];
-    }
-  ) {
-    const formData = new FormData();
-  
-    formData.append("name", data.name.slice(0, 20));
-    formData.append("description", data.description);
-    formData.append("date", typeof data.date === "string" ? data.date : data.date.toISOString().split("T")[0]);
-    formData.append("tag", data.tag);
-    formData.append("longitude", data.longitude.toString());
-    formData.append("latitude", data.latitude.toString());
-  
-    if (data.images && data.images.length > 0) {
-      data.images.forEach((imageUri, index) => {
-        formData.append(`file`, {
-          uri: imageUri,
-          type: mime.getType(imageUri) || "image/jpeg",
-          name: imageUri.split("/").pop() || `image${index}.jpg`,
-        } as unknown as Blob);
-      });
-    }
-  
-    // FIX: Retrieve the token
-    const token = await AsyncStorage.getItem("accessToken");
+  endpoint: string,
+  method: string = "POST",
+  data: {
+    name: string;
+    description: string;
+    date: Date | string;
+    tag: string;
+    longitude: number;
+    latitude: number;
+    images?: string[];
+  },
+  setUserToken?: (val: string | null) => void
+) {
+  const formData = new FormData();
 
-    console.log(" Token being sent:", token);
+  formData.append("name", data.name.slice(0, 20));
+  formData.append("description", data.description);
+  formData.append("date", typeof data.date === "string" ? data.date : data.date.toISOString().split("T")[0]);
+  formData.append("tag", data.tag);
+  formData.append("longitude", data.longitude.toString());
+  formData.append("latitude", data.latitude.toString());
 
-  
-    const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}${endpoint}`, {
-      method,
-      headers: {
-        'Authorization': token ? `Bearer ${token}` : '',
-      },
-      body: formData,
+  if (data.images && data.images?.length) {
+    data.images.forEach((imageUri, index) => {
+      formData.append(`file`, {
+        uri: imageUri,
+        type: mime.getType(imageUri) || "image/jpeg",
+        name: imageUri.split("/").pop() || `image${index}.jpg`,
+      } as unknown as Blob);
     });
-  
-    if (!response.ok) {
-      const text = await response.text();
-      console.error("Unexpected server response:", text);
-      throw new Error(`Server error: ${response.status} - ${text}`);
+  }
+
+  let token = await SecureStore.getItemAsync("accessToken");
+  const config: RequestInit = {
+    method,
+    headers: {
+      'Authorization': token ? `Bearer ${token}` : '',
+    },
+    body: formData,
+  };
+
+  let response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}${endpoint}`, config);
+
+  if (response.status === 401 && setUserToken) {
+    console.warn("Token expired during file upload. Attempting refresh...");
+    const newToken = await refreshAccessToken(setUserToken);
+    if (newToken) {
+      config.headers['Authorization'] = `Bearer ${newToken}`;
+      response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}${endpoint}`, config);
+    } else {
+      throw new Error("Session expired. Please log in again.");
     }
-  
-    const contentType = response.headers.get("content-type");
-    if (contentType?.includes("application/json")) {
-      return await response.json();
-    }
-  
+  }
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`Server error: ${response.status} - ${text}`);
+  }
+
+  const contentType = response.headers.get("content-type");
+  if (contentType?.includes("application/json")) {
     return await response.json();
   }
-  
 
-export async function fetchAPI(endpoint: string, method: string = 'GET', body: any = null) {
-    const token = await AsyncStorage.getItem("accessToken"); // Store token in mobile storage
-    
-    const config: RequestInit = {
-        method,
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': token ? `Bearer ${token}` : ''
-          }
-        }
-    if (body) {
-        config.body = JSON.stringify(body);
-    }
+  return await response.json();
+}
 
-    const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}${endpoint}`, config);
+// General-purpose API fetch with retry
+export async function fetchAPI(
+  endpoint: string,
+  method: string = 'GET',
+  body: any = null,
+  setUserToken?: (val: string | null) => void
+) {
+  let token = await SecureStore.getItemAsync("accessToken");
 
-    if (!response.ok) {
-      const textResponse = await response.text();
-      try {
-        console.log("Non-JSON response received:", textResponse);
-        const errorResponse = JSON.parse(textResponse);
-        throw new Error(errorResponse.error || response.statusText);
-      } catch (error) {
-        throw new Error(textResponse || 'The server returned an unexpected response.');
-      }
+  const config: RequestInit = {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': token ? `Bearer ${token}` : '',
+    },
+  };
+
+  if (body) {
+    config.body = JSON.stringify(body);
+  }
+
+  let response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}${endpoint}`, config);
+
+  if (response.status === 401 && setUserToken) {
+    console.warn("Token expired. Attempting refresh...");
+    const newToken = await refreshAccessToken(setUserToken);
+    if (newToken) {
+      config.headers['Authorization'] = `Bearer ${newToken}`;
+      response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}${endpoint}`, config);
+    } else {
+      throw new Error("Session expired. Please log in again.");
     }
-    
-    // handle 204 No Content (successful DELETE)
-    if (response.status === 204) {
-      return;
+  }
+
+  if (!response.ok) {
+    const text = await response.text();
+    try {
+      const errorResponse = JSON.parse(text);
+      throw new Error(errorResponse.error || response.statusText);
+    } catch {
+      throw new Error(text || "Unexpected error");
     }
-    
-    const contentType = response.headers.get("content-type");
-    if (contentType?.includes("application/json")) {
-      return await response.json();
-    }
-    
-    return;
-    
+  }
+
+  if (response.status === 204) return;
+
+  const contentType = response.headers.get("content-type");
+  if (contentType?.includes("application/json")) {
+    return await response.json();
+  }
+
+  return;
 }

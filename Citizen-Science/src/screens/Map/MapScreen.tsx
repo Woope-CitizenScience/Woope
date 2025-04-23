@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import { createPinNew, getAllPinsNew, deletePinNew, updatePinNew } from '../../api/pins';
 
 import {
@@ -22,6 +22,7 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as MediaLibrary from 'expo-media-library';
 import test from 'node:test';
+import { AuthContext } from '../../util/AuthContext';
 
 const windowWidth = Dimensions.get('window').width;
 
@@ -51,6 +52,7 @@ interface Pin {
 }
 
 export const MapScreen = () => {
+	  const { userToken, setUserToken } = useContext(AuthContext);
 	const [currentLocation, setCurrentLocation] = useState<Location | null>(null);
 	const [initialRegion, setInitialRegion] = useState<Region | null>(null);
 	const [pins, setPins] = useState<Pin[]>([]);
@@ -98,7 +100,7 @@ export const MapScreen = () => {
 
 	const fetchPins = async () => {
 		try {
-			const allPins = await getAllPinsNew();
+			const allPins = await getAllPinsNew(setUserToken);
 			// console.log('\nFetched pins from the server:', allPins); // We do get the pin_id
 
 			const transformedPins = allPins.map((pin) => ({
@@ -215,7 +217,7 @@ export const MapScreen = () => {
 
 	const handleDeletePin = async (pinId: number): Promise<boolean> => {
 		try {
-			await deletePinNew(pinId); // The API call
+			await deletePinNew(pinId, setUserToken); // The API call
 			console.log('Pin deleted successfully!');
 			return true;
 		} catch (error) {
@@ -265,7 +267,8 @@ export const MapScreen = () => {
 				formData.tag,
 				pinLocation.longitude,
 				pinLocation.latitude,
-				formData.image || null
+				formData.image || null,
+				setUserToken
 			);
 
 			console.log("✅ Pin Created Successfully:", newPin);
@@ -471,7 +474,8 @@ export const MapScreen = () => {
 				new Date(formData.date),
 				formData.tag,
 				pinLocation.longitude, // changed to match backend
-				pinLocation.latitude  // changed to match backend
+				pinLocation.latitude,  // changed to match backend
+				setUserToken
 			);
 
 			// Ensure date parsing is valid

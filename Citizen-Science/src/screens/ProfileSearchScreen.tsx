@@ -109,7 +109,7 @@ const ProfileSearchScreen: React.FC<ProfileSearchScreenProps> = ({
 							},
 						]}
 						onChangeText={(text) => handleTextChange(text)}
-						placeholder="Search"
+						placeholder="Search for other users"
 						placeholderTextColor={"grey"}
 					></TextInput>
 				</View>

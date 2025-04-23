@@ -9,7 +9,7 @@ export const createRefreshToken = async (user: User) => {
         },
         config.refreshTokenSecret!,
         {
-            expiresIn: `7d`
+            expiresIn: `30d` //user will be logged out after a month
         }
     );
 };
@@ -29,7 +29,7 @@ export const createAccessToken = async (user: User) => {
         },
         config.accessTokenSecret!,
         {
-            expiresIn: '15m'
+            expiresIn: '60m' //fetch request token will last an hour
         }
     );
 };

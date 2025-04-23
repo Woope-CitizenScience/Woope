@@ -32,7 +32,6 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-import Weather from "../components/Weather";
 import {
   createPost,
   getAllPosts,
@@ -54,7 +53,7 @@ import {
 import { PdfFile, Post, Comment, PostWithUsername } from "../api/types";
 import WelcomeBanner from "../components/WelcomeBanner";
 import FixedSwitch from "../components/FixedSwitch";
-
+import Weather from "../components/Weather";
 const HomeScreen = () => {
   const { userToken, setUserToken } = useContext(AuthContext);
   const [data, setData] = useState(null);
@@ -104,7 +103,7 @@ const HomeScreen = () => {
 
   const fetchPosts = async () => {
     try {
-      let postsList = await getAllPosts(userId);
+      let postsList = await getAllPosts(userId, setUserToken);
       postsList = postsList.filter((post: PostWithUsername) => {
         return post.is_active;
       });
@@ -257,7 +256,7 @@ const HomeScreen = () => {
     }
 
     try {
-      const updatedPost = await updatePost(editingPostId, postText); // Adjust parameters as needed
+      const updatedPost = await updatePost(editingPostId, postText, setUserToken); // Adjust parameters as needed
       fetchPosts();
 
       // Reset the form and editing state
@@ -283,7 +282,7 @@ const HomeScreen = () => {
     }
     try {
       const postOrgId = postAsOrganization ? userOrgId : NaN;
-      await createPost(Number(userId), postOrgId, postText);
+      await createPost(Number(userId), postOrgId, postText, setUserToken);
       fetchPosts();
 
       // Clear the form
@@ -301,7 +300,7 @@ const HomeScreen = () => {
     setVisibleDropdown(null);
     if (userCanDeletePost(postToDelete)) {
       try {
-        deletePost(postToDelete.post_id);
+        deletePost(postToDelete.post_id, setUserToken);
         setPosts((currentPosts) =>
           currentPosts.filter((post) => post.post_id !== postToDelete.post_id)
         );
