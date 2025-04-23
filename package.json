@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@react-native-community/datetimepicker": "^8.3.0",
     "@types/react-native-calendars": "^1.1264.7",
     "expo-camera": "^16.0.9",
     "expo-image-picker": "^16.0.3",

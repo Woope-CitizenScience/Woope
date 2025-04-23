@@ -32,6 +32,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
+import Weather from "../components/Weather";
 import {
   createPost,
   getAllPosts,
@@ -91,6 +92,7 @@ const HomeScreen = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editingPostId, setEditingPostId] = useState<number | null>(null);
   const [modalY] = useState(new Animated.Value(0));
+  const [refreshing, setRefreshing] = useState(false);
   const postTextInputRef = useRef<TextInput>(null);
 
   interface CommentsMap {
@@ -118,6 +120,11 @@ const HomeScreen = () => {
       console.error(error);
       setError("Failed to fetch posts.");
     }
+  };
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchPosts();
+    setRefreshing(false);
   };
 
   const pickImage = async () => {
@@ -389,6 +396,8 @@ const HomeScreen = () => {
         <KeyboardAwareFlatList
           data={posts}
           keyExtractor={(item) => item.post_id.toString()}
+          refreshing={refreshing}
+          onRefresh={onRefresh}
           renderItem={({ item }) => (
             <View style={styles.post}>
               <View style={styles.headerRow}>
