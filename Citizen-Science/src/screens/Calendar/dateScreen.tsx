@@ -3,9 +3,8 @@ import { useNavigation, useFocusEffect} from '@react-navigation/native';
 import { View, Text, SafeAreaView, FlatList, TouchableOpacity, StyleSheet, StatusBar, ScrollView } from 'react-native';
 import EventCard from '../../components/EventCard';
 import { Event } from '../../api/types';
-import { getDayEvents } from '../../api/event';
-import { Button } from 'react-native-paper';
-import { addDays } from 'date-fns';
+import { getDayEvents, getFollowedEvents, getUserEvents } from '../../api/event';
+import { addDays, set } from 'date-fns';
 
 const DateScreen = ({route}) => {
     const navigation = useNavigation<any>();
@@ -13,43 +12,55 @@ const DateScreen = ({route}) => {
     let [selectedDate, setSelectedDate] = useState<Date>(new Date());
     let [dayAfter, setDayAfter] = useState<Date>(new Date());
     let [dateString, setDateString] = useState(route.params.dateString)
-  
-
-    useFocusEffect(() => {
-        getRange();
-        fetchEvents();
-    }, )
-
-    const [eventData, setEventData] = useState<Event[]>([]);
-    const [followedEventData, setfollowedEventData] = useState<Event[]>([]);
-    const [userEventData, setUserEventData] = useState<Event[]>([]);
+    let [eventData, setEventData] = useState<Event[]>([]);
+    let [stylePublic, setStylePublic] = useState(styles.selected);
+    let [styleFollowed, setStyleFollowed] = useState(styles.options);
+    let [stylePrivate, setStylePrivate] = useState(styles.options);
+    const [generalEventList, setGeneralEventList] = useState<Event[]>([])
+    const [followedEventList, setfollowedEventList] = useState<Event[]>([]);
+    const [userEventList, setUserEventList] = useState<Event[]>([]);
     
-    const getRange = () => {
+    useEffect(() => {
+            getRange();
+            Promise.all([fetchEvents(),fetchFollowedEvents(),fetchUserEvents()]).then((values => {
+                console.log("yippee")
+            }))
+        },[]);
+
+    const getRange = async() => {
         now = new Date(dateString);
         selectedDate = new Date(now.getTime() + now.getTimezoneOffset() * 60000);
         dayAfter = addDays(selectedDate, 1);
+        try {
+            const eventList = await getDayEvents(selectedDate, dayAfter);
+            setEventData(eventList);
+        } catch (error) {
+            console.log(error)
+        }
     }
     // retrieve all events from the given date
     const fetchEvents = async () => {
         try {
             const eventList = await getDayEvents(selectedDate, dayAfter);
-            setEventData(eventList);
+            setGeneralEventList(eventList);
         } catch (error) {
             console.log(error);
         }
     }
     const fetchFollowedEvents = async () => {
         try {
-            
+            const followedList = await getFollowedEvents(selectedDate, dayAfter, route.params.id);
+            setfollowedEventList(followedList);
         } catch (error) {
-            
+            console.log(error);
         }
     }
     const fetchUserEvents = async () => {
         try {
-            
+            const userList = await getUserEvents(selectedDate, dayAfter, route.params.id);
+            setUserEventList(userList)
         } catch (error) {
-            
+            console.log(error);
         }
     }
     return(
@@ -79,21 +90,37 @@ const DateScreen = ({route}) => {
             )}/> 
 
 <View style={styles.buttonBar}>
-                <TouchableOpacity style={styles.selected}>
+                <TouchableOpacity style={stylePublic} onPress={() => {
+                    setEventData(generalEventList);
+                    setStylePublic(styles.selected);
+                    setStyleFollowed(styles.options);
+                    setStylePrivate(styles.options);
+                    
+                }}>
                     <View>
                         <Text>
                             Public
                         </Text>
                     </View>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.options}>
+                <TouchableOpacity style={styleFollowed} onPress={() => {
+                    setEventData(followedEventList);
+                    setStylePublic(styles.options);
+                    setStyleFollowed(styles.selected);
+                    setStylePrivate(styles.options);
+                }}>
                     <View>
                         <Text>
                             Followed
                         </Text>
                     </View>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.options}>
+                <TouchableOpacity style={stylePrivate} onPress={() => {
+                    setEventData(userEventList);
+                    setStylePublic(styles.options);
+                    setStyleFollowed(styles.options);
+                    setStylePrivate(styles.selected);
+                }}>
                     <View>
                         <Text>
                             Private

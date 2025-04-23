@@ -188,12 +188,12 @@ export const getDayEvents = async (bottom: Date, top: Date) =>{
 
     }
 }
-export const getFollowedEvents = async (day: number, month: number, year: number, user_id: number) =>{
+export const getFollowedEvents = async (bottom: Date, top: Date, user_id: number) =>{
     try {
         let query;
         let values;
-        query = `SELECT * FROM public.event FULL JOIN public.user_organization_follows ON public.event.org_id = public.user_organization_follows.org_id WHERE EXTRACT(DAY FROM public.event.time_begin) = $1 AND EXTRACT(MONTH FROM public.event.time_begin) = $2 AND EXTRACT(YEAR FROM public.event.time_begin) = $3 AND public.user_organization_follows.user_id = $4`;
-        values = [day, month, year, user_id];
+        query = `SELECT * FROM public.event FULL JOIN public.user_organization_follows ON public.event.org_id = public.user_organization_follows.org_id WHERE public.event.time_begin BETWEEN $1 AND $2 AND public.user_organization_follows.user_id = $3`;
+        values = [bottom, top, user_id];
         const response = await pool.query(query, values);
         return response.rows;
     } catch (error) {
@@ -201,12 +201,12 @@ export const getFollowedEvents = async (day: number, month: number, year: number
 
     }
 }
-export const getUserEvents = async (day: number, month: number, year: number, user_id: number) =>{
+export const getUserEvents = async (bottom: Date, top: Date, user_id: number) =>{
     try {
         let query;
         let values;
-        query = `SELECT * FROM public.user_event WHERE EXTRACT(DAY FROM public.user_event.time_begin) = $1 AND EXTRACT(MONTH FROM public.user_event.time_begin) = $2 AND EXTRACT(YEAR FROM public.user_event.time_begin) = $3 AND public.user_event = $4`;
-        values = [day, month, year, user_id];
+        query = `SELECT * FROM public.user_event WHERE public.user_event.time_begin BETWEEN $1 AND $2 AND public.user_event.user_id = $3`;
+        values = [bottom, top, user_id];
         const response = await pool.query(query, values);
         return response.rows;
     } catch (error) {

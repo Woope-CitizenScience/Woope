@@ -1,5 +1,5 @@
 import express from 'express';
-import { getEvents, createEvents, getEventInfo, deleteEvent, updateEvent, getDates, getFollowedDates, getDayEvents, createUserEvents, getUserDates} from "../models/events";
+import { getEvents, createEvents, getEventInfo, deleteEvent, updateEvent, getDates, getFollowedDates, getDayEvents, createUserEvents, getUserDates, getFollowedEvents, getUserEvents} from "../models/events";
 const router = require('express').Router();
 
 //get all events
@@ -106,6 +106,30 @@ router.get('/getuserdates/:month/:year/:user_id', async(req: express.Request, re
 router.get('/getdayevents/:bottom/:top/', async(req: express.Request, res: express.Response) => {
     try {
         const dates = await getDayEvents(new Date(req.params.bottom), new Date(req.params.top));
+        res.status(200).json(dates);
+    } catch (error) {
+        if (error instanceof Error) {
+            res.status(500).json(`Internal server error: ${error.message}`);
+        } else {
+            res.status(500).json('Internal server error: An unknown error occurred');
+        }
+    }
+});
+router.get('/getfollowedevents/:bottom/:top/:user_id', async(req: express.Request, res: express.Response) => {
+    try {
+        const dates = await getFollowedEvents(new Date(req.params.bottom), new Date(req.params.top), Number(req.params.user_id));
+        res.status(200).json(dates);
+    } catch (error) {
+        if (error instanceof Error) {
+            res.status(500).json(`Internal server error: ${error.message}`);
+        } else {
+            res.status(500).json('Internal server error: An unknown error occurred');
+        }
+    }
+});
+router.get('/getuserevents/:bottom/:top/:user_id', async(req: express.Request, res: express.Response) => {
+    try {
+        const dates = await getUserEvents(new Date(req.params.bottom), new Date(req.params.top), Number(req.params.user_id));
         res.status(200).json(dates);
     } catch (error) {
         if (error instanceof Error) {
