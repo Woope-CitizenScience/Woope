@@ -5,9 +5,9 @@ CREATE TABLE IF NOT EXISTS event (
     name VARCHAR(25) NOT NULL,
     text_description VARCHAR(500) DEFAULT '',
     tagline VARCHAR(50) DEFAULT '',
-    time_begin TIMESTAMP NOT NULL,
-    time_end TIMESTAMP NOT NULL,
+    time_begin TIMESTAMPTZ NOT NULL,
+    time_end TIMESTAMPTZ NOT NULL,
     image_path VARCHAR(500),
     location VARCHAR(50),
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

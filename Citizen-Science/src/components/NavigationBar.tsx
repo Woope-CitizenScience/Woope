@@ -23,6 +23,7 @@ import FeatureOrganization from '../screens/Organizations/FeatureOrganization';
 import EventHome from '../screens/Events/EventHome';
 import ReportScreen from '../screens/ReportScreen';
 import DateScreen from '../screens/Calendar/DateScreen';
+import OldCalendarScreen from '../screens/OldCalendarScreen'
 
 const Tab = createBottomTabNavigator();
 interface AnimatedTabIconProps {

@@ -1,5 +1,5 @@
 import express from 'express';
-import { getEvents, createEvents, getEventInfo, deleteEvent, updateEvent, getDates, getFollowedDates, getDayEvents} from "../models/events";
+import { getEvents, createEvents, getEventInfo, deleteEvent, updateEvent, getDates, getFollowedDates, getDayEvents, createUserEvents, getUserDates} from "../models/events";
 const router = require('express').Router();
 
 //get all events
@@ -91,11 +91,37 @@ router.get('/getfolloweddates/:month/:year/:user_id', async(req: express.Request
         }
     }
 });
-router.get('/getdayevents/:day/:month/:year/:user_id', async(req: express.Request, res: express.Response) => {
+router.get('/getuserdates/:month/:year/:user_id', async(req: express.Request, res: express.Response) => {
     try {
-        const dates = await getDayEvents(Number(req.params.day), Number(req.params.month), Number(req.params.year), Number(req.params.user_id));
+        const dates = await getUserDates(Number(req.params.month), Number(req.params.year), Number(req.params.user_id));
         res.status(200).json(dates);
     } catch (error) {
+        if (error instanceof Error) {
+            res.status(500).json(`Internal server error: ${error.message}`);
+        } else {
+            res.status(500).json('Internal server error: An unknown error occurred');
+        }
+    }
+});
+router.get('/getdayevents/:bottom/:top/', async(req: express.Request, res: express.Response) => {
+    try {
+        const dates = await getDayEvents(new Date(req.params.bottom), new Date(req.params.top));
+        res.status(200).json(dates);
+    } catch (error) {
+        if (error instanceof Error) {
+            res.status(500).json(`Internal server error: ${error.message}`);
+        } else {
+            res.status(500).json('Internal server error: An unknown error occurred');
+        }
+    }
+});
+//create an event
+router.post('/createuserevents', async(req: express.Request, res: express.Response) => {
+    try{
+        const {user_id, name, tagline, text_description, time_begin, time_end} = req.body;
+        const newPost = await createUserEvents(user_id, name, tagline, text_description, time_begin, time_end);
+        res.status(201).json(newPost);
+    }catch(error){
         if (error instanceof Error) {
             res.status(500).json(`Internal server error: ${error.message}`);
         } else {

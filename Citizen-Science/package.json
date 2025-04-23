@@ -9,6 +9,7 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@date-fns/utc": "^2.1.0",
     "@mdi/js": "^7.4.47",
     "@mdi/react": "^1.6.1",
     "@react-native-async-storage/async-storage": "1.23.1",

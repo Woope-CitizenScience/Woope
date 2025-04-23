@@ -26,6 +26,13 @@ export const getDates = async(month: number, year: number) => {
 export const getFollowedDates = async(month: number, year: number, user_id: number) => {
     return fetchAPI(`/events/getfolloweddates/${month}/${year}/${user_id}`, 'GET');
 }
-export const getDayEvents = async(day: number, month: number, year: number, user_id: number) => {
-    return fetchAPI(`/events/getdayevents/${day}/${month}/${year}/${user_id}`, 'GET');
+export const getUserDates = async(month: number, year: number, user_id: number) => {
+    return fetchAPI(`/events/getuserdates/${month}/${year}/${user_id}`, 'GET');
+}
+export const getDayEvents = async(bottom: Date, top: Date) => {
+    return fetchAPI(`/events/getdayevents/${bottom}/${top}`, 'GET');
+}
+//create a user event
+export const createUserEvents = async(user_id:number, name: string, tagline: string, text_description: string, time_begin: Date, time_end: Date) => {
+    return fetchAPI(`/events/createuserevents`, 'POST', {user_id, name, tagline, text_description, time_begin, time_end});
 }
