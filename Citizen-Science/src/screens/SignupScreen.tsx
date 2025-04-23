@@ -73,6 +73,7 @@ const SignupScreen = () => {
 		setUserInfo(prevState => ({ ...prevState, [field]: value }));
 	};
 
+
 	const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
 	const showDatePicker = () => setDatePickerVisibility(true);
@@ -89,6 +90,7 @@ const SignupScreen = () => {
 
 				await storeToken('accessToken', response.accessToken);
 				await storeToken('refreshToken', response.refreshToken);
+
 
 				setUserToken(response.accessToken);
 			} catch (error) {

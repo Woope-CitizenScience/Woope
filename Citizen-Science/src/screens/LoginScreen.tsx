@@ -29,6 +29,7 @@ const LoginScreen: React.FC = () => {
     const navigation = useNavigation<NavigationProp>();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+
     const [showPassword, setShowPassword] = useState(false);
     const { setUserToken } = useContext(AuthContext);
     const handleLoginPress = async () => {
@@ -38,10 +39,12 @@ const LoginScreen: React.FC = () => {
             const storedToken = await AsyncStorage.getItem("accessToken");
             setUserToken(storedToken);
 
+
         } catch (error) {
             console.log('Login failed', error);
         }
     };
+
 
     return (
         <KeyboardAvoidingView

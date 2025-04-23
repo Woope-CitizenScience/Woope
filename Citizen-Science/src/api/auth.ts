@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { storeToken } from '../util/token';
 
 export const loginUser = async (email: string, password: string) => {
 	const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/auth/login`, {
@@ -18,12 +19,13 @@ export const loginUser = async (email: string, password: string) => {
 
 	const data = await response.json();
 
-	// Store token in AsyncStorage
 	if (data?.accessToken) {
-		await AsyncStorage.setItem("accessToken", data.accessToken);
-		console.log(" Access token stored (login).");
-	} else {
-		console.warn(" No access token in login response.");
+		await storeToken("accessToken", data.accessToken);
+		console.log(" Access token stored (login)");
+	}
+	if (data?.refreshToken) {
+		await storeToken("refreshToken", data.refreshToken);
+		console.log(" Refresh token stored (login)");
 	}
 
 	return data;
@@ -61,16 +63,18 @@ export const registerUser = async (
 
 	const data = await response.json();
 
-	//  Store token in AsyncStorage
 	if (data?.accessToken) {
-		await AsyncStorage.setItem("accessToken", data.accessToken);
-		console.log(" Access token stored (register).");
-	} else {
-		console.warn(" No access token in register response.");
+		await storeToken("accessToken", data.accessToken);
+		console.log(" Access token stored (register)");
+	}
+	if (data?.refreshToken) {
+		await storeToken("refreshToken", data.refreshToken);
+		console.log(" Refresh token stored (register)");
 	}
 
 	return data;
 };
+
 
 export const logoutUser = async (userId: number) => {
 	const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/auth/logout`, {
@@ -87,8 +91,4 @@ export const logoutUser = async (userId: number) => {
 		error.name = `HTTP Error ${response.status}`;
 		throw error;
 	}
-
-	// Clear token from AsyncStorage
-	await AsyncStorage.removeItem("accessToken");
-	console.log("👋 Access token removed (logout).");
 };
