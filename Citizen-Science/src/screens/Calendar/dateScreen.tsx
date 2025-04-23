@@ -82,7 +82,7 @@ const DateScreen = ({route}) => {
                 <TouchableOpacity style={styles.selected}>
                     <View>
                         <Text>
-                            All
+                            Public
                         </Text>
                     </View>
                 </TouchableOpacity>
@@ -96,7 +96,7 @@ const DateScreen = ({route}) => {
                 <TouchableOpacity style={styles.options}>
                     <View>
                         <Text>
-                            Personal
+                            Private
                         </Text>
                     </View>
                 </TouchableOpacity>

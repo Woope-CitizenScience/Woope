@@ -138,12 +138,10 @@ export const updateEvent = async (event_id: number, tagline: string, text_descri
     }
 }
 export const getDates = async (month: number, year: number) =>{
-    
     try {
         let query;
         let values;
-        
-        query = `SELECT DISTINCT TO_CHAR(public.event.time_begin, 'yyyy-mm-dd') FROM public.event WHERE EXTRACT(MONTH FROM public.event.time_begin) = $1 AND EXTRACT(YEAR FROM public.event.time_begin) = $2`
+        query = `SELECT DISTINCT TO_CHAR(public.event.time_begin, 'yyyy-mm-dd'), time_begin FROM public.event WHERE EXTRACT(MONTH FROM public.event.time_begin) = $1 AND EXTRACT(YEAR FROM public.event.time_begin) = $2`
         values = [month, year]
         const response = await pool.query(query, values)
         return response.rows;
@@ -155,7 +153,7 @@ export const getFollowedDates = async (month: number, year: number, user_id: num
     try {
         let query;
         let values;
-        query = `SELECT DISTINCT TO_CHAR(public.event.time_begin, 'yyyy-mm-dd') FROM public.event INNER JOIN public.user_organization_follows ON public.event.org_id = public.user_organization_follows.org_id WHERE EXTRACT(MONTH FROM public.event.time_begin) = $1 AND EXTRACT(YEAR FROM public.event.time_begin) = $2 AND public.user_organization_follows.user_id = $3`
+        query = `SELECT DISTINCT TO_CHAR(public.event.time_begin, 'yyyy-mm-dd'), time_begin FROM public.event INNER JOIN public.user_organization_follows ON public.event.org_id = public.user_organization_follows.org_id WHERE EXTRACT(MONTH FROM public.event.time_begin) = $1 AND EXTRACT(YEAR FROM public.event.time_begin) = $2 AND public.user_organization_follows.user_id = $3`
         values = [month, year, user_id]
         const response = await pool.query(query, values)
         return response.rows
@@ -168,7 +166,7 @@ export const getUserDates = async (month: number, year: number, user_id: number)
     try {
         let query;
         let values;
-        query = `SELECT DISTINCT TO_CHAR(public.user_event.time_begin, 'yyyy-mm-dd') FROM public.user_event WHERE EXTRACT(MONTH FROM public.user_event.time_begin) = $1 AND EXTRACT(YEAR FROM public.user_event.time_begin) = $2 AND public.user_event.user_id = $3`
+        query = `SELECT DISTINCT TO_CHAR(public.user_event.time_begin, 'yyyy-mm-dd'), time_begin FROM public.user_event WHERE EXTRACT(MONTH FROM public.user_event.time_begin) = $1 AND EXTRACT(YEAR FROM public.user_event.time_begin) = $2 AND public.user_event.user_id = $3`
         values = [month, year, user_id]
         const response = await pool.query(query, values)
         return response.rows

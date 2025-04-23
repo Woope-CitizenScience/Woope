@@ -21,6 +21,7 @@ interface Arguments {
 }
 interface Marks {
   to_char: string;
+  time_begin: string;
 }
 
 const CalendarScreen = () => {
@@ -54,27 +55,30 @@ const CalendarScreen = () => {
   const createMarks = () => {
     // Marks all dates with any organization date first
     generalMarks.forEach((element) => {
-      marks[element.to_char] = {marked:true, dots:[generalColor]}
+      let day = new Date(element.time_begin).toLocaleDateString("sv-SE")
+      marks[day] = {marked:true, dots:[generalColor]}
     });
     // adds a dot for personal/user events
     followedMarks.forEach((element) => {
-      if(marks[element.to_char].dots.some(({color}) => color == 'red')){
+      let day = new Date(element.time_begin).toLocaleDateString("sv-SE")
+      if(marks[day].dots.some(({color}) => color == 'red')){
     
       }
       else{ 
-        marks[element.to_char].dots.push(followedColor)
+        marks[day].dots.push(followedColor)
       }
     });
     //adds a dot for events that are followed
     userMarks.forEach((element) => {
-      if(!marks[element.to_char]){
-        marks[element.to_char] = {marked:true, dots:[userColor]}
+      let day = new Date(element.time_begin).toLocaleDateString("sv-SE")
+      if(!marks[day]){
+        marks[day] = {marked:true, dots:[userColor]}
       }
-      else if(marks[element.to_char].dots.some(({color}) => color == 'lightgreen')){
+      else if(marks[day].dots.some(({color}) => color == 'lightgreen')){
         
       }
       else{ 
-        marks[element.to_char].dots.push(userColor)
+        marks[day].dots.push(userColor)
       }
     });
   }
@@ -83,8 +87,8 @@ const CalendarScreen = () => {
     navigation.navigate("DateScreen", {
         id: userId,
         dateString: day.dateString,
-        dayNum: day.day ,
-        month: day.month ,
+        dayNum: day.day,
+        month: day.month,
         year: day.year
     })
   }, []);
