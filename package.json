@@ -1,9 +1,14 @@
 {
   "dependencies": {
     "@types/react-native-calendars": "^1.1264.7",
-    "expo-camera": "^16.0.9",
-    "expo-image-picker": "^16.0.3",
-    "mime": "^4.0.1"
+    "expo-camera": "16.0.18",
+    "expo-image-picker": "16.0.6",
+    "metro": "^0.81.4",
+    "metro-config": "^0.81.4",
+    "metro-resolver": "^0.81.4",
+    "mime": "^4.0.1",
+    "@types/react": "18.3.12",
+    "expo": "~52.0.42"
   },
   "devDependencies": {
     "@types/react": "^19.0.0",

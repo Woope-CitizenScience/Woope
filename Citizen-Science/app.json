@@ -18,8 +18,10 @@
       "supportsTablet": true,
       "infoPlist": {
         "NSCameraUsageDescription": "We need access to your camera to take pictures for pins.",
-        "NSPhotoLibraryUsageDescription": "We need access to your photo library to upload pictures for pins."
-      }
+        "NSPhotoLibraryUsageDescription": "We need access to your photo library to upload pictures for pins.",
+        "ITSAppUsesNonExemptEncryption": false
+      },
+      "bundleIdentifier": "com.vaishnavisen.CitizenScience"
     },
     "android": {
       "adaptiveIcon": {
@@ -31,7 +33,8 @@
         "WRITE_EXTERNAL_STORAGE",
         "READ_EXTERNAL_STORAGE"
       ],
-      "softwareKeyboardLayoutMode": "resize"
+      "softwareKeyboardLayoutMode": "resize",
+      "package": "com.vaishnavisen.CitizenScience"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -39,6 +42,11 @@
     "plugins": [
       "expo-build-properties",
       "expo-secure-store"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "32605924-9ac8-409c-b96a-000f4cb543ee"
+      }
+    }
   }
 }
