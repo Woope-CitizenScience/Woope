@@ -14,6 +14,8 @@ import { responsiveHeight, responsiveWidth } from "react-native-responsive-dimen
 import Blobs from "../components/Blobs";
 import { storeToken } from "../util/token";
 import { AuthContext } from "../util/AuthContext";
+import DateTimePicker from '@react-native-community/datetimepicker';
+import moment from 'moment';
 
 type NavigationParam = {
 	Login: undefined;
@@ -33,7 +35,7 @@ interface UserInfo {
 	firstName: string;
 	lastName: string;
 	email: string;
-	dateOfBirth: string;
+	dateOfBirth: Date | null;
 	password: string;
 }
 
@@ -45,7 +47,7 @@ const SignupScreen = () => {
 	const [userInfo, setUserInfo] = useState<UserInfo>({
 		firstName: '',
 		lastName: '',
-		dateOfBirth: '',
+		dateOfBirth: null,
 		email: '',
 		password: ''
 	});
@@ -67,14 +69,23 @@ const SignupScreen = () => {
 	const [errors, setErrors] = useState<Errors>({});
 	const { setUserToken } = useContext(AuthContext);
 
-	const handleInputChange = (field: keyof UserInfo, value: string) => {
+	const handleInputChange = (field: keyof UserInfo, value: string | Date | null) => {
 		setUserInfo(prevState => ({ ...prevState, [field]: value }));
+	};
+
+	const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+
+	const showDatePicker = () => setDatePickerVisibility(true);
+	const hideDatePicker = () => setDatePickerVisibility(false);
+	const handleConfirm = (date: Date) => {
+		handleInputChange('dateOfBirth', date);
+		hideDatePicker();
 	};
 
 	const handleSignUpPress = async () => {
 		if (validate()) {
 			try {
-				const response = await registerUser(userInfo.email, userInfo.password, userInfo.firstName, userInfo.lastName, userInfo.dateOfBirth);
+				const response = await registerUser(userInfo.email, userInfo.password, userInfo.firstName, userInfo.lastName, userInfo.dateOfBirth ? moment(userInfo.dateOfBirth).format('MM/DD/YY') : '');
 
 				await storeToken('accessToken', response.accessToken);
 				await storeToken('refreshToken', response.refreshToken);
@@ -117,11 +128,10 @@ const SignupScreen = () => {
 			errorMessages.push('Last name is required');
 		}
 
-		const dateOfBirthRegex = /^(0[1-9]|1[0-2])\/(0[1-9]|[12][0-9]|3[01])\/\d\d$/;
-		if (!dateOfBirthRegex.test(userInfo.dateOfBirth.trim())) {
-			newErrors.dateOfBirth = 'Invalid date format';
+		if (!userInfo.dateOfBirth) {
+			newErrors.dateOfBirth = 'Birth date is required';
 			isValid = false;
-			errorMessages.push('Invalid date format');
+			errorMessages.push('Birth date is required');
 		}
 
 
@@ -176,35 +186,61 @@ const SignupScreen = () => {
 						position={{ top: -10, left: -20 }}
 					/>
 
-					<CustomTextField
-						size={{ width: responsiveWidth(23.5), height: responsiveHeight(5.5) }}
-						placeholder="First Name"
-						value={userInfo.firstName}
-						onChangeText={(value) => handleInputChange('firstName', value)}
-						borderColor="#5EA1E9"
-						borderRadius={10}
-						position={{ top: 20, left: -23 }}
-					/>
+					<View style={{ width: responsiveWidth(70), position: 'relative', top: 120 }}>
+						<View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+							<CustomTextField
+								size={{ width: responsiveWidth(33), height: responsiveHeight(5.5) }}
+								placeholder="First Name"
+								value={userInfo.firstName}
+								onChangeText={(value) => handleInputChange('firstName', value)}
+								borderColor="#5EA1E9"
+								borderRadius={10}
+								position={{ top: 0, left: 0 }}
+							/>
+							<CustomTextField
+								size={{ width: responsiveWidth(33), height: responsiveHeight(5.5) }}
+								placeholder="Last Name"
+								value={userInfo.lastName}
+								onChangeText={(value) => handleInputChange('lastName', value)}
+								borderColor="#5EA1E9"
+								borderRadius={10}
+								position={{ top: 0, left: 0 }}
+							/>
+						</View>
+						<TouchableOpacity
+							onPress={showDatePicker}
+							style={{
+								width: responsiveWidth(70),
+								height: responsiveHeight(5.5),
+								borderWidth: 1,
+								borderColor: '#5EA1E9',
+								borderRadius: 10,
+								justifyContent: 'center',
+								paddingLeft: 10,
+								marginTop: responsiveHeight(1.5),
+							}}
+						>
+							<Text style={{ color: userInfo.dateOfBirth ? 'black' : 'grey' }}>
+								{userInfo.dateOfBirth ? moment(userInfo.dateOfBirth).format('MMM D, YYYY') : 'Birth Date'}
+							</Text>
+						</TouchableOpacity>
+					</View>
 
-					<CustomTextField
-						size={{ width: responsiveWidth(23.1), height: responsiveHeight(5.5) }}
-						placeholder="Last Name"
-						value={userInfo.lastName}
-						onChangeText={(value) => handleInputChange('lastName', value)}
-						borderColor="#5EA1E9"
-						borderRadius={10}
-						position={{ top: 14.5, left: 2 }}
-					/>
-
-					<CustomTextField
-						size={{ width: responsiveWidth(19.5), height: responsiveHeight(5.5) }}
-						placeholder="11/14/93"
-						value={userInfo.dateOfBirth}
-						onChangeText={(value) => handleInputChange('dateOfBirth', value)}
-						borderColor="#5EA1E9"
-						borderRadius={10}
-						position={{ top: 9, left: 25 }}
-					/>
+					{isDatePickerVisible && (
+						<View style={{ position: 'absolute', bottom: 305, left: 200, width: '100%' }}>
+							<DateTimePicker
+								value={userInfo.dateOfBirth || new Date()}
+								mode="date"
+								display="default"
+								onChange={(event, selectedDate) => {
+									if (selectedDate) {
+										handleInputChange('dateOfBirth', selectedDate);
+									}
+									hideDatePicker();
+								}}
+							/>
+						</View>
+					)}
 
 					<CustomTextField
 						size={{ width: responsiveWidth(70), height: responsiveHeight(5.5) }}
@@ -214,7 +250,7 @@ const SignupScreen = () => {
 						onChangeText={(value) => handleInputChange('email', value)}
 						borderColor="#5EA1E9"
 						borderRadius={10}
-						position={{ top: 10, left: 0 }}
+						position={{ top: 13.9, left: 0 }}
 						textContentType={'oneTimeCode'}
 					/>
 					{/* Password TextField with show/hide */}
@@ -227,7 +263,7 @@ const SignupScreen = () => {
 							secureTextEntry={!showPassword}
 							borderColor="#5EA1E9"
 							borderRadius={10}
-							position={{ top: 11, left: 0 }}
+							position={{ top: 15, left: 0 }}
 							textContentType={'oneTimeCode'}
 						/>
 						<TouchableOpacity
@@ -236,7 +272,7 @@ const SignupScreen = () => {
 								position: 'absolute',
 								left: 280,
 								top: responsiveHeight(11),
-								height: responsiveHeight(5.5),
+								height: responsiveHeight(13),
 								justifyContent: 'center',
 								alignItems: 'center'
 							}}
@@ -256,7 +292,7 @@ const SignupScreen = () => {
 						backgroundColor="#5EA1E9"
 						//TODO potentially redirect to home page after account creation
 						onPress={handleSignUpPress}
-						position={{ top: 13, left: 0 }}
+						position={{ top: 20, left: 0 }}
 					/>
 
 
