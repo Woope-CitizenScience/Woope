@@ -31,7 +31,7 @@ const EventCard:React.FC<EventProps> = ({event_id, org_id}) => {
             }
             useEffect(() => {
                 fetchInfo();
-            })
+            },[])
     return(
         // Container
         <SafeAreaView>

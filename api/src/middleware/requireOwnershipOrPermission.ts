@@ -7,6 +7,7 @@ type OwnershipPermissionOptions<T> = {
   extractUserId: (resource: T) => number;
   idSource: 'query' | 'params' | 'body';
   idKey: string;
+  compareToUser?: (user: any) => number; //makes this optional
 };
 
 export function requireOwnershipOrPermission<T>({
@@ -15,7 +16,8 @@ export function requireOwnershipOrPermission<T>({
   permissionAll,
   extractUserId,
   idSource,
-  idKey
+  idKey,
+  compareToUser, //only for orgs
 }: OwnershipPermissionOptions<T>) {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -27,18 +29,22 @@ export function requireOwnershipOrPermission<T>({
         return res.status(400).json({ error: `Invalid or missing ${idKey}` });
       }
 
-      const resource = await fetchResource(resourceId);
-      if (!resource) {
+      const resourceData = await fetchResource(resourceId);
+      const resource = Array.isArray(resourceData) ? resourceData[0] : resourceData;
+            if (!resource) {
         return res.status(404).json({ error: "Resource not found" });
       }
 
-      const isOwner = extractUserId(resource) === user?.user_id;
-      const canOwn = user?.permissions?.[permissionOwn];
-      const canAll = user?.permissions?.[permissionAll];
+      const extractedId = extractUserId(resource);
+      const compareId = compareToUser ? compareToUser(user) : user?.user_id;
+      
+      const isOwner = extractedId === compareId;
+      const canOwn = Boolean(user?.permissions?.[permissionOwn]);
+      const canAll = Boolean(user?.permissions?.[permissionAll]);
 
-      if (!canAll && (!isOwner || !canOwn)) {
+            if (!canAll && (!isOwner || !canOwn)) {
         return res.status(403).json({ error: "Insufficient permissions." });
-      }
+      }      
 
       next();
     } catch (err) {

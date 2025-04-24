@@ -393,7 +393,7 @@ const HomeScreen = () => {
             <View style={styles.post}>
               <View style={styles.headerRow}>
                 <Image
-                  source={{ uri: "https://wallpapercave.com/wp/wp4008085.jpg" }}
+                  source={{ uri: "https://wallpapercave.com/wp/wp4008086.jpg" }}
                   style={styles.avatar}
                 />
                 <View style={styles.headerTextContainer}>
