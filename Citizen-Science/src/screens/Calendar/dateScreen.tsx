@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react'
 import { useNavigation, useFocusEffect} from '@react-navigation/native';
 import { View, Text, SafeAreaView, FlatList, TouchableOpacity, StyleSheet, StatusBar, ScrollView } from 'react-native';
 import EventCard from '../../components/EventCard';
+import EventCardViewOnly from '../../components/EventCardViewOnly';
 import { Event } from '../../api/types';
 import { getDayEvents, getFollowedEvents, getUserEvents } from '../../api/event';
 import { addDays, set } from 'date-fns';
@@ -76,7 +77,7 @@ const DateScreen = ({route}) => {
             scrollEnabled={true}
             keyExtractor={(item) => item.event_id} 
             renderItem={({item}) => (
-                <EventCard 
+                <EventCardViewOnly
                     event_id = {item.event_id} 
                     org_id = {item.org_id} 
                     name = {item.name}
