@@ -9,6 +9,7 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@date-fns/utc": "^2.1.0",
     "@expo/metro-runtime": "~4.0.1",
     "@mdi/js": "^7.4.47",
     "@mdi/react": "^1.6.1",
@@ -22,6 +23,7 @@
     "atob": "^2.1.2",
     "axios": "^1.6.7",
     "core-js": "^3.39.0",
+    "date-fns": "^4.1.0",
     "expo": "^52.0.42",
     "expo-build-properties": "~0.13.2",
     "expo-camera": "~16.0.18",

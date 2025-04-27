@@ -1,7 +1,7 @@
-/* Create event table */
-CREATE TABLE IF NOT EXISTS event (
+/* Replace with your SQL commands */
+CREATE TABLE IF NOT EXISTS user_event (
     event_id SERIAL PRIMARY KEY,
-    org_id INTEGER NOT NULL,
+    user_id INTEGER NOT NULL,
     name VARCHAR(25) NOT NULL,
     text_description VARCHAR(500) DEFAULT '',
     tagline VARCHAR(50) DEFAULT '',

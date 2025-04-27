@@ -5,7 +5,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import Svg, { Path } from 'react-native-svg';
 import { mdiHome, mdiTestTube, mdiCalendar, mdiBookshelf, mdiMapMarker, mdiFileDocument } from '@mdi/js';
-import CalendarScreen from '../screens/CalendarScreen';
+import CalendarScreen from '../screens/Calendar/CalendarScreen';
 import CommunitySideMenu from './CommunitySideMenu';
 import { MapScreen } from '../screens/Map/MapScreen';
 
@@ -21,7 +21,9 @@ import CreateOrganization from '../screens/Organizations/CreateOrganization';
 import CreateCategory from '../screens/Organizations/CreateCategory';
 import FeatureOrganization from '../screens/Organizations/FeatureOrganization';
 import EventHome from '../screens/Events/EventHome';
-import ReportScreen from '../screens/ReportScreen'
+import ReportScreen from '../screens/ReportScreen';
+import DateScreen from '../screens/Calendar/DateScreen';
+import OldCalendarScreen from '../screens/OldCalendarScreen'
 
 const Tab = createBottomTabNavigator();
 interface AnimatedTabIconProps {
