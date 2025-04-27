@@ -6,7 +6,7 @@ import LoginScreen from './screens/LoginScreen';
 import SignupScreen from './screens/SignupScreen';
 import SplashScreen from "./screens/SplashScreen";
 import NavigationBar from "./components/NavigationBar";
-import DateScreen from './screens/Calendar/DateScreen';
+import DateScreen from './screens/Calendar/dateScreen';
 
 
 const Stack = createNativeStackNavigator();
