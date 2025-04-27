@@ -14,6 +14,10 @@ export interface OrganizationWithCategory{
     name: string,
     category: string,
 }
+export interface OrganizationFollowed{
+    user_id: number, 
+    org_id: number,
+}
 export interface Category{
     category_id: number,
     name: string,

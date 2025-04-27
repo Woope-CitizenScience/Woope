@@ -2,12 +2,6 @@ import { Post, PostWithUsername, PostWithMedia, UserLikedPosts } from "../interf
 
 const pool = require('../db');
 
-/**
- * Retrieves posts with associated media and like information.
- * @param {number} currentUserId - The ID of the current user.
- * @returns {Promise<PostWithMedia[]>} A list of posts with media and like information.
- */
-
 export const getPostWithMedia = async (currentUserId: number): Promise<PostWithMedia[]> => {
   const query = `
       SELECT 
@@ -43,12 +37,6 @@ export const getPostWithMedia = async (currentUserId: number): Promise<PostWithM
   }));
 };
 
-/**
- * Retrieves posts with user and organization information.
- * @param {number} currentUserId - The ID of the current user.
- * @returns {Promise<UserLikedPosts[]>} A list of posts including user and organization details.
- */
-
 export const getPost = async (currentUserId: number): Promise<UserLikedPosts[]> => {
   const query = `
       SELECT 
@@ -77,35 +65,15 @@ export const getPost = async (currentUserId: number): Promise<UserLikedPosts[]> 
   }));
 };
 
-/**
- * Retrieves a post by its ID.
- * @param {number} id - The ID of the post.
- * @returns {Promise<Post | null>} The post if found, otherwise null.
- */
-
-export const getPostById = async (id: number): Promise<Post[] | null> => {
-  const response = await pool.query('SELECT * FROM posts WHERE id = $1', [id]);
+export const getPostById = async (post_id: number): Promise<Post | null> => {
+  const response = await pool.query('SELECT * FROM posts WHERE post_id = $1', [post_id]);
   return response.rows.length > 0 ? response.rows[0] : null;
 }
-
-/**
- * Retrieves all posts made by a specific user.
- * @param {number} user_id - The ID of the user.
- * @returns {Promise<Post[]>} A list of posts created by the user.
- */
 
 export const getPostByUserId = async (user_id: number): Promise<Post[]> => {
   const response = await pool.query('SELECT * FROM posts WHERE user_id = $1', [user_id]);
   return response.rows;
 }
-
-/**
- * Creates a new post.
- * @param {number} user_id - The ID of the user creating the post.
- * @param {number | null} org_id - The ID of the organization, if applicable.
- * @param {string} content - The content of the post.
- * @returns {Promise<Post>} The created post.
- */
 
 export const createPost = async (user_id: number, org_id: number | null, content: string): Promise<Post> => {
   try {
@@ -121,13 +89,6 @@ export const createPost = async (user_id: number, org_id: number | null, content
   }
 }
 
-/**
- * Updates a post's content.
- * @param {number} post_id - The ID of the post to update.
- * @param {string} content - The updated content.
- * @returns {Promise<Post>} The updated post.
- */
-
 export const updatePost = async (post_id: number, content: string): Promise<Post> => {
   try {
     const response = await pool.query(
@@ -141,11 +102,6 @@ export const updatePost = async (post_id: number, content: string): Promise<Post
   }
 };
 
-/**
- * Soft deletes a post by marking it inactive.
- * @param {number} post_id - The ID of the post.
- */
-
 export const softDeletePost = async (post_id: number): Promise<void> => {
   try {
     await pool.query('UPDATE posts SET is_active = FALSE WHERE post_id = $1', [post_id]);
@@ -155,10 +111,14 @@ export const softDeletePost = async (post_id: number): Promise<void> => {
   }
 }
 
-/**
- * Permanently deletes a post and its associated likes.
- * @param {number} post_id - The ID of the post.
- */
+export const restorePost = async (post_id: number): Promise<void> => {
+  try {
+    await pool.query('UPDATE posts SET is_active = TRUE WHERE post_id = $1', [post_id]);
+  } catch (error) {
+    console.error(`Error soft deleting post with id ${post_id}`, error);
+    throw error;
+  }
+}
 
 export const deletePost = async (post_id: number): Promise<void> => {
   const client = await pool.connect();
@@ -185,12 +145,6 @@ export const deletePost = async (post_id: number): Promise<void> => {
   }
 }
 
-/**
- * Adds a like to a post.
- * @param {number} post_id - The ID of the post.
- * @param {number} user_id - The ID of the user liking the post.
- */
-
 export const addPostLike = async (post_id: number, user_id: number): Promise<void> => {
   try {
     await pool.query('INSERT INTO post_likes (post_id, user_id) VALUES ($1, $2)', [post_id, user_id]);
@@ -199,12 +153,6 @@ export const addPostLike = async (post_id: number, user_id: number): Promise<voi
     throw error;
   }
 }
-
-/**
- * Removes a like from a post.
- * @param {number} post_id - The ID of the post.
- * @param {number} user_id - The ID of the user unliking the post.
- */
 
 export const removePostLike = async (post_id: number, user_id: number): Promise<void> => {
   try {
@@ -248,4 +196,15 @@ export const searchPosts = async (query: string): Promise<Post[]> => {
     console.error('Error searching posts', error);
     throw error;
   }
+}
+
+export const getPostsByOrgId = async (org_id: number): Promise<Post[] | undefined> => {
+  try {
+    const response = await pool.query('SELECT * FROM posts WHERE org_id = $1', [org_id]);
+    return response.rows;
+  }
+  catch (e) {
+    console.log("Error getting posts by org id: " + e);
+  }
+
 }

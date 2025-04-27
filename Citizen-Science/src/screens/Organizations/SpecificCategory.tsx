@@ -34,6 +34,7 @@ export const SpecificCategory = ({route}) => {
             keyExtractor={item => item.org_id}
             renderItem={({item}) => (
             <TouchableOpacity style={styles.directoryButton} onPress={() => navigation.navigate("OrganizationProfile",{
+                org_id: item.org_id,
                 name: item.name,
                 tagline: item.tagline,
                 text_description: item.text_description,

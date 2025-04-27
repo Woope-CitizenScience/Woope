@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ActivityIndicator, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, ActivityIndicator, ScrollView, StyleSheet, Alert } from 'react-native';
 import axios from 'axios';
+import * as Location from 'expo-location';
 
 interface WeatherData {
     Day: string;
@@ -16,19 +17,40 @@ const getWeatherIcon = (description: string) => {
     if (lowerCaseDescription.includes('rain')) return '🌧️';
     if (lowerCaseDescription.includes('snow')) return '❄️';
     if (lowerCaseDescription.includes('thunder')) return '⛈️';
-    return '🌈'; // Default icon if no match found
+    return '🌈';
 };
+
 const Weather: React.FC = () => {
     const [weatherData, setWeatherData] = useState<WeatherData[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const [locationName, setLocationName] = useState<string>('Your Location');
 
     useEffect(() => {
         const fetchWeatherData = async () => {
             try {
-                const response = await axios.get<WeatherData[]>(`${process.env.EXPO_PUBLIC_API_URL}/weather/forecast`);
-                const sevenDayForecast = response.data.slice(0, 7);
-                setWeatherData(sevenDayForecast);
+                const { status } = await Location.requestForegroundPermissionsAsync();
+                if (status !== 'granted') {
+                    setError('Location permission denied');
+                    return;
+                }
+
+                const location = await Location.getCurrentPositionAsync({});
+                const { latitude, longitude } = location.coords;
+
+                const response = await axios.get<WeatherData[]>(
+                    `${process.env.EXPO_PUBLIC_API_URL}/weather/forecast?lat=${latitude}&lon=${longitude}`
+                );
+
+                setWeatherData(response.data.slice(0, 7));
+
+                // Optional: Get location name using reverse geocoding
+                const geo = await Location.reverseGeocodeAsync({ latitude, longitude });
+                if (geo.length > 0) {
+                    const city = geo[0].city || geo[0].region || 'Your Location';
+                    setLocationName(city);
+                }
+
             } catch (err) {
                 console.error(err);
                 setError('Failed to fetch weather data');
@@ -36,6 +58,7 @@ const Weather: React.FC = () => {
                 setLoading(false);
             }
         };
+
         fetchWeatherData();
     }, []);
 
@@ -44,6 +67,7 @@ const Weather: React.FC = () => {
 
     return (
         <View style={styles.container}>
+            <Text style={styles.cityText}>{locationName}</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollView}>
                 {weatherData.map((data, index) => (
                     <View key={index} style={styles.weatherItem}>
@@ -59,6 +83,7 @@ const Weather: React.FC = () => {
         </View>
     );
 };
+
 
 const styles = StyleSheet.create({
     container: {
@@ -122,5 +147,12 @@ const styles = StyleSheet.create({
         color: '#D8000C',
         textAlign: 'center',
     },
+    cityText: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginBottom: 10,
+        color: '#333',
+        textAlign: 'center',
+    },    
 });
 export default Weather;

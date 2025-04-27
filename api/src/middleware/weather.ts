@@ -27,11 +27,10 @@ interface ForecastDictionary {
  * @throws {Error} - If the API call fails or the data cannot be retrieved.
  */
 
-const getWeatherData = (): Promise<ForecastDictionary[]> => {
-    const point_x = 40.0853; // Hard-coded coordinates
-    const point_y = -100.6746;
+const getWeatherData = (lat: number, lon: number): Promise<ForecastDictionary[]> => {
     const weather_api = 'https://api.weather.gov/points/';
-    const initial_api = `${weather_api}${point_x},${point_y}`;
+    const initial_api = `${weather_api}${lat},${lon}`;
+    
     return axios.get(initial_api)
         .then(response => {
             const forecast_api = response.data.properties.forecast;
@@ -39,21 +38,18 @@ const getWeatherData = (): Promise<ForecastDictionary[]> => {
         })
         .then(forecast_response => {
             let forecast = forecast_response.data.properties.periods;
-            let forecast_return: ForecastDictionary[] = [];
-            for (let i = 0; i < forecast.length; i++) {
-                let dictionary: ForecastDictionary = {
-                    Day: forecast[i].name,
-                    Temp: forecast[i].temperature,
-                    TempUnit: forecast[i].temperatureUnit,
-                    Description: forecast[i].shortForecast,
-                };
-                forecast_return.push(dictionary);
-            }
+            let forecast_return: ForecastDictionary[] = forecast.map((period: any) => ({
+                Day: period.name,
+                Temp: period.temperature,
+                TempUnit: period.temperatureUnit,
+                Description: period.shortForecast,
+            }));
             return forecast_return;
         })
         .catch(error => {
             console.error(error);
-            throw new Error('Failed to retrieve weather data'); // Throw an error to be handled by the caller
+            throw new Error('Failed to retrieve weather data');
         });
-}
+};
+
 export default getWeatherData; // Export the function

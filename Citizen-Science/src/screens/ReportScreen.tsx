@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { createReport } from '../api/report';
 
@@ -33,39 +33,41 @@ export const ReportScreen = () => {
     };
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Create a Report</Text>
-            <DropDownPicker
-                open={dropdownOpen}
-                value={formData.label}
-                items={labelOptions}
-                setOpen={setDropdownOpen}
-                setValue={(callback) => setFormData((prev) => ({ ...prev, label: callback(prev.label) }))}
-                style={styles.dropdown}
-                placeholder="Select a Label"
-            />
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+            <View style={styles.container}>
+                <Text style={styles.title}>Create a Report</Text>
+                <DropDownPicker
+                    open={dropdownOpen}
+                    value={formData.label}
+                    items={labelOptions}
+                    setOpen={setDropdownOpen}
+                    setValue={(callback) => setFormData((prev) => ({ ...prev, label: callback(prev.label) }))}
+                    style={styles.dropdown}
+                    placeholder="Select a Label"
+                />
 
-            <TextInput
-                style={styles.input}
-                placeholder="Title"
-                placeholderTextColor="#999"
-                value={formData.title}
-                onChangeText={(text) => setFormData({ ...formData, title: text })}
-            />
+                <TextInput
+                    style={styles.input}
+                    placeholder="Title"
+                    placeholderTextColor="#999"
+                    value={formData.title}
+                    onChangeText={(text) => setFormData({ ...formData, title: text })}
+                />
 
-            <TextInput
-                style={[styles.input, styles.textArea]}
-                placeholder="Description"
-                placeholderTextColor="#999"
-                value={formData.description}
-                onChangeText={(text) => setFormData({ ...formData, description: text })}
-                multiline
-            />
+                <TextInput
+                    style={[styles.input, styles.textArea]}
+                    placeholder="Description"
+                    placeholderTextColor="#999"
+                    value={formData.description}
+                    onChangeText={(text) => setFormData({ ...formData, description: text })}
+                    multiline
+                />
 
-            <TouchableOpacity style={styles.submitButton} onPress={handleFormSubmit}>
-                <Text style={styles.buttonText}>Submit Report</Text>
-            </TouchableOpacity>
-        </View>
+                <TouchableOpacity style={styles.submitButton} onPress={handleFormSubmit}>
+                    <Text style={styles.buttonText}>Submit Report</Text>
+                </TouchableOpacity>
+            </View>
+        </TouchableWithoutFeedback>
     );
 };
 

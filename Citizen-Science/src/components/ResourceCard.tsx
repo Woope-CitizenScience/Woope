@@ -26,7 +26,7 @@ const ResourcesCard:React.FC<ResourceProps> = ({resource_id, org_id}) => {
         }
         useEffect(() => {
             fetchInfo();
-        })
+        },[])
     return(
         <SafeAreaView>
             <FlatList 

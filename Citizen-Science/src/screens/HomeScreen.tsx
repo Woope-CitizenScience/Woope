@@ -32,7 +32,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-import Weather from "../components/weather";
+import Weather from "../components/Weather";
 import {
   createPost,
   getAllPosts,
@@ -54,13 +54,13 @@ import {
 import { PdfFile, Post, Comment, PostWithUsername } from "../api/types";
 import WelcomeBanner from "../components/WelcomeBanner";
 import FixedSwitch from "../components/FixedSwitch";
-
+import Weather from "../components/Weather";
 const HomeScreen = () => {
   const { userToken, setUserToken } = useContext(AuthContext);
   const [data, setData] = useState(null);
   const decodedToken = userToken ? jwtDecode<AccessToken>(userToken) : null;
   const userPermissions = decodedToken
-    ? JSON.parse(decodedToken?.permissions)
+    ? (decodedToken?.permissions)
     : null;
   const userCanDeleteAllPosts = userPermissions
     ? userPermissions.delete_all_posts
@@ -92,6 +92,7 @@ const HomeScreen = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editingPostId, setEditingPostId] = useState<number | null>(null);
   const [modalY] = useState(new Animated.Value(0));
+  const [refreshing, setRefreshing] = useState(false);
   const postTextInputRef = useRef<TextInput>(null);
 
   interface CommentsMap {
@@ -104,7 +105,10 @@ const HomeScreen = () => {
 
   const fetchPosts = async () => {
     try {
-      const postsList = await getAllPosts(userId);
+      let postsList = await getAllPosts(userId, setUserToken);
+      postsList = postsList.filter((post: PostWithUsername) => {
+        return post.is_active;
+      });
       setPosts(postsList);
       const commentsMap: CommentsMap = {};
       for (const post of postsList) {
@@ -116,6 +120,11 @@ const HomeScreen = () => {
       console.error(error);
       setError("Failed to fetch posts.");
     }
+  };
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchPosts();
+    setRefreshing(false);
   };
 
   const pickImage = async () => {
@@ -254,7 +263,7 @@ const HomeScreen = () => {
     }
 
     try {
-      const updatedPost = await updatePost(editingPostId, postText); // Adjust parameters as needed
+      const updatedPost = await updatePost(editingPostId, postText, setUserToken); // Adjust parameters as needed
       fetchPosts();
 
       // Reset the form and editing state
@@ -280,7 +289,7 @@ const HomeScreen = () => {
     }
     try {
       const postOrgId = postAsOrganization ? userOrgId : NaN;
-      await createPost(Number(userId), postOrgId, postText);
+      await createPost(Number(userId), postOrgId, postText, setUserToken);
       fetchPosts();
 
       // Clear the form
@@ -298,7 +307,7 @@ const HomeScreen = () => {
     setVisibleDropdown(null);
     if (userCanDeletePost(postToDelete)) {
       try {
-        deletePost(postToDelete.post_id);
+        deletePost(postToDelete.post_id, setUserToken);
         setPosts((currentPosts) =>
           currentPosts.filter((post) => post.post_id !== postToDelete.post_id)
         );
@@ -377,7 +386,7 @@ const HomeScreen = () => {
     <>
       <WelcomeBanner />
       <SafeAreaView style={styles.flexContainer}>
-        {(userPermissions.create_org_posts && userOrgId) && (
+        {userPermissions.create_org_posts && userOrgId && (
           <FixedSwitch
             onValueChange={togglePostAsOrg}
             value={postAsOrganization}
@@ -387,11 +396,13 @@ const HomeScreen = () => {
         <KeyboardAwareFlatList
           data={posts}
           keyExtractor={(item) => item.post_id.toString()}
+          refreshing={refreshing}
+          onRefresh={onRefresh}
           renderItem={({ item }) => (
             <View style={styles.post}>
               <View style={styles.headerRow}>
                 <Image
-                  source={{ uri: "https://wallpapercave.com/wp/wp4008085.jpg" }}
+                  source={{ uri: "https://wallpapercave.com/wp/wp4008086.jpg" }}
                   style={styles.avatar}
                 />
                 <View style={styles.headerTextContainer}>

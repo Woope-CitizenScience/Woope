@@ -13,7 +13,7 @@ const OrganizationSearch = () => {
     const [data,setData] = useState<Organization[]>([]);
     useEffect(() => {
 		fetchOrganizations();
-	});
+	},[]);
     const fetchOrganizations = async () => {
         try {
             const organizationList = await getAllOrganizations();

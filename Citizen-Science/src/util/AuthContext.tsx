@@ -1,6 +1,6 @@
-import React, {createContext, useState, useEffect, ReactNode} from 'react';
-import {getToken} from "./token";
-import {refreshAccessToken} from "./fetchWithToken";
+import React, { createContext, useState, useEffect, ReactNode } from "react";
+import { getToken } from "./token";
+import { refreshAccessToken } from "./fetchWithToken";
 
 interface AuthContextType {
 	userToken: string | null;
@@ -9,8 +9,7 @@ interface AuthContextType {
 
 const defaultAuthContextValue: AuthContextType = {
 	userToken: null,
-	setUserToken: () => {
-	},
+	setUserToken: () => {},
 };
 
 export const AuthContext = createContext<AuthContextType>(defaultAuthContextValue);
@@ -19,50 +18,45 @@ interface AuthProviderProps {
 	children: ReactNode;
 }
 
-export const AuthProvider = ({children}: AuthProviderProps) => {
+export const AuthProvider = ({ children }: AuthProviderProps) => {
 	const [userToken, setUserToken] = useState<string | null>(null);
 
 	useEffect(() => {
 		const verifyToken = async () => {
 			try {
-				const token = await getToken('accessToken');
+				const token = await getToken("accessToken");
+
 				if (token) {
 					const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/auth/verify-access-token`, {
-						method: 'POST',
+						method: "POST",
 						headers: {
-							'Content-Type': 'application/json',
+							"Content-Type": "application/json",
 						},
-						body: JSON.stringify({accessToken: token}),
+						body: JSON.stringify({ accessToken: token }),
 					});
 
 					if (response.ok) {
 						setUserToken(token);
 					} else {
-						// Attempt to refresh the access token
-						const refreshToken = await getToken('refreshToken');
+						const refreshToken = await getToken("refreshToken");
 						if (refreshToken) {
-							const refreshedAccessToken = await refreshAccessToken();
-
+							const refreshedAccessToken = await refreshAccessToken(setUserToken);
 							if (refreshedAccessToken) {
 								setUserToken(refreshedAccessToken);
-							} else {
-								// Handle refresh token invalidity
-								console.error('Refresh token invalid or expired');
-								setUserToken(null)
 							}
 						}
 					}
 				}
 			} catch (error) {
-				console.error('Error verifying token:', error);
+				console.error("Error verifying token:", error);
 			}
 		};
 
 		verifyToken();
-	}, [setUserToken]);
+	}, []);
 
 	return (
-		<AuthContext.Provider value={{userToken, setUserToken}}>
+		<AuthContext.Provider value={{ userToken, setUserToken }}>
 			{children}
 		</AuthContext.Provider>
 	);

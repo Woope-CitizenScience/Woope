@@ -35,14 +35,14 @@ export const ResourceHome = () => {
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView style={styles.scrollView}>
-                {/* Followed Groups Button */}
+                {/* Followed Groups Button
                 <Pressable onPress={() => navigation.navigate("ManageOrganizations")}> 
                     <View style = {styles.postBox}> 
                         <View style = {styles.postBoxInner}>
                             <Text style={styles.postBoxText}> Manage Groups </Text>
                         </View>
                     </View>
-                </Pressable>
+                </Pressable> */}
                 {/* Followed Groups Button */}
                 <Pressable onPress={() => navigation.navigate("OrganizationFollowed")}> 
                     <View style = {styles.postBox}> 

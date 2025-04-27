@@ -17,11 +17,12 @@ interface ImageInfo {
     uri: string;
 }
 interface ModalProps {
+    org_id: number,
     name: string,
     isVisible: boolean,
     onClose: () => void,
 }
-const UpdateOrganizationModal: React.FC<ModalProps> = ({name, isVisible, onClose}) => {
+const UpdateOrganizationModal: React.FC<ModalProps> = ({org_id, name, isVisible, onClose}) => {
     const [newInfo, setNewInfo] = useState<OrganizationInfo>({
         tagline: "",
         description: "",
@@ -51,22 +52,22 @@ const UpdateOrganizationModal: React.FC<ModalProps> = ({name, isVisible, onClose
     const updateInfo = async () => {
             try {
                 // upload metadata to database
-                const response = await updateOrganization(name, newInfo.tagline, newInfo.description)
+                const response = await updateOrganization(org_id, name, newInfo.tagline, newInfo.description)
             }catch(error) {
                 console.log('Organization Info Update Failed', error);
             }
     }
     // handles when the save button is pressed
-    const handleSave = () => {
+    const handleSave = async () => {
         if(imageInfo.name){
-            uploadPhoto();
+            await uploadPhoto();
             setImageInfo({ 
                 name: "",
                 uri: "",
             })
         }
         if(newInfo.description || newInfo.tagline){
-            updateInfo();
+            await updateInfo();
             setNewInfo({
                 tagline: "",
                 description: "",
@@ -140,8 +141,8 @@ const UpdateOrganizationModal: React.FC<ModalProps> = ({name, isVisible, onClose
                     />
                     <Button 
                     title="Save"
-                    onPress = {() => {
-                        handleSave();
+                    onPress = {async() => {
+                        await handleSave();
                         onClose();
                     }}/>
                 </View>

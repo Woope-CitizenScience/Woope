@@ -1,3 +1,6 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { storeToken } from '../util/token';
+
 export const loginUser = async (email: string, password: string) => {
 	const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/auth/login`, {
 		method: 'POST',
@@ -14,16 +17,41 @@ export const loginUser = async (email: string, password: string) => {
 		throw error;
 	}
 
-	return await response.json();
-}
+	const data = await response.json();
 
-export const registerUser = async (email: string, password: string, firstName: string, lastName: string, dateOfBirth: string, phoneNumber?: string) => {
+	if (data?.accessToken) {
+		await storeToken("accessToken", data.accessToken);
+		console.log(" Access token stored (login)");
+	}
+	if (data?.refreshToken) {
+		await storeToken("refreshToken", data.refreshToken);
+		console.log(" Refresh token stored (login)");
+	}
+
+	return data;
+};
+
+export const registerUser = async (
+	email: string,
+	password: string,
+	firstName: string,
+	lastName: string,
+	dateOfBirth: string,
+	phoneNumber?: string
+) => {
 	const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/auth/register`, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
 		},
-		body: JSON.stringify({ email, phoneNumber, password, firstName, lastName, dateOfBirth}),
+		body: JSON.stringify({
+			email,
+			phoneNumber,
+			password,
+			firstName,
+			lastName,
+			dateOfBirth
+		}),
 	});
 
 	if (!response.ok) {
@@ -33,8 +61,20 @@ export const registerUser = async (email: string, password: string, firstName: s
 		throw error;
 	}
 
-	return await response.json();
-}
+	const data = await response.json();
+
+	if (data?.accessToken) {
+		await storeToken("accessToken", data.accessToken);
+		console.log(" Access token stored (register)");
+	}
+	if (data?.refreshToken) {
+		await storeToken("refreshToken", data.refreshToken);
+		console.log(" Refresh token stored (register)");
+	}
+
+	return data;
+};
+
 
 export const logoutUser = async (userId: number) => {
 	const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/auth/logout`, {
@@ -51,4 +91,4 @@ export const logoutUser = async (userId: number) => {
 		error.name = `HTTP Error ${response.status}`;
 		throw error;
 	}
-}
+};

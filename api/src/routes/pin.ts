@@ -9,7 +9,14 @@ import {
     getAllPinsNew,
     deletePinNew,
     updatePinNew,
+    getPinById,
 } from '../models/pins';
+import { upload } from '../server';
+import { authenticateToken, requirePermission } from '../middleware/authMiddleware';
+import { requireOwnershipOrPermission } from '../middleware/requireOwnershipOrPermission';
+
+
+
 
 const router = express.Router();
 
@@ -91,9 +98,36 @@ const router = express.Router();
 // New Pins 2024
 
 // new create pin NEW
-router.post('/pinnew', async (req: express.Request, res: express.Response) => {
+router.post('/pinNew', authenticateToken, upload.single('file'), async (req: express.Request, res: express.Response) => {
     try {
-        const newPin = await createPinNew(req.body.name, req.body.description, req.body.date, req.body.tag, Number(req.body.longitude), Number(req.body.latitude));
+        //if (!req.file) {
+        //    return res.status(400).json({ error: "No image received!" });
+        //}
+
+        if (!req.body.name || !req.body.date) {
+            return res.status(400).json({ error: "Missing required fields: name or date" });
+        }
+        
+        const user_id = req.user?.user_id;
+        if (typeof user_id !== 'number') {
+          return res.status(401).json({ error: 'Unauthorized: user ID missing' });
+        }        
+
+        // ✅ Construct the image URL
+        const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
+
+        // ✅ Ensure imageUrl is passed to createPinNew
+        const newPin = await createPinNew(
+            req.body.name,
+            req.body.description,
+            req.body.date,
+            req.body.tag,
+            Number(req.body.longitude),
+            Number(req.body.latitude),
+            imageUrl,
+            user_id,
+        );
+
         res.status(201).json(newPin);
     } catch (error) {
         if (error instanceof Error) {
@@ -105,7 +139,7 @@ router.post('/pinnew', async (req: express.Request, res: express.Response) => {
 });
 
 // Route to get all pins
-router.get('/pinnew', async (req: express.Request, res: express.Response) => {
+router.get('/pinnew', authenticateToken, async (req: express.Request, res: express.Response) => {
     console.log("GET /pinnew called (route)");
     try {
         const pins = await getAllPinsNew();
@@ -119,7 +153,17 @@ router.get('/pinnew', async (req: express.Request, res: express.Response) => {
     }
 });
 
-router.delete('/pinnew', async (req: express.Request, res: express.Response) => {
+router.delete('/pinnew',   
+    authenticateToken,
+    requireOwnershipOrPermission({
+      fetchResource: getPinById,
+      permissionOwn: 'delete_own_pin',
+      permissionAll: 'delete_all_pins',
+      extractUserId: (pin) => pin.user_id!,
+      idSource: 'query',
+      idKey: 'pin_id',
+    }),
+    async (req: express.Request, res: express.Response) => {
     try {
         const pinIdRaw = req.query.pin_id; // Get the raw query param
         const pinId = Number(pinIdRaw);   // Convert to number
@@ -138,7 +182,17 @@ router.delete('/pinnew', async (req: express.Request, res: express.Response) => 
     }
 });
 
-router.put('/pinnew', async (req: express.Request, res: express.Response) => {
+router.put('/pinnew',
+    authenticateToken,
+    requireOwnershipOrPermission({
+        fetchResource: getPinById,
+        permissionOwn: 'edit_own_post',
+        permissionAll: 'edit_all_posts',
+        extractUserId: (pin) => pin.user_id!,
+        idSource: 'query',
+        idKey: 'pin_id',
+      }),
+    async (req: express.Request, res: express.Response) => {
     // console.log('PUT request received at /pinnew');
     // console.log('Query Params:', req.query);
     // console.log('Body:', req.body);

@@ -71,15 +71,12 @@ router.post('/register', async (req: express.Request, res: express.Response) => 
     try {
         const existingUser = await getUser(email, phoneNumber);
         if (existingUser) {
-            return res.status(400).json({error: 'User already exists'});
+            return res.status(400).json({ error: 'User already exists' });
         }
 
         const hashedPassword = await hashPassword(password);
-        const newUser = await createUser(email, phoneNumber, hashedPassword, firstName, lastName, dateOfBirth);
 
-        if (!newUser) {
-            return res.status(500).json('Error creating user');
-        }
+        const newUser = await createUser(email, phoneNumber, hashedPassword, firstName, lastName, dateOfBirth);
 
         const refreshToken = await createRefreshToken(newUser);
         const hashedRefreshToken = await hashPassword(refreshToken);
@@ -87,11 +84,18 @@ router.post('/register', async (req: express.Request, res: express.Response) => 
         await pool.query('UPDATE users SET refresh_token = $1 WHERE user_id = $2', [hashedRefreshToken, newUser.user_id]);
 
         const accessToken = await createAccessToken(newUser);
-        res.status(201).json({ 'accessToken': accessToken, 'refreshToken': refreshToken });
+        
+        res.status(201).json({
+            accessToken,
+            refreshToken,
+            role_id: newUser.role_id 
+        });
+
     } catch (error) {
-        res.status(500).json({error: `${(error as Error).message}`});
+        res.status(500).json({ error: `${(error as Error).message}` });
     }
 });
+
 
 
 router.post('/refresh-access-token', async (req: express.Request, res: express.Response) => {
