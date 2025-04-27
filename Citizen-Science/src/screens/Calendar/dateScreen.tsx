@@ -10,7 +10,6 @@ import { addDays, set } from 'date-fns';
 const DateScreen = ({route}) => {
     const navigation = useNavigation<any>();
     let [now, setNow] = useState<Date>();
-    let [selectedDate, setSelectedDate] = useState<Date>(new Date());
     let [dayAfter, setDayAfter] = useState<Date>(new Date());
     let [dateString, setDateString] = useState(route.params.dateString)
     let [eventData, setEventData] = useState<Event[]>([]);
@@ -20,17 +19,22 @@ const DateScreen = ({route}) => {
     const [generalEventList, setGeneralEventList] = useState<Event[]>([])
     const [followedEventList, setfollowedEventList] = useState<Event[]>([]);
     const [userEventList, setUserEventList] = useState<Event[]>([]);
-    
+
+    // ! from the recieved datestring, converts it to correct UTC using users timezone offset. Translating the recieved datestring
+    // ! straight into UTC will not give correct offset leading to odd results.
+    let [selectedDate, setSelectedDate] = useState<Date>(new Date(new Date(dateString).getTime() + new Date(dateString).getTimezoneOffset() * 60000));
+
+    // gets correct date range for query and populates flatlist with general dates
+    // also loads separate lists of general/followed/user events to be toggled between without having to do a separate query each time
     useEffect(() => {
             getRange();
             Promise.all([fetchEvents(),fetchFollowedEvents(),fetchUserEvents()]).then((values => {
-                console.log("yippee")
+                
             }))
-        },[]);
+    },[]);
 
+    //sets flatlist to show general events as default
     const getRange = async() => {
-        now = new Date(dateString);
-        selectedDate = new Date(now.getTime() + now.getTimezoneOffset() * 60000);
         dayAfter = addDays(selectedDate, 1);
         try {
             const eventList = await getDayEvents(selectedDate, dayAfter);
@@ -39,7 +43,8 @@ const DateScreen = ({route}) => {
             console.log(error)
         }
     }
-    // retrieve all events from the given date
+
+    // retrieve all events from the given date, updatesflatlist
     const fetchEvents = async () => {
         try {
             const eventList = await getDayEvents(selectedDate, dayAfter);
@@ -48,6 +53,7 @@ const DateScreen = ({route}) => {
             console.log(error);
         }
     }
+    // retrieves all followed events from the given date, updatesflatlist
     const fetchFollowedEvents = async () => {
         try {
             const followedList = await getFollowedEvents(selectedDate, dayAfter, route.params.id);
@@ -56,6 +62,7 @@ const DateScreen = ({route}) => {
             console.log(error);
         }
     }
+    //retrieves all user/private events from the given date range, updates flatlist
     const fetchUserEvents = async () => {
         try {
             const userList = await getUserEvents(selectedDate, dayAfter, route.params.id);
@@ -68,7 +75,13 @@ const DateScreen = ({route}) => {
         <SafeAreaView style={styles.container}>
              <View>
                 <View style={styles.upcomingEvents}>
-                    <Text style={styles.title}>{route.params.month}-{route.params.dayNum}-{route.params.year} Events</Text>
+                    <Text style={styles.title}>{selectedDate.toLocaleDateString(undefined, {
+                        weekday: "long",
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                        
+                    })}</Text>
                 </View>
             </View>
 

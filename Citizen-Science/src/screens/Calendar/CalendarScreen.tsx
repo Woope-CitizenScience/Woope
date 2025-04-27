@@ -42,7 +42,8 @@ const CalendarScreen = () => {
   const userColor = {color: 'lightgreen'};
   const [modalVisible, setModalVisible] = useState(false);
    
-  // gets 
+  // gets all dates with marks/types of marks and once all promises are successful
+  // creates the marks and applies them to the calendar
   useFocusEffect(
     React.useCallback(() => {
       Promise.all([getGeneralMarks(), getFollowedMarks(), getUserMarks()]).then((values) => {
@@ -51,7 +52,7 @@ const CalendarScreen = () => {
     },[selectedValue, modalVisible])
   )
 
-
+// creates the marks object to send to the calendar
   const createMarks = () => {
     // Marks all dates with any organization date first
     generalMarks.forEach((element) => {
@@ -112,6 +113,7 @@ const CalendarScreen = () => {
       console.log(error);
     }
   }
+  // gets all events that are private/user created
   const getUserMarks = async() => {
     try {
       userMarks = await getUserDates(selectedValue.getMonth() + 1, selectedValue.getFullYear(), userId);
