@@ -27,7 +27,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       <nav className="navbar navbar-expand-lg">
         <div className="container-fluid">
           <Link className="navbar-brand" to="/home">
-            Woope Admin
+            Wóoph̆e Admin
           </Link>
           <button
             className="navbar-toggler"

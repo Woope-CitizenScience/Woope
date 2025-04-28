@@ -5,7 +5,7 @@ const Home = () => {
   return (
     <div>
       <div className="container mt-5">
-        <h1>Welcome to Woope Admin</h1>
+        <h1>Welcome to Wóoph̆e Admin</h1>
         <p>Use the navigation bar to manage users, posts, and organizations.</p>
       </div>
     </div>

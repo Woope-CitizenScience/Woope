@@ -54,7 +54,6 @@ import {
 import { PdfFile, Post, Comment, PostWithUsername } from "../api/types";
 import WelcomeBanner from "../components/WelcomeBanner";
 import FixedSwitch from "../components/FixedSwitch";
-import Weather from "../components/Weather";
 const HomeScreen = () => {
   const { userToken, setUserToken } = useContext(AuthContext);
   const [data, setData] = useState(null);
