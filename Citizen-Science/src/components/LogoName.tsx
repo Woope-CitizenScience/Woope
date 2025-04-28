@@ -17,7 +17,7 @@ const LogoName: React.FC<LogoNameProps> = ({
                 styles.title,
                 {color: color},
                 {fontSize: responsiveFontSize(2)}]}>
-                WOOPE
+                WÓOPH̆E
             </Text>
         </SafeAreaView>
 

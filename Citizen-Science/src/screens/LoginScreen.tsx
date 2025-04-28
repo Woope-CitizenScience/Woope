@@ -14,7 +14,7 @@ import Blobs from "../components/Blobs";
 import { loginUser } from "../api/auth";
 //import {storeToken} from "../util/token"
 import { AuthContext } from "../util/AuthContext";
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { storeToken } from '../util/token';
 
 
 type NavigationParam = {
@@ -35,15 +35,16 @@ const LoginScreen: React.FC = () => {
     const handleLoginPress = async () => {
         try {
             const response = await loginUser(email, password);
-
-            const storedToken = await AsyncStorage.getItem("accessToken");
-            setUserToken(storedToken);
-
-
+    
+            await storeToken('accessToken', response.accessToken);
+            await storeToken('refreshToken', response.refreshToken);
+    
+            setUserToken(response.accessToken);
         } catch (error) {
             console.log('Login failed', error);
         }
     };
+    
 
 
     return (
@@ -99,8 +100,8 @@ const LoginScreen: React.FC = () => {
                     />
 
 
-                    /* Password TextField */
-                    <View
+                    {/* Password TextField */} 
+                   <View
                         style={{
                             width: responsiveWidth(70),
                             height: responsiveHeight(5.5),
@@ -151,14 +152,16 @@ const LoginScreen: React.FC = () => {
                     />
 
                     {/* Giving Users the option to signup if they are not registered */}
-                    <Text style={{ fontSize: responsiveFontSize(2), position: 'absolute', top: responsiveHeight(84) }}>
+                    <View style={{ position: 'absolute', top: responsiveHeight(84), flexDirection: 'row' }}>
+                    <Text style={{ fontSize: responsiveFontSize(2) }}>
                         Don't have an account?{' '}
-                        <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
-                            <Text style={{ fontSize: responsiveFontSize(2), color: '#5EA1E9', top: responsiveHeight(0.4) }}>
-                                Sign Up
-                            </Text>
-                        </TouchableOpacity>
                     </Text>
+                    <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
+                        <Text style={{ fontSize: responsiveFontSize(2), color: '#5EA1E9' }}>
+                        Sign Up
+                        </Text>
+                    </TouchableOpacity>
+                    </View>
 
                 </SafeAreaView>
 
