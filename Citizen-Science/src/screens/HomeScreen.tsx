@@ -32,7 +32,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-import Weather from "../components/weather";
+import Weather from "../components/Weather";
 import {
   createPost,
   getAllPosts,
