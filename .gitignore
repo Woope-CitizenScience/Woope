@@ -40,6 +40,6 @@ Citizen-Science/%ProgramData%/Microsoft/Windows/UUS/State/_active.uusver
 .env
 
 #VScode
-/.vscode
+# /.vscode
 
-api/uploads/
+# api/uploads/

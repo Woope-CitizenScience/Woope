@@ -65,31 +65,31 @@ TABLESPACE pg_default;
 ALTER TABLE IF EXISTS public.role_permissions
     OWNER to postgres;
 
-insert into role_permissions(role_id, permission_id)
+INSERT INTO public.role_permissions(role_id, permission_id)
 	values(1,1);
 
-insert into role_permissions(role_id, permission_id)
+INSERT INTO public.role_permissions(role_id, permission_id)
 	values(1,2);
 
-insert into role_permissions(role_id, permission_id)
+INSERT INTO public.role_permissions(role_id, permission_id)
 	values(1,3);
 
-insert into role_permissions(role_id, permission_id)
+INSERT INTO public.role_permissions(role_id, permission_id)
 	values(1,4);
 
-insert into role_permissions(role_id, permission_id)
+INSERT INTO public.role_permissions(role_id, permission_id)
 	values(1,5);
 
-insert into role_permissions(role_id, permission_id)
+INSERT INTO public.role_permissions(role_id, permission_id)
 	values(1,6);
 
-insert into role_permissions(role_id, permission_id)
+INSERT INTO public.role_permissions(role_id, permission_id)
 	values(3,4);
 
-insert into role_permissions(role_id, permission_id)
+INSERT INTO public.role_permissions(role_id, permission_id)
 	values(3,5);
 
-insert into role_permissions(role_id, permission_id)
+INSERT INTO public.role_permissions(role_id, permission_id)
 	values(3,6);
 
 ALTER TABLE IF EXISTS users
