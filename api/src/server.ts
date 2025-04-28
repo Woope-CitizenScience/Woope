@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import { createPinNew } from './models/pins';
+require('dotenv').config();
 
 const express = require('express')
 const cors = require('cors');
@@ -49,9 +50,11 @@ app.use('/uploads', express.static('uploads'));
 // ✅ Import and Use Routes
 const pinRoutes = require('./routes/pin');
 const authRoutes = require('./routes/authentication');
+import otpRoutes from './routes/otp';
 
 app.use('/', pinRoutes);
 app.use('/auth', authRoutes);
+app.use('/otp', otpRoutes);
 
 require('./startup/routes')(app);
 app.listen(port, () => console.log(`Server running on port ${port}`))

@@ -1,5 +1,7 @@
 import React, { useContext, useState } from 'react';
-import { ImageBackground, SafeAreaView, Platform, KeyboardAvoidingView, Text, View, TouchableOpacity } from "react-native";
+const apiUrl = process.env.EXPO_PUBLIC_API_URL;
+import { ImageBackground, SafeAreaView, Platform, KeyboardAvoidingView, Text, View, TouchableOpacity, Alert } from "react-native";
+import axios from 'axios';
 import { Ionicons } from '@expo/vector-icons';
 import CustomButton from '../components/CustomButton';
 import CustomTextField from '../components/CustomTextField';
@@ -54,6 +56,9 @@ const SignupScreen = () => {
 
 	const [showPassword, setShowPassword] = useState(false);
 
+	const [otpSent, setOtpSent] = useState(false);
+	const [otp, setOtp] = useState('');
+
 	const [isPopupVisible, setIsPopupVisible] = useState(false);
 	const [popupMessage, setPopupMessage] = useState('');
 
@@ -84,17 +89,56 @@ const SignupScreen = () => {
 	};
 
 	const handleSignUpPress = async () => {
-		if (validate()) {
+		if (!otpSent) {
+			if (validate()) {
+				try {
+					if (!apiUrl) {
+						console.log('API URL not defined. Check your app config or environment.');
+						return;
+					}
+					await axios.post(`${apiUrl}/otp/send-otp`, { email: userInfo.email });
+					setOtpSent(true);
+					Alert.alert('OTP Sent', 'Please check your email for the OTP.');
+				} catch (error) {
+					console.log('Error sending OTP', error);
+					Alert.alert('Error', 'Failed to send OTP. Please try again.');
+				}
+			}
+		} else {
 			try {
-				const response = await registerUser(userInfo.email, userInfo.password, userInfo.firstName, userInfo.lastName, userInfo.dateOfBirth ? moment(userInfo.dateOfBirth).format('MM/DD/YY') : '');
+				const verifyRes = await axios.post(`${apiUrl}/otp/verify-otp`, {
+					email: userInfo.email,
+					otp,
+				});
 
-				await storeToken('accessToken', response.accessToken);
-				await storeToken('refreshToken', response.refreshToken);
-
-
-				setUserToken(response.accessToken);
+				console.log("OTP Verification Response:", verifyRes.data);
+				// Updated condition to handle boolean and object with success/verified property
+				if (verifyRes.data === true || verifyRes.data.success === true || verifyRes.data.verified === true) {
+					console.log("OTP verified. Proceeding to register user.");
+					try {
+						const response = await registerUser(
+							userInfo.email,
+							userInfo.password,
+							userInfo.firstName,
+							userInfo.lastName,
+							userInfo.dateOfBirth ? moment(userInfo.dateOfBirth).format('MM/DD/YY') : '',
+							otp
+						);
+						console.log("User registration successful.");
+						await storeToken('accessToken', response.accessToken);
+						await storeToken('refreshToken', response.refreshToken);
+						setUserToken(response.accessToken);
+					} catch (regError) {
+						console.log('User registration failed:', regError);
+						Alert.alert('Registration Error', 'Failed to register user. Please try again.');
+					}
+				} else {
+					Alert.alert('Invalid OTP', 'Please enter the correct OTP sent to your email.');
+				}
+				console.log("Reached end of OTP flow but user not created.");
 			} catch (error) {
-				console.log('Signup failed', error);
+				console.log('OTP verification failed', error);
+				Alert.alert('Error', 'OTP verification failed. Try again.');
 			}
 		}
 	};
@@ -286,6 +330,18 @@ const SignupScreen = () => {
 							/>
 						</TouchableOpacity>
 					</View>
+					{/* OTP TextField shown after password, if otpSent */}
+					{otpSent && (
+						<CustomTextField
+							size={{ width: responsiveWidth(70), height: responsiveHeight(5.5) }}
+							placeholder="Enter OTP"
+							value={otp}
+							onChangeText={(value) => setOtp(value)}
+							borderColor="#5EA1E9"
+							borderRadius={10}
+							position={{ top: 17, left: 0 }}
+						/>
+					)}
 					{/* Signup Button */}
 					<CustomButton
 						size={{ width: responsiveWidth(70), height: responsiveHeight(5.5) }}

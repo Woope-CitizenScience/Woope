@@ -1,13 +1,14 @@
-import {config} from '../config/config'
+import { verifyOtp, deleteOTP } from '../models/otp';
+import { config } from '../config/config'
 import express from 'express';
-import {getUser, createUser, getUserByRefreshToken} from '../models/users';
-import {hashPassword, comparePasswords} from '../utils/password';
-import {createAccessToken, createRefreshToken} from '../utils/token';
+import { getUser, createUser, getUserByRefreshToken } from '../models/users';
+import { hashPassword, comparePasswords } from '../utils/password';
+import { createAccessToken, createRefreshToken } from '../utils/token';
 import jwt from 'jsonwebtoken';
 
 const pool = require('../db');
 const router = require('express').Router();
-const refreshTokenSecret:string = config.refreshTokenSecret!;
+const refreshTokenSecret: string = config.refreshTokenSecret!;
 
 router.post('/login', async (req: express.Request, res: express.Response) => {
     try {
@@ -66,7 +67,7 @@ router.post('/logout', async (req: express.Request, res: express.Response) => {
 
 
 router.post('/register', async (req: express.Request, res: express.Response) => {
-    const { email, phoneNumber, password, firstName, lastName, dateOfBirth } = req.body;
+    const { email, phoneNumber, password, firstName, lastName, dateOfBirth, otp } = req.body;
 
     try {
         const existingUser = await getUser(email, phoneNumber);
@@ -74,21 +75,25 @@ router.post('/register', async (req: express.Request, res: express.Response) => 
             return res.status(400).json({ error: 'User already exists' });
         }
 
+        const isValid = await verifyOtp(email, otp);
+        if (!isValid) {
+            return res.status(401).json({ error: 'Invalid or expired OTP' });
+        }
+
         const hashedPassword = await hashPassword(password);
-
         const newUser = await createUser(email, phoneNumber, hashedPassword, firstName, lastName, dateOfBirth);
-
+        await deleteOTP(email);
         const refreshToken = await createRefreshToken(newUser);
         const hashedRefreshToken = await hashPassword(refreshToken);
 
         await pool.query('UPDATE users SET refresh_token = $1 WHERE user_id = $2', [hashedRefreshToken, newUser.user_id]);
 
         const accessToken = await createAccessToken(newUser);
-        
+
         res.status(201).json({
             accessToken,
             refreshToken,
-            role_id: newUser.role_id 
+            role_id: newUser.role_id
         });
 
     } catch (error) {
@@ -128,21 +133,21 @@ router.post('/refresh-access-token', async (req: express.Request, res: express.R
 });
 
 router.post('/verify-access-token', async (req: express.Request, res: express.Response) => {
-	const { accessToken } = req.body;
-	if (!accessToken) {
-		return res.status(401).json('Access token is required');
-	}
+    const { accessToken } = req.body;
+    if (!accessToken) {
+        return res.status(401).json('Access token is required');
+    }
 
-	try {
-		jwt.verify(accessToken, config.accessTokenSecret!);
-		res.status(200).json('Valid access token');
-	} catch (error) {
-		if (error instanceof jwt.JsonWebTokenError) {
-			res.status(403).json('Invalid access token');
-		} else {
-			res.status(500).json(`Internal server error: ${(error as Error).message}`);
-		}
-	}
+    try {
+        jwt.verify(accessToken, config.accessTokenSecret!);
+        res.status(200).json('Valid access token');
+    } catch (error) {
+        if (error instanceof jwt.JsonWebTokenError) {
+            res.status(403).json('Invalid access token');
+        } else {
+            res.status(500).json(`Internal server error: ${(error as Error).message}`);
+        }
+    }
 });
 
 

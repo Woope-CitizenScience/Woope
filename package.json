@@ -5,9 +5,11 @@
     "expo-camera": "^16.0.9",
     "expo-image-picker": "^16.0.3",
     "mime": "^4.0.1",
-    "multer": "^1.4.5-lts.2"
+    "multer": "^1.4.5-lts.2",
+    "nodemailer": "^6.10.1"
   },
   "devDependencies": {
+    "@types/nodemailer": "^6.4.17",
     "@types/react": "^19.0.0",
     "typedoc": "^0.27.9"
   }
