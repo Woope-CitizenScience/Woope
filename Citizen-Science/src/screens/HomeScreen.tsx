@@ -32,7 +32,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-import Weather from "../components/Weather";
+import Weather from "../components/weather";
 import {
   createPost,
   getAllPosts,
@@ -394,7 +394,7 @@ const HomeScreen = () => {
             <View style={styles.post}>
               <View style={styles.headerRow}>
                 <Image
-                  source={{ uri: "https://wallpapercave.com/wp/wp4008085.jpg" }}
+                  source={{ uri: `${process.env.EXPO_PUBLIC_API_URL}${item.image_url}` }}
                   style={styles.avatar}
                 />
                 <View style={styles.headerTextContainer}>
