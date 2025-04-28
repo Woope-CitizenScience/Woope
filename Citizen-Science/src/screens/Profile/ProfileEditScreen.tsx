@@ -13,12 +13,13 @@ import {
 	responsiveWidth,
 } from "react-native-responsive-dimensions";
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { getProfile, updateName } from "../../api/community";
+import { getProfile, updateName, updatePfp } from "../../api/community";
 import IconButton from "../../components/IconButton";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { jwtDecode } from "jwt-decode";
 import { AccessToken } from "../../util/token";
 import { AuthContext } from "../../util/AuthContext";
+import * as ImagePicker from 'expo-image-picker';
 
 interface ProfileEditProps {
 	navigation: any;
@@ -31,6 +32,7 @@ const ProfileEditScreen: React.FC<ProfileEditProps> = ({ navigation }) => {
 
 	const [editFirstName, setEditFirstName] = useState("");
 	const [editLastName, setEditLastName] = useState("");
+	const [newPfp, setNewPfp] = useState("");
 
 	{
 		/* Will load profile data of user */
@@ -69,6 +71,32 @@ const ProfileEditScreen: React.FC<ProfileEditProps> = ({ navigation }) => {
 			console.error("Errors: ", error);
 		}
 	};
+
+	const handleEditPfp = async() => {
+		const result = await ImagePicker.launchImageLibraryAsync({
+					mediaTypes: ImagePicker.MediaTypeOptions.Images,
+					allowsEditing: true,
+					quality: 1,
+					// exif: false
+				});
+
+		if(!result.canceled){
+			const imageUri = result.assets[0].uri
+			setNewPfp(imageUri)
+		}
+
+	}
+
+	const handleUpdatePfp = async() => {
+		try {
+			if(newPfp){
+				await updatePfp(user_id + "", newPfp)
+			}
+			
+		} catch (error) {
+			console.error("Errors: ", error);
+		}
+	}
 
 	return (
 		<View style={styles.container}>
@@ -114,6 +142,7 @@ const ProfileEditScreen: React.FC<ProfileEditProps> = ({ navigation }) => {
 						style={[{ padding: responsiveWidth(1) }]}
 						onPress={() => {
 							handleUpdateUserName();
+							handleUpdatePfp();
 							navigation.goBack();
 						}}
 					>
@@ -136,7 +165,7 @@ const ProfileEditScreen: React.FC<ProfileEditProps> = ({ navigation }) => {
 					{/* temp For Profile Picture */}
 					<IconButton
 						iconName={"circle"}
-						onPress={() => void 0}
+						onPress={handleEditPfp}
 						iconSize={responsiveHeight(11)}
 						iconColor={"lightblue"}
 					/>

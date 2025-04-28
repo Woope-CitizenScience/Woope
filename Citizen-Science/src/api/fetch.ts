@@ -61,7 +61,6 @@ export async function fetchAPIWithFiles(
   
     return await response.json();
   }
-  
 
 export async function fetchAPI(endpoint: string, method: string = 'GET', body: any = null) {
     const token = await AsyncStorage.getItem("accessToken"); // Store token in mobile storage

@@ -1,8 +1,10 @@
 import { config } from "../config/config";
 import express from "express";
-import { updateName, getUserFullNameByID, searchUsersWithName, getUserByID, updateUserOrg, updateUserRole } from "../models/users";
+import { updateName, getUserFullNameByID, searchUsersWithName, getUserByID, updateUserOrg, updateUserRole, updatePfp} from "../models/users";
 import jwt from "jsonwebtoken";
 import { checkFollowExists, createFollowRelation, deleteFollowRelation, getFollowerCount, getFollowersList, getFollowingCount, getFollowingList } from "../models/user-follows";
+import { upload } from "../server";
+import { authenticateToken } from "../middleware/authMiddleware";
 const router = require("express").Router();
 
 router.get("/", (req: express.Request, res: express.Response) => {
@@ -37,6 +39,34 @@ router.post(
 				return res.status(501).json("Error updating names");
 			}
 			res.status(200).json(updatedUserNames);
+		} catch (error) {
+			if (error instanceof jwt.JsonWebTokenError) {
+				res.status(403).json('Invalid access token');
+			} else {
+				res.status(500).json(`Internal server error: ${(error as Error).message}`);
+			}
+		}
+	}
+);
+
+router.post(
+	"/update-pfp", 
+	authenticateToken,
+	upload.single('file'),
+	async (req: express.Request, res: express.Response) => {
+		const { user_id } = req.body;
+		const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
+
+		console.log('req.file: ', req.file)
+		console.log('req.body', req.body)
+
+		try {
+			const updatedPfp = await updatePfp(user_id, imageUrl);
+
+			if (!updatedPfp) {
+				return res.status(501).json("Error updating pfp");
+			}
+			res.status(200).json(updatedPfp);
 		} catch (error) {
 			if (error instanceof jwt.JsonWebTokenError) {
 				res.status(403).json('Invalid access token');
