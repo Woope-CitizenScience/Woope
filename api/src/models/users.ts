@@ -171,6 +171,30 @@ export const createUser = async (email: string, phoneNumber: string, hashedPassw
 	}
 };
 
+export const updatePfp = async (userId: string, imageUri: string | null) => {
+	const client = await pool.connect();
+
+	try {
+		await pool.query('BEGIN');
+
+		const query = 'UPDATE profile_information SET image_url = $1 WHERE user_id = $2 RETURNING *'
+		const values = [imageUri, userId]
+
+		const response = await pool.query(query, values);
+
+		await pool.query('COMMIT')
+
+		return response.rows[0]
+		
+	} catch (error) {
+		await pool.query('ROLLBACK');
+		throw new Error("Error updating profile picture: " + (error as Error).message);
+	}
+   finally {
+	client.release();
+  }
+}
+
 /**
  * Updates the first and last name of a user.
  * 
@@ -182,6 +206,8 @@ export const createUser = async (email: string, phoneNumber: string, hashedPassw
  */
 
 export const updateName = async (userId: string, firstName: string, lastName: string) => {
+	const client = await pool.connect();
+
 	try {
 		await pool.query('BEGIN');
 
@@ -202,6 +228,9 @@ export const updateName = async (userId: string, firstName: string, lastName: st
 		await pool.query('ROLLBACK');
 		throw new Error("Error updating user name: " + (error as Error).message);
 	}
+	finally {
+		client.release();
+	  }
 };
 
 /**
@@ -213,6 +242,7 @@ export const updateName = async (userId: string, firstName: string, lastName: st
  */
 
 export const getUserFullNameByID = async (userId: string) => {
+	const client = await pool.connect();
 	try {
 		await pool.query('BEGIN');
 
@@ -229,6 +259,9 @@ export const getUserFullNameByID = async (userId: string) => {
 	} catch (error) {
 		throw new Error("Error getting user's name " + (error as Error).message);
 	}
+	finally {
+		client.release();
+	  }
 }
 
 /**
@@ -389,4 +422,4 @@ export const updateUserRole = async (userId: string, roleId: string) => {
 	}
 }
 
-module.exports = { getUser, createUser, getUserByRefreshToken, updateName, getUserFullNameByID, getUserByID, searchUsersWithName, updateUserOrg, updateUserRole };
+module.exports = { getUser, createUser, getUserByRefreshToken, updateName, getUserFullNameByID, getUserByID, searchUsersWithName, updateUserOrg, updateUserRole, updatePfp };

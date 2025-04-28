@@ -43,7 +43,8 @@ export const getPost = async (currentUserId: number): Promise<UserLikedPosts[]> 
           posts.*, 
 		      organizations.name AS org_name,
           profile_information.first_name, 
-          profile_information.last_name, 
+          profile_information.last_name,
+		      profile_information.image_url,
           COALESCE(COUNT(post_likes.post_id), 0) AS likes_count,
           BOOL_OR(post_likes.user_id = $1) AS user_liked
       FROM posts
@@ -51,7 +52,8 @@ export const getPost = async (currentUserId: number): Promise<UserLikedPosts[]> 
       LEFT JOIN post_likes ON posts.post_id = post_likes.post_id
 	    LEFT JOIN organizations ON posts.org_id = organizations.org_id
       GROUP BY posts.post_id, profile_information.first_name, 
-	  		      profile_information.last_name, organizations.name
+	  		      profile_information.last_name, profile_information.image_url,
+					organizations.name
       ORDER BY posts.created_at DESC
   `;
   const response = await pool.query(query, [currentUserId]);
@@ -71,7 +73,8 @@ export const getPostById = async (post_id: number): Promise<Post | null> => {
 }
 
 export const getPostByUserId = async (user_id: number): Promise<Post[]> => {
-  const response = await pool.query('SELECT * FROM posts WHERE user_id = $1', [user_id]);
+  const response = await pool.query(
+    'SELECT * FROM posts AS p JOIN profile_information AS pi ON p.user_id=pi.user_id WHERE p.user_id=$1', [user_id]);
   return response.rows;
 }
 

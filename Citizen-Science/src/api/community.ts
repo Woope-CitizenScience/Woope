@@ -1,3 +1,6 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import mime from "mime";
+
 /**
 	Updates the name of a user
 	@param user_id Unique identifier of the user
@@ -30,6 +33,37 @@ export const updateName = async (
 	}
 	return await response.json();
 };
+
+export const updatePfp = async (user_id: string, imageUri: string ) => {
+	const formData = new FormData();
+
+	formData.append('user_id', user_id)
+	formData.append(`file`, {
+		uri: imageUri,
+		type: mime.getType(imageUri) || "image/jpeg",
+		name: imageUri.split("/").pop()
+	  } as unknown as Blob);
+
+	  const token = await AsyncStorage.getItem("accessToken");
+
+	  const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/community/update-pfp`, {
+		method: 'POST',
+		headers: {
+		  'Authorization': token ? `Bearer ${token}` : '',
+		},
+		body: formData,
+	  });
+	
+	  if (!response.ok) {
+		const errorResponse = await response.json();
+		const error = new Error(errorResponse.error || response.statusText);
+		error.name = `HTTP Error ${response.status}`;
+		throw error;
+	}
+
+	return await response.json();
+	
+}
 
 /**
 	Returns the profile content of a user
