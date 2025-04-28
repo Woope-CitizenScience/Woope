@@ -14,7 +14,9 @@ interface ScreenHeaderProps {
 
 const ScreenHeader: React.FC<ScreenHeaderProps> = ({ title, navigation }) => {
 	return (
-		<SafeAreaView>
+		<SafeAreaView
+		style={{ backgroundColor: "transparent" }}
+		edges={["top"]}>
 			<View
 				style={[
 					styles.container,

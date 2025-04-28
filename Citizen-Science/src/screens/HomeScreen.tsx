@@ -54,7 +54,6 @@ import {
 import { PdfFile, Post, Comment, PostWithUsername } from "../api/types";
 import WelcomeBanner from "../components/WelcomeBanner";
 import FixedSwitch from "../components/FixedSwitch";
-
 const HomeScreen = () => {
   const { userToken, setUserToken } = useContext(AuthContext);
   const [data, setData] = useState(null);
@@ -92,6 +91,7 @@ const HomeScreen = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editingPostId, setEditingPostId] = useState<number | null>(null);
   const [modalY] = useState(new Animated.Value(0));
+  const [refreshing, setRefreshing] = useState(false);
   const postTextInputRef = useRef<TextInput>(null);
 
   interface CommentsMap {
@@ -104,7 +104,7 @@ const HomeScreen = () => {
 
   const fetchPosts = async () => {
     try {
-      let postsList = await getAllPosts(userId);
+      let postsList = await getAllPosts(userId, setUserToken);
       postsList = postsList.filter((post: PostWithUsername) => {
         return post.is_active;
       });
@@ -119,6 +119,11 @@ const HomeScreen = () => {
       console.error(error);
       setError("Failed to fetch posts.");
     }
+  };
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchPosts();
+    setRefreshing(false);
   };
 
   const pickImage = async () => {
@@ -257,7 +262,7 @@ const HomeScreen = () => {
     }
 
     try {
-      const updatedPost = await updatePost(editingPostId, postText); // Adjust parameters as needed
+      const updatedPost = await updatePost(editingPostId, postText, setUserToken); // Adjust parameters as needed
       fetchPosts();
 
       // Reset the form and editing state
@@ -283,7 +288,7 @@ const HomeScreen = () => {
     }
     try {
       const postOrgId = postAsOrganization ? userOrgId : NaN;
-      await createPost(Number(userId), postOrgId, postText);
+      await createPost(Number(userId), postOrgId, postText, setUserToken);
       fetchPosts();
 
       // Clear the form
@@ -301,7 +306,7 @@ const HomeScreen = () => {
     setVisibleDropdown(null);
     if (userCanDeletePost(postToDelete)) {
       try {
-        deletePost(postToDelete.post_id);
+        deletePost(postToDelete.post_id, setUserToken);
         setPosts((currentPosts) =>
           currentPosts.filter((post) => post.post_id !== postToDelete.post_id)
         );
@@ -390,11 +395,14 @@ const HomeScreen = () => {
         <KeyboardAwareFlatList
           data={posts}
           keyExtractor={(item) => item.post_id.toString()}
+          refreshing={refreshing}
+          onRefresh={onRefresh}
           renderItem={({ item }) => (
             <View style={styles.post}>
               <View style={styles.headerRow}>
                 <Image
                   source={{ uri: `${process.env.EXPO_PUBLIC_API_URL}${item.image_url}` }}
+
                   style={styles.avatar}
                 />
                 <View style={styles.headerTextContainer}>

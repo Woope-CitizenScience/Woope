@@ -41,9 +41,14 @@ export const followOrganization = async(user_id: number, org_id: number) => {
     return fetchAPI(`/organizations/follow`, 'POST', {user_id, org_id});
 }
 //update an organization
-export const updateOrganization = async(name: string, tagline: string, text_description: string) => {
-    return fetchAPI(`/organizations/update`, 'PUT', {name,tagline,text_description});
-}
+export const updateOrganization = async(org_id: number, name: string, tagline: string, text_description: string) => {
+    return fetchAPI(`/organizations/update?org_id=${org_id}`, 'PUT', {
+        name,
+        tagline,
+        text_description
+    });
+};
+
 //feature an organization given its name
 export const setFeatured = async(name: string) => {
     return fetchAPI(`/organizations/setfeatured`, 'PUT', {name});

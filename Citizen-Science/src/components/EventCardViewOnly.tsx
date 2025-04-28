@@ -15,73 +15,39 @@ interface EventProps {
     image_path: string;
 }
 //Component to display event information 
-const EventCard:React.FC<EventProps> = ({event_id, org_id}) => {
+const EventCardViewOnly:React.FC<EventProps> = ({event_id, org_id, name, tagline, text_description, time_begin, time_end, image_path}) => {
     // let startDate = new Date(time_begin);
     // let endDate = new Date(time_end);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [isDeleteVisible, setIsDeleteVisible] = useState(false);
     const [data, setData] = useState<EventProps[]>([]);
-    const fetchInfo = async () => {
-                try {
-                    const response = await getEventInfo(event_id);
-                    setData(response);
-                } catch (error) {
-                    console.log(error);
-                }
-            }
-            useEffect(() => {
-                fetchInfo();
-            },[])
+  
     return(
         // Container
         <SafeAreaView>
-            <FlatList
-                data={data}
-                keyExtractor={(item) => item.event_id}
-                scrollEnabled={false}
-                renderItem={({item}) => (
             <View style={styles.cardContainer}>
                 {/*Event Name, Date, Time */}
                 <View style ={styles.headerContainer}>
                     <View>
-                        <Text style={styles.title}>{item.name}</Text>
-                        <Text style={styles.category}>{new Date(item.time_begin).toLocaleDateString([],{weekday: 'long', month:'long', day:'2-digit', year:'numeric'})}</Text>
-                        <Text style={styles.category}>{new Date(item.time_begin).toLocaleTimeString([],{hour:'2-digit', minute:'2-digit'})} - {new Date(item.time_end).toLocaleTimeString([],{hour:'2-digit', minute:'2-digit'})}</Text>
+                        <Text style={styles.title}>{name}</Text>
+                        <Text style={styles.category}>{new Date(time_begin).toLocaleDateString([],{weekday: 'long', month:'long', day:'2-digit', year:'numeric'})}</Text>
+                        <Text style={styles.category}>{new Date(time_begin).toLocaleTimeString([],{hour:'2-digit', minute:'2-digit'})} - {new Date(time_end).toLocaleTimeString([],{hour:'2-digit', minute:'2-digit'})}</Text>
                         <Text style={styles.category}>Location</Text>
-                    </View>
-                    <View style = {styles.editContainer}>
-                        <TouchableOpacity onPress={() => setIsModalVisible(true)}>
-                                <AntDesign name="edit" size={30}/>
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={() => deleteEvent(item.event_id, item.name)}>
-                                <AntDesign name="delete" size={30}/>
-                        </TouchableOpacity>
                     </View>
                 </View>
                 {/*Organization Banner Image */}
                 <View>
-                    {item.image_path && <Image style={styles.imageStyle}source={require('../../assets/adaptive-icon.png')}/>}
+                    {image_path && <Image style={styles.imageStyle}source={require('../../assets/adaptive-icon.png')}/>}
                 </View>
                 {/* Short Tagline */}
                 <View>
-                    <Text style={styles.tagline}>{item.tagline}</Text>
+                    <Text style={styles.tagline}>{tagline}</Text>
                 </View>
                 {/* Full Description */}
                 <View>
-                    <Text style={styles.description}>{item.text_description}</Text>
+                    <Text style={styles.description}>{text_description}</Text>
                 </View>
-                {/* Container for Events and Posts Button */}
-                <View style={styles.buttonContainer}>
-                    {/* <TouchableOpacity style={styles.eventButton}>
-                        <Text>Add To Calendar</Text>
-                    </TouchableOpacity> */}
-                </View>
-                <UpdateEventModal event_id={event_id} time_begin={new Date(item.time_begin)} time_end={new Date(item.time_end)} text_description={item.text_description} tagline = {item.tagline} isVisible = {isModalVisible} onClose={() => {
-                            setIsModalVisible(false);
-                            fetchInfo();
-                        }} />
             </View>
-            )}/>
         </SafeAreaView>
     );
 };
@@ -197,4 +163,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default EventCard;
+export default EventCardViewOnly;

@@ -42,8 +42,7 @@ interface ProfileScreenProps {
 
 const ProfileScreen: React.FC<ProfileScreenProps> = ({ route, navigation }) => {
   const { userID } = route.params;
-
-  let { userToken } = useContext(AuthContext);
+  const { userToken, setUserToken } = useContext(AuthContext);
   const decodedToken = userToken ? jwtDecode<AccessToken>(userToken) : null;
   const currentUserID = decodedToken ? decodedToken.user_id : null;
   const [profileOwner, setProfileOwner] = useState(false);
@@ -114,7 +113,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ route, navigation }) => {
 
   const fetchPosts = async () => {
       try {
-        const postsList = await getPostByUserId(userID);
+        const postsList = await getPostByUserId(userID, setUserToken);
         setPosts(postsList);
         const commentsMap: CommentsMap = {};
         for (const post of postsList) {
@@ -137,7 +136,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ route, navigation }) => {
       setVisibleDropdown(null);
       if (userID === currentUserID) {
         try {
-          deletePost(postToDelete.post_id);
+          deletePost(postToDelete.post_id, setUserToken);
           setPosts((currentPosts) =>
             currentPosts.filter((post) => post.post_id !== postToDelete.post_id)
           );

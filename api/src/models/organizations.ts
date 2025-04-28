@@ -113,7 +113,7 @@ export const followOrganization = async (user_id: number, org_id: number) => {
  * @throws {Error} Throws an error if the query fails.
  */
 
-export const getOrganizationById = async (org_id: number): Promise<Organization[]> => {
+export const getOrganizationById = async (org_id: number): Promise<Organization> => {
     try {
         let query = `
             SELECT * 

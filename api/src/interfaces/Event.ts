@@ -6,4 +6,5 @@ export interface Event{
     tagline: string,
     time_begin: Date, 
     time_end: Date,
+    image_path: string, 
 }

@@ -5,7 +5,8 @@
 import React, {useState} from "react";
 import { Modal, View, TextInput, Button, StyleSheet, SafeAreaView, Text, FlatList} from "react-native";
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { createEvents } from "../api/event";
+import { createUserEvents } from "../api/event";
+
 interface EventInfo {
     name: string;
     tagline: string;
@@ -14,11 +15,12 @@ interface EventInfo {
     time_end: Date;
 }
 interface ModalProps {
-    org_id: number,
+    user_id: number,
     isVisible: boolean,
     onClose: () => void,
 }
-const CreateEvent: React.FC<ModalProps> = ({org_id, isVisible, onClose}) => {
+
+const CreateUserEvent: React.FC<ModalProps> = ({user_id, isVisible, onClose}) => {
     const [startDate, setStartDate] = useState(new Date());
     const [endDate, setEndDate] = useState(new Date());
     const [show, setShow] = useState(false);
@@ -32,14 +34,14 @@ const CreateEvent: React.FC<ModalProps> = ({org_id, isVisible, onClose}) => {
 
     const handleSave = async () => {
         try {
-            const response = await createEvents(org_id, newInfo.name, newInfo.tagline, newInfo.description, startDate, endDate)
+            const response = await createUserEvents(user_id, newInfo.name, newInfo.tagline, newInfo.description, startDate, endDate)
         } catch (error) {
             console.log('Update Failed', error);
         }
     }
     
     const showMode = () => {
-    setShow(true);
+        setShow(true);
     };
 
     const handleInputChange = (field: keyof EventInfo, value: string) => {
@@ -154,4 +156,4 @@ const styles = StyleSheet.create({
         justifyContent: "center"
     }
 })
-export default CreateEvent;
+export default CreateUserEvent;

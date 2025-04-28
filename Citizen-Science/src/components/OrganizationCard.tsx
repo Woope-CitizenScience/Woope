@@ -85,7 +85,6 @@ const OrganizationCard: React.FC<OrganizationProps> = ({org_id, user_id})=> {
                     <View style ={styles.headerContainer}>
                         <View>
                             <Text style={styles.title}>{data[0].name}</Text>
-                            <Text style={styles.category}></Text>
                         </View>
                         
                         <View style={styles.edit}>
@@ -126,9 +125,15 @@ const OrganizationCard: React.FC<OrganizationProps> = ({org_id, user_id})=> {
                     </View>
                     {/* Container for Events and Posts Button */}
                     <View style={styles.buttonContainer}>
-                        <TouchableOpacity style={styles.postButton}>
-                            <Text>View Posts</Text>
-                        </TouchableOpacity>
+                    <TouchableOpacity
+                    style={styles.postButton}
+                    onPress={() => {
+                        navigation.navigate("OrganizationProfile", { org_id, user_id });
+                    }}
+                    >
+                    <Text>View Posts</Text>
+                    </TouchableOpacity>
+
                         <TouchableOpacity style={styles.eventButton} onPress={() => navigation.navigate("EventHome", {
                             org_id: org_id
                         })}>
@@ -141,7 +146,8 @@ const OrganizationCard: React.FC<OrganizationProps> = ({org_id, user_id})=> {
                         setIsModalVisible(false);
                         fetchInfo();
                     }} 
-                    name={data[0].name}/>
+                    name={data[0].name}
+                    org_id={org_id}/>
                 </View>
     </SafeAreaView>
     );
@@ -216,6 +222,7 @@ const styles = StyleSheet.create({
         padding: 10,
     },
     eventButton:{
+        marginTop: 20,
         padding:10,
         borderRadius:10,
         backgroundColor: 'white',
@@ -232,6 +239,7 @@ const styles = StyleSheet.create({
         gap: 10,
     },
     postButton:{
+        marginTop: 20,
         padding:10,
         borderRadius:10,
         backgroundColor:'white',

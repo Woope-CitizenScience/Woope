@@ -6,7 +6,7 @@ import LoginScreen from './screens/LoginScreen';
 import SignupScreen from './screens/SignupScreen';
 import SplashScreen from "./screens/SplashScreen";
 import NavigationBar from "./components/NavigationBar";
-
+import DateScreen from './screens/Calendar/DateScreen';
 
 
 const Stack = createNativeStackNavigator();
@@ -35,6 +35,8 @@ const AppNavigation = () => {
 				<>
 					{/* View  components/navigationbar to see the rest of the screens, nested under their respective bottom tabs*/}
 					<Stack.Screen name="NavigationBar" component={NavigationBar} />
+					<Stack.Screen name="DateScreen" component={DateScreen}/> 
+
 				</>
 
 			) : (
