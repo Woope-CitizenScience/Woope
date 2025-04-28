@@ -462,7 +462,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ route, navigation }) => {
           <View style={styles.post}>
             <View style={styles.headerRow}>
               <Image
-                source={{ uri: "https://wallpapercave.com/wp/wp4008085.jpg" }}
+                source={{ uri: `${process.env.EXPO_PUBLIC_API_URL}${item.image_url}` }}
                 style={styles.avatar}
               />
               <View style={styles.headerTextContainer}>
@@ -517,7 +517,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ route, navigation }) => {
             <MaterialIcons name="comment" size={24} color="#007AFF" />
             <Text style={{ color: "#007AFF", marginLeft: 4 }}>
                 {(commentsMap[item.post_id] || []).length}
-              </Text> */
+              </Text>
             </TouchableOpacity>
             {userID === currentUserID && (
               <TouchableOpacity
