@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import mime from "mime";
+import { getToken } from "../util/token";
 
 /**
 	Updates the name of a user
@@ -44,7 +45,7 @@ export const updatePfp = async (user_id: string, imageUri: string ) => {
 		name: imageUri.split("/").pop()
 	  } as unknown as Blob);
 
-	  const token = await AsyncStorage.getItem("accessToken");
+	  const token = await getToken("accessToken")
 
 	  const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/community/update-pfp`, {
 		method: 'POST',
@@ -53,6 +54,8 @@ export const updatePfp = async (user_id: string, imageUri: string ) => {
 		},
 		body: formData,
 	  });
+
+	  console.log(response)
 	
 	  if (!response.ok) {
 		const errorResponse = await response.json();
