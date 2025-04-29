@@ -86,6 +86,7 @@ const ProfileEditScreen: React.FC<ProfileEditProps> = ({ navigation }) => {
 		if(!result.canceled){
 			const imageUri = result.assets[0].uri
 			setNewPfp(imageUri)
+			setImageUrl(imageUri)
 		}
 
 	}
