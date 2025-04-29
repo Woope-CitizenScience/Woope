@@ -107,7 +107,7 @@ const LoginScreen: React.FC = () => {
                             height: responsiveHeight(5.5),
                             marginTop: responsiveHeight(1),
                             position: 'relative',
-                            top: responsiveHeight(10),
+                            top: responsiveHeight(9.5),
                         }}
                     >
                         <CustomTextField

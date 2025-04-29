@@ -151,166 +151,164 @@ const SignupScreen = () => {
 
 
 	return (
+        <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            style={{ flex: 1 }}>
 
-		<KeyboardAvoidingView
-			behavior={Platform.OS === "ios" ? "padding" : "height"}
-			style={{ flex: 1 }}>
-
-			<ImageBackground
-				source={require('../../assets/background2.png')}
-				style={{ flex: 1 }}>
+            <ImageBackground
+                source={require('../../assets/background1.png')}
+                style={{ flex: 1, width: '100%', height: '100%' }}>
 
 
-				<SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+					<SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
 
-					{/* First Blob Cluster */}
-					{/*<Blobs rotationDeg={'0deg'} widthPercentage={20} heightPercentage={10} position={{ top: 45, left: 6 }} />*/}
-					{/*<Blobs rotationDeg={'0deg'} widthPercentage={10} heightPercentage={5} position={{ top: 45, left: 30 }} />*/}
+					{/* Blobs, Logo, Back button */}
 
-					{/* Second Blob Cluster */}
 					<Blobs rotationDeg={'0deg'} widthPercentage={20} heightPercentage={10} position={{ top: 6, left: 80 }} />
 					<Blobs rotationDeg={'0deg'} widthPercentage={6} heightPercentage={3} position={{ top: 15, left: 93 }} />
+					<BackButton position={{ top: -8, left: -45 }} />
 
-
-					<LogoName position={'bottomRight'} color={'grey'} />
-
-
-					<BackButton position={{ top: -22, left: -45 }} />
-
-
-					{/* 'Create an Account' title on signup */}
 					<ScreenTitle
 						text={'Create an \nAccount'}
 						textStyle={'title'}
 						fontSize={5}
 						color={'white'}
-						// Uses responsive library {width, height} through the components file
-						position={{ top: -10, left: -20 }}
+						position={{ top: 5, left: -20 }}
 					/>
 
-					<View style={{ width: responsiveWidth(70), position: 'relative', top: 120 }}>
-						<View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-							<CustomTextField
-								size={{ width: responsiveWidth(33), height: responsiveHeight(5.5) }}
-								placeholder="First Name"
-								value={userInfo.firstName}
-								onChangeText={(value) => handleInputChange('firstName', value)}
-								borderColor="#5EA1E9"
-								borderRadius={10}
-								position={{ top: 0, left: 0 }}
-							/>
-							<CustomTextField
-								size={{ width: responsiveWidth(33), height: responsiveHeight(5.5) }}
-								placeholder="Last Name"
-								value={userInfo.lastName}
-								onChangeText={(value) => handleInputChange('lastName', value)}
-								borderColor="#5EA1E9"
-								borderRadius={10}
-								position={{ top: 0, left: 0 }}
-							/>
-						</View>
-						<TouchableOpacity
-							onPress={showDatePicker}
-							style={{
-								width: responsiveWidth(70),
-								height: responsiveHeight(5.5),
-								borderWidth: 1,
-								borderColor: '#5EA1E9',
-								borderRadius: 10,
-								justifyContent: 'center',
-								paddingLeft: 10,
-								marginTop: responsiveHeight(1.5),
-							}}
-						>
-							<Text style={{ color: userInfo.dateOfBirth ? 'black' : 'grey' }}>
-								{userInfo.dateOfBirth ? moment(userInfo.dateOfBirth).format('MMM D, YYYY') : 'Birth Date'}
-							</Text>
-						</TouchableOpacity>
+					{/* First & Last Name */}
+					<View style={{ flexDirection: 'row', justifyContent: 'space-between', width: responsiveWidth(70), marginTop: responsiveHeight(30) }}>
+						<CustomTextField
+						size={{ width: responsiveWidth(33), height: responsiveHeight(5.5) }}
+						placeholder="First Name"
+						value={userInfo.firstName}
+						onChangeText={(value) => handleInputChange('firstName', value)}
+						borderColor="#5EA1E9"
+						borderRadius={10}
+						position={{ top: 0, left: 0 }}
+						/>
+						<CustomTextField
+						size={{ width: responsiveWidth(33), height: responsiveHeight(5.5) }}
+						placeholder="Last Name"
+						value={userInfo.lastName}
+						onChangeText={(value) => handleInputChange('lastName', value)}
+						borderColor="#5EA1E9"
+						borderRadius={10}
+						position={{ top: 0, left: 0 }}
+						/>
 					</View>
 
+					{/* Birth Date */}
+					<TouchableOpacity
+						onPress={showDatePicker}
+						style={{
+						width: responsiveWidth(70),
+						height: responsiveHeight(5.5),
+						borderWidth: 1,
+						borderColor: '#5EA1E9',
+						borderRadius: 10,
+						justifyContent: 'center',
+						paddingLeft: 10,
+						marginTop: responsiveHeight(1.5),
+						}}
+					>
+						<Text style={{ color: userInfo.dateOfBirth ? 'black' : 'grey' }}>
+						{userInfo.dateOfBirth ? moment(userInfo.dateOfBirth).format('MMM D, YYYY') : 'Birth Date'}
+						</Text>
+					</TouchableOpacity>
+
 					{isDatePickerVisible && (
-						<View style={{ position: 'absolute', bottom: 305, left: 200, width: '100%' }}>
-							<DateTimePicker
-								value={userInfo.dateOfBirth || new Date()}
-								mode="date"
-								display="default"
-								onChange={(event, selectedDate) => {
-									if (selectedDate) {
-										handleInputChange('dateOfBirth', selectedDate);
-									}
-									hideDatePicker();
-								}}
-							/>
-						</View>
+						<DateTimePicker
+						value={userInfo.dateOfBirth || new Date()}
+						mode="date"
+						display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+						maximumDate={new Date()}
+							onChange={(event, selectedDate) => {
+							if (event.type === 'set') {
+							  handleInputChange('dateOfBirth', selectedDate);
+							  // Delay hiding the picker to give users visual confirmation
+							  setTimeout(() => {
+								hideDatePicker();
+							  }, 1000); // 1000ms delay 
+							}
+						  }}
+						  
+						/>
 					)}
 
+					{/* Email */}
 					<CustomTextField
 						size={{ width: responsiveWidth(70), height: responsiveHeight(5.5) }}
-						// TODO: Add option to signup with phone number
 						placeholder="Email"
 						value={userInfo.email}
 						onChangeText={(value) => handleInputChange('email', value)}
 						borderColor="#5EA1E9"
 						borderRadius={10}
-						position={{ top: 13.9, left: 0 }}
+						position={{ top:1.5, left: 0 }}
 						textContentType={'oneTimeCode'}
 					/>
-					{/* Password TextField with show/hide */}
-					<View style={{ position: 'relative' }}>
+
+					{/* Password + Eye Toggle */}
+					<View
+						style={{
+						width: responsiveWidth(70),
+						height: responsiveHeight(5.5),
+						marginTop: responsiveHeight(1),
+						position: 'relative',
+						top: responsiveHeight(2),
+						}}
+					>
 						<CustomTextField
-							size={{ width: responsiveWidth(70), height: responsiveHeight(5.5) }}
-							placeholder="Password"
-							value={userInfo.password}
-							onChangeText={(value) => handleInputChange('password', value)}
-							secureTextEntry={!showPassword}
-							borderColor="#5EA1E9"
-							borderRadius={10}
-							position={{ top: 15, left: 0 }}
-							textContentType={'oneTimeCode'}
+						size={{ width: responsiveWidth(70), height: responsiveHeight(5.5) }}
+						placeholder="Password"
+						value={userInfo.password}
+						onChangeText={(value) => handleInputChange('password', value)}
+						secureTextEntry={!showPassword}
+						borderColor="#5EA1E9"
+						borderRadius={10}
+						position={{ top: 0, left: 0 }}
+						textContentType={'oneTimeCode'}
 						/>
 						<TouchableOpacity
-							onPress={() => setShowPassword(!showPassword)}
-							style={{
-								position: 'absolute',
-								left: 280,
-								top: responsiveHeight(11),
-								height: responsiveHeight(13),
-								justifyContent: 'center',
-								alignItems: 'center'
-							}}
+						onPress={() => setShowPassword(!showPassword)}
+						style={{
+							position: 'absolute',
+							right: 10,
+							top: responsiveHeight(1.7),
+							height: responsiveHeight(2),
+							justifyContent: 'center',
+							alignItems: 'center',
+						}}
 						>
-							<Ionicons
-								name={showPassword ? 'eye-off' : 'eye'}
-								size={20}
-								color="#5EA1E9"
-							/>
+						<Ionicons name={showPassword ? 'eye-off' : 'eye'} size={20} color="#5EA1E9" />
 						</TouchableOpacity>
 					</View>
-					{/* Signup Button */}
+
+					{/* Sign Up Button */}
 					<CustomButton
 						size={{ width: responsiveWidth(70), height: responsiveHeight(5.5) }}
 						label="Sign Up"
 						labelColor="white"
 						backgroundColor="#5EA1E9"
-						//TODO potentially redirect to home page after account creation
 						onPress={handleSignUpPress}
-						position={{ top: 20, left: 0 }}
+						position={{ top: responsiveHeight(.4), left: 0 }}
 					/>
 
-
+					{/* Popup */}
 					<Popup
 						isVisible={isPopupVisible}
 						message={popupMessage}
 						onClose={() => setIsPopupVisible(false)}
 					/>
 
+					<LogoName position={'bottomRight'} color={'grey'} />
 
-				</SafeAreaView>
-
-			</ImageBackground>
-		</KeyboardAvoidingView>
+					</SafeAreaView>
 
 
-	)
+
+            </ImageBackground>
+        </KeyboardAvoidingView>
+    );
 };
 export default SignupScreen;
