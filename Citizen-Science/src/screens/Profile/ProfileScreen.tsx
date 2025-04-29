@@ -60,6 +60,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ route, navigation }) => {
       null
     );
   const [commentsModalVisible, setCommentsModalVisible] = useState(false);
+  const [userPfp, setUserPfp] = useState("")
 
   interface CommentsMap {
       [key: number]: Comment[];
@@ -79,6 +80,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ route, navigation }) => {
       .then((data) => {
         setFirstName(data.user.first_name);
         setLastName(data.user.last_name);
+        setUserPfp(`${process.env.EXPO_PUBLIC_API_URL}${data.user.image_url}`);
 
         setFollowerCount(data.followerCount.follower_of_count);
         setFollowingCount(data.followingCount.following_of_count);
@@ -284,15 +286,15 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ route, navigation }) => {
         ListHeaderComponent={
           <>
             <View style={styles.profileUser}>
-              {/* temp For Profile Picture */}
-              <View
+              <Image
                 style={{
                   height: responsiveHeight(9),
                   width: responsiveHeight(9),
                   borderRadius: 50,
                   backgroundColor: "lightblue",
                 }}
-              ></View>
+                source={{ uri: userPfp }}
+              ></Image>
               {/* Posts, Followers, Following */}
               <View style={styles.attributes}>
                 <TouchableOpacity
@@ -302,7 +304,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ route, navigation }) => {
                   <Text style={styles.textUserInfo}>Posts</Text>
                   <Text style={styles.textUserInfo}>{posts.length}</Text>
                 </TouchableOpacity>
-                <TouchableOpacity
+                {/* <TouchableOpacity
                   onPress={() =>
                     navigation.navigate("ProfileFollowersScreen", {
                       userID: userID,
@@ -323,7 +325,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ route, navigation }) => {
                 >
                   <Text style={styles.textUserInfo}>{"Following "}</Text>
                   <Text style={styles.textUserInfo}>{followingCount}</Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
               </View>
             </View>
             {/* Name */}
@@ -375,7 +377,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ route, navigation }) => {
                   },
                 ]}
               >
-                {!following && (
+                {/* {!following && (
                   <TouchableOpacity
                     onPress={() => handleFollowProfile()}
                     style={styles.iconStyle}
@@ -406,7 +408,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ route, navigation }) => {
                       Following
                     </Text>
                   </TouchableOpacity>
-                )}
+                )} */}
 
                 {/* <TouchableOpacity onPress={void 0} style={styles.iconStyle}>
                   <Text
