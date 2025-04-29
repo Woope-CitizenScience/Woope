@@ -4,3 +4,4 @@ CREATE TABLE IF NOT EXISTS reports (
     label VARCHAR(20) NOT NULL, 
     title VARCHAR(50),
     description VARCHAR(500)
+);
