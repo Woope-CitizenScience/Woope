@@ -1,5 +1,6 @@
 import {
 	Text,
+	Image,
 	View,
 	StyleSheet,
 	TouchableOpacity,
@@ -33,6 +34,7 @@ const ProfileEditScreen: React.FC<ProfileEditProps> = ({ navigation }) => {
 	const [editFirstName, setEditFirstName] = useState("");
 	const [editLastName, setEditLastName] = useState("");
 	const [newPfp, setNewPfp] = useState("");
+	const [imageUrl, setImageUrl] = useState("");
 
 	{
 		/* Will load profile data of user */
@@ -44,6 +46,7 @@ const ProfileEditScreen: React.FC<ProfileEditProps> = ({ navigation }) => {
 					getProfile(data);
 					setEditFirstName(data.user.first_name);
 					setEditLastName(data.user.last_name);
+					setImageUrl(`${process.env.EXPO_PUBLIC_API_URL}${data.user.image_url}`)
 				})
 				.catch((error) => {
 					console.error("Error: ", error);
@@ -83,6 +86,7 @@ const ProfileEditScreen: React.FC<ProfileEditProps> = ({ navigation }) => {
 		if(!result.canceled){
 			const imageUri = result.assets[0].uri
 			setNewPfp(imageUri)
+			setImageUrl(imageUri)
 		}
 
 	}
@@ -163,12 +167,19 @@ const ProfileEditScreen: React.FC<ProfileEditProps> = ({ navigation }) => {
 					]}
 				>
 					{/* temp For Profile Picture */}
-					<IconButton
+					{/* <IconButton
 						iconName={"circle"}
 						onPress={handleEditPfp}
 						iconSize={responsiveHeight(11)}
 						iconColor={"lightblue"}
-					/>
+					/> */}
+					<TouchableOpacity onPress={handleEditPfp}>
+						<Image
+							source={{ uri: imageUrl }}
+							style={{ width: responsiveHeight(11), height: responsiveHeight(11), borderRadius: responsiveHeight(11) / 2 }}
+							resizeMode="cover"
+						/>
+					</TouchableOpacity>
 					<View style={styles.container}>
 						<Text style={{ fontSize: responsiveFontSize(1.5) }}>
 							First Name

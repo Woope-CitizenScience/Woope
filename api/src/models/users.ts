@@ -246,7 +246,7 @@ export const getUserFullNameByID = async (userId: string) => {
 	try {
 		await pool.query('BEGIN');
 
-		const query = 'SELECT first_name, last_name FROM profile_information WHERE user_id = $1';
+		const query = 'SELECT first_name, last_name, image_url FROM profile_information WHERE user_id = $1';
 		const values = [userId];
 
 		const result = await pool.query(query, values);
