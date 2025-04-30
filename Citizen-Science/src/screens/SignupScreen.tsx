@@ -1,5 +1,7 @@
 import React, { useContext, useState } from 'react';
-import { ImageBackground, SafeAreaView, Platform, KeyboardAvoidingView, Text, View, TouchableOpacity } from "react-native";
+const apiUrl = process.env.EXPO_PUBLIC_API_URL;
+import { ImageBackground, SafeAreaView, Platform, KeyboardAvoidingView, Text, View, TouchableOpacity, Alert } from "react-native";
+import axios from 'axios';
 import { Ionicons } from '@expo/vector-icons';
 import CustomButton from '../components/CustomButton';
 import CustomTextField from '../components/CustomTextField';
@@ -54,6 +56,9 @@ const SignupScreen = () => {
 
 	const [showPassword, setShowPassword] = useState(false);
 
+	const [otpSent, setOtpSent] = useState(false);
+	const [otp, setOtp] = useState('');
+
 	const [isPopupVisible, setIsPopupVisible] = useState(false);
 	const [popupMessage, setPopupMessage] = useState('');
 
@@ -84,17 +89,56 @@ const SignupScreen = () => {
 	};
 
 	const handleSignUpPress = async () => {
-		if (validate()) {
+		if (!otpSent) {
+			if (validate()) {
+				try {
+					if (!apiUrl) {
+						console.log('API URL not defined. Check your app config or environment.');
+						return;
+					}
+					await axios.post(`${apiUrl}/otp/send-otp`, { email: userInfo.email });
+					setOtpSent(true);
+					Alert.alert('OTP Sent', 'Please check your email for the OTP.');
+				} catch (error) {
+					console.log('Error sending OTP', error);
+					Alert.alert('Error', 'Failed to send OTP. Please try again.');
+				}
+			}
+		} else {
 			try {
-				const response = await registerUser(userInfo.email, userInfo.password, userInfo.firstName, userInfo.lastName, userInfo.dateOfBirth ? moment(userInfo.dateOfBirth).format('MM/DD/YY') : '');
+				const verifyRes = await axios.post(`${apiUrl}/otp/verify-otp`, {
+					email: userInfo.email,
+					otp,
+				});
 
-				await storeToken('accessToken', response.accessToken);
-				await storeToken('refreshToken', response.refreshToken);
-
-
-				setUserToken(response.accessToken);
+				console.log("OTP Verification Response:", verifyRes.data);
+				// Updated condition to handle boolean and object with success/verified property
+				if (verifyRes.data === true || verifyRes.data.success === true || verifyRes.data.verified === true) {
+					console.log("OTP verified. Proceeding to register user.");
+					try {
+						const response = await registerUser(
+							userInfo.email,
+							userInfo.password,
+							userInfo.firstName,
+							userInfo.lastName,
+							userInfo.dateOfBirth ? moment(userInfo.dateOfBirth).format('MM/DD/YY') : '',
+							otp
+						);
+						console.log("User registration successful.");
+						await storeToken('accessToken', response.accessToken);
+						await storeToken('refreshToken', response.refreshToken);
+						setUserToken(response.accessToken);
+					} catch (regError) {
+						console.log('User registration failed:', regError);
+						Alert.alert('Registration Error', 'Failed to register user. Please try again.');
+					}
+				} else {
+					Alert.alert('Invalid OTP', 'Please enter the correct OTP sent to your email.');
+				}
+				console.log("Reached end of OTP flow but user not created.");
 			} catch (error) {
-				console.log('Signup failed', error);
+				console.log('OTP verification failed', error);
+				Alert.alert('Error', 'OTP verification failed. Try again.');
 			}
 		}
 	};
@@ -103,7 +147,7 @@ const SignupScreen = () => {
 		let isValid = true;
 		let errorMessages: string[] = [];
 
-		const emailRegex = /^[^\s@]+@(gmail\.com|icloud\.com|hotmail\.com|yahoo\.com)$/;
+		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 		if (!emailRegex.test(userInfo.email.trim())) {
 			newErrors.email = 'Invalid email';
 			isValid = false;
@@ -151,164 +195,178 @@ const SignupScreen = () => {
 
 
 	return (
-        <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-            style={{ flex: 1 }}>
 
-            <ImageBackground
-                source={require('../../assets/background1.png')}
-                style={{ flex: 1, width: '100%', height: '100%' }}>
+		<KeyboardAvoidingView
+			behavior={Platform.OS === "ios" ? "padding" : "height"}
+			style={{ flex: 1 }}>
+
+			<ImageBackground
+				source={require('../../assets/background2.png')}
+				style={{ flex: 1 }}>
 
 
-					<SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+				<SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
 
-					{/* Blobs, Logo, Back button */}
+					{/* First Blob Cluster */}
+					{/*<Blobs rotationDeg={'0deg'} widthPercentage={20} heightPercentage={10} position={{ top: 45, left: 6 }} />*/}
+					{/*<Blobs rotationDeg={'0deg'} widthPercentage={10} heightPercentage={5} position={{ top: 45, left: 30 }} />*/}
 
+					{/* Second Blob Cluster */}
 					<Blobs rotationDeg={'0deg'} widthPercentage={20} heightPercentage={10} position={{ top: 6, left: 80 }} />
 					<Blobs rotationDeg={'0deg'} widthPercentage={6} heightPercentage={3} position={{ top: 15, left: 93 }} />
-					<BackButton position={{ top: -8, left: -45 }} />
 
+
+					<LogoName position={'bottomRight'} color={'grey'} />
+
+
+					<BackButton position={{ top: -22, left: -45 }} />
+
+
+					{/* 'Create an Account' title on signup */}
 					<ScreenTitle
 						text={'Create an \nAccount'}
 						textStyle={'title'}
 						fontSize={5}
 						color={'white'}
-						position={{ top: 5, left: -20 }}
+						// Uses responsive library {width, height} through the components file
+						position={{ top: -10, left: -20 }}
 					/>
 
-					{/* First & Last Name */}
-					<View style={{ flexDirection: 'row', justifyContent: 'space-between', width: responsiveWidth(70), marginTop: responsiveHeight(30) }}>
-						<CustomTextField
-						size={{ width: responsiveWidth(33), height: responsiveHeight(5.5) }}
-						placeholder="First Name"
-						value={userInfo.firstName}
-						onChangeText={(value) => handleInputChange('firstName', value)}
-						borderColor="#5EA1E9"
-						borderRadius={10}
-						position={{ top: 0, left: 0 }}
-						/>
-						<CustomTextField
-						size={{ width: responsiveWidth(33), height: responsiveHeight(5.5) }}
-						placeholder="Last Name"
-						value={userInfo.lastName}
-						onChangeText={(value) => handleInputChange('lastName', value)}
-						borderColor="#5EA1E9"
-						borderRadius={10}
-						position={{ top: 0, left: 0 }}
-						/>
+					<View style={{ width: responsiveWidth(70), position: 'relative', top: 120 }}>
+						<View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+							<CustomTextField
+								size={{ width: responsiveWidth(33), height: responsiveHeight(5.5) }}
+								placeholder="First Name"
+								value={userInfo.firstName}
+								onChangeText={(value) => handleInputChange('firstName', value)}
+								borderColor="#5EA1E9"
+								borderRadius={10}
+								position={{ top: 0, left: 0 }}
+							/>
+							<CustomTextField
+								size={{ width: responsiveWidth(33), height: responsiveHeight(5.5) }}
+								placeholder="Last Name"
+								value={userInfo.lastName}
+								onChangeText={(value) => handleInputChange('lastName', value)}
+								borderColor="#5EA1E9"
+								borderRadius={10}
+								position={{ top: 0, left: 0 }}
+							/>
+						</View>
+						<TouchableOpacity
+							onPress={showDatePicker}
+							style={{
+								width: responsiveWidth(70),
+								height: responsiveHeight(5.5),
+								borderWidth: 1,
+								borderColor: '#5EA1E9',
+								borderRadius: 10,
+								justifyContent: 'center',
+								paddingLeft: 10,
+								marginTop: responsiveHeight(1.5),
+							}}
+						>
+							<Text style={{ color: userInfo.dateOfBirth ? 'black' : 'grey' }}>
+								{userInfo.dateOfBirth ? moment(userInfo.dateOfBirth).format('MMM D, YYYY') : 'Birth Date'}
+							</Text>
+						</TouchableOpacity>
 					</View>
 
-					{/* Birth Date */}
-					<TouchableOpacity
-						onPress={showDatePicker}
-						style={{
-						width: responsiveWidth(70),
-						height: responsiveHeight(5.5),
-						borderWidth: 1,
-						borderColor: '#5EA1E9',
-						borderRadius: 10,
-						justifyContent: 'center',
-						paddingLeft: 10,
-						marginTop: responsiveHeight(1.5),
-						}}
-					>
-						<Text style={{ color: userInfo.dateOfBirth ? 'black' : 'grey' }}>
-						{userInfo.dateOfBirth ? moment(userInfo.dateOfBirth).format('MMM D, YYYY') : 'Birth Date'}
-						</Text>
-					</TouchableOpacity>
-
 					{isDatePickerVisible && (
-						<DateTimePicker
-						value={userInfo.dateOfBirth || new Date()}
-						mode="date"
-						display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-						maximumDate={new Date()}
-							onChange={(event, selectedDate) => {
-							if (event.type === 'set') {
-							  handleInputChange('dateOfBirth', selectedDate);
-							  // Delay hiding the picker to give users visual confirmation
-							  setTimeout(() => {
-								hideDatePicker();
-							  }, 1000); // 1000ms delay 
-							}
-						  }}
-						  
-						/>
+						<View style={{ position: 'absolute', bottom: 305, left: 200, width: '100%' }}>
+							<DateTimePicker
+								value={userInfo.dateOfBirth || new Date()}
+								mode="date"
+								display="default"
+								onChange={(event, selectedDate) => {
+									if (selectedDate) {
+										handleInputChange('dateOfBirth', selectedDate);
+									}
+									hideDatePicker();
+								}}
+							/>
+						</View>
 					)}
 
-					{/* Email */}
 					<CustomTextField
 						size={{ width: responsiveWidth(70), height: responsiveHeight(5.5) }}
+						// TODO: Add option to signup with phone number
 						placeholder="Email"
 						value={userInfo.email}
 						onChangeText={(value) => handleInputChange('email', value)}
 						borderColor="#5EA1E9"
 						borderRadius={10}
-						position={{ top:1.5, left: 0 }}
+						position={{ top: 13.9, left: 0 }}
 						textContentType={'oneTimeCode'}
 					/>
-
-					{/* Password + Eye Toggle */}
-					<View
-						style={{
-						width: responsiveWidth(70),
-						height: responsiveHeight(5.5),
-						marginTop: responsiveHeight(1),
-						position: 'relative',
-						top: responsiveHeight(2),
-						}}
-					>
+					{/* Password TextField with show/hide */}
+					<View style={{ position: 'relative' }}>
 						<CustomTextField
-						size={{ width: responsiveWidth(70), height: responsiveHeight(5.5) }}
-						placeholder="Password"
-						value={userInfo.password}
-						onChangeText={(value) => handleInputChange('password', value)}
-						secureTextEntry={!showPassword}
-						borderColor="#5EA1E9"
-						borderRadius={10}
-						position={{ top: 0, left: 0 }}
-						textContentType={'oneTimeCode'}
+							size={{ width: responsiveWidth(70), height: responsiveHeight(5.5) }}
+							placeholder="Password"
+							value={userInfo.password}
+							onChangeText={(value) => handleInputChange('password', value)}
+							secureTextEntry={!showPassword}
+							borderColor="#5EA1E9"
+							borderRadius={10}
+							position={{ top: 15, left: 0 }}
+							textContentType={'oneTimeCode'}
 						/>
 						<TouchableOpacity
-						onPress={() => setShowPassword(!showPassword)}
-						style={{
-							position: 'absolute',
-							right: 10,
-							top: responsiveHeight(1.7),
-							height: responsiveHeight(2),
-							justifyContent: 'center',
-							alignItems: 'center',
-						}}
+							onPress={() => setShowPassword(!showPassword)}
+							style={{
+								position: 'absolute',
+								left: 280,
+								top: responsiveHeight(11),
+								height: responsiveHeight(13),
+								justifyContent: 'center',
+								alignItems: 'center'
+							}}
 						>
-						<Ionicons name={showPassword ? 'eye-off' : 'eye'} size={20} color="#5EA1E9" />
+							<Ionicons
+								name={showPassword ? 'eye-off' : 'eye'}
+								size={20}
+								color="#5EA1E9"
+							/>
 						</TouchableOpacity>
 					</View>
-
-					{/* Sign Up Button */}
+					{/* OTP TextField shown after password, if otpSent */}
+					{otpSent && (
+						<CustomTextField
+							size={{ width: responsiveWidth(70), height: responsiveHeight(5.5) }}
+							placeholder="Enter OTP"
+							value={otp}
+							onChangeText={(value) => setOtp(value)}
+							borderColor="#5EA1E9"
+							borderRadius={10}
+							position={{ top: 17, left: 0 }}
+						/>
+					)}
+					{/* Signup Button */}
 					<CustomButton
 						size={{ width: responsiveWidth(70), height: responsiveHeight(5.5) }}
 						label="Sign Up"
 						labelColor="white"
 						backgroundColor="#5EA1E9"
+						//TODO potentially redirect to home page after account creation
 						onPress={handleSignUpPress}
-						position={{ top: responsiveHeight(.4), left: 0 }}
+						position={{ top: 20, left: 0 }}
 					/>
 
-					{/* Popup */}
+
 					<Popup
 						isVisible={isPopupVisible}
 						message={popupMessage}
 						onClose={() => setIsPopupVisible(false)}
 					/>
 
-					<LogoName position={'bottomRight'} color={'grey'} />
 
-					</SafeAreaView>
+				</SafeAreaView>
+
+			</ImageBackground>
+		</KeyboardAvoidingView>
 
 
-
-            </ImageBackground>
-        </KeyboardAvoidingView>
-    );
+	)
 };
 export default SignupScreen;

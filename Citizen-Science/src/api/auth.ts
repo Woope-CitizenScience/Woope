@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { storeToken } from '../util/token';
 
+
 export const loginUser = async (email: string, password: string) => {
 	const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/auth/login`, {
 		method: 'POST',
@@ -37,6 +38,7 @@ export const registerUser = async (
 	firstName: string,
 	lastName: string,
 	dateOfBirth: string,
+	otp: string,
 	phoneNumber?: string
 ) => {
 	const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/auth/register`, {
@@ -50,7 +52,8 @@ export const registerUser = async (
 			password,
 			firstName,
 			lastName,
-			dateOfBirth
+			dateOfBirth,
+			otp
 		}),
 	});
 
