@@ -147,7 +147,7 @@ const SignupScreen = () => {
 		let isValid = true;
 		let errorMessages: string[] = [];
 
-		const emailRegex = /^[^\s@]+@(gmail\.com|icloud\.com|hotmail\.com|yahoo\.com)$/;
+		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 		if (!emailRegex.test(userInfo.email.trim())) {
 			newErrors.email = 'Invalid email';
 			isValid = false;
