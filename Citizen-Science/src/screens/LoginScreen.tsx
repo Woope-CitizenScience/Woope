@@ -40,10 +40,22 @@ const LoginScreen: React.FC = () => {
             await storeToken('refreshToken', response.refreshToken);
     
             setUserToken(response.accessToken);
-        } catch (error) {
-            console.log('Login failed', error);
-        }
+        } catch (error: any) {
+            console.log('Login failed.', error);
+        
+            const statusCode = parseInt(error?.name?.replace('HTTP Error ', '')) || 0;
+            console.log('Parsed status code:', statusCode);
+        
+            if (statusCode === 401) {
+                alert('Invalid credentials');
+            } else if (statusCode === 404) {
+                alert('User not found.');
+            } else {
+                alert('Something went wrong. Please try again.');
+            }
+        
     };
+};
     
 
 
