@@ -259,7 +259,7 @@ const SignupScreen = () => {
 						marginTop: responsiveHeight(1.5),
 						}}
 					>
-						<Text style={{ color: userInfo.dateOfBirth ? 'black' : 'grey' }}>
+						<Text style={{ color: userInfo.dateOfBirth ? 'black' : '#A9A9A9' }}>
 						{userInfo.dateOfBirth ? moment(userInfo.dateOfBirth).format('MMM D, YYYY') : 'Birth Date'}
 						</Text>
 					</TouchableOpacity>
