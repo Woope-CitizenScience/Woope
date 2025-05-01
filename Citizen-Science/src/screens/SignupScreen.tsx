@@ -18,6 +18,7 @@ import { storeToken } from "../util/token";
 import { AuthContext } from "../util/AuthContext";
 import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment';
+import { useRef } from 'react';
 
 type NavigationParam = {
 	Login: undefined;
@@ -80,6 +81,7 @@ const SignupScreen = () => {
 
 
 	const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+	const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
 	const showDatePicker = () => setDatePickerVisibility(true);
 	const hideDatePicker = () => setDatePickerVisibility(false);
@@ -197,7 +199,8 @@ const SignupScreen = () => {
 	return (
         <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "height"}
-            style={{ flex: 1 }}>
+            style={{ flex: 1 }}
+			keyboardVerticalOffset={Platform.OS === 'ios' ? 200 : 0}>
 
             <ImageBackground
                 source={require('../../assets/background1.png')}
@@ -261,24 +264,29 @@ const SignupScreen = () => {
 						</Text>
 					</TouchableOpacity>
 
-					{isDatePickerVisible && (
+						{isDatePickerVisible && (
 						<DateTimePicker
-						value={userInfo.dateOfBirth || new Date()}
-						mode="date"
-						display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-						maximumDate={new Date()}
+							value={userInfo.dateOfBirth || new Date()}
+							mode="date"
+							display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+							maximumDate={new Date()}
 							onChange={(event, selectedDate) => {
-							if (event.type === 'set') {
-							  handleInputChange('dateOfBirth', selectedDate);
-							  // Delay hiding the picker to give users visual confirmation
-							  setTimeout(() => {
+							if (event.type === 'set' && selectedDate) {
+								handleInputChange('dateOfBirth', selectedDate);
+
+								if (timeoutRef.current) {
+								clearTimeout(timeoutRef.current);
+								}
+
+								timeoutRef.current = setTimeout(() => {
 								hideDatePicker();
-							  }, 1000); // 1000ms delay 
+								}, 3000);
+							} else if (event.type === 'dismissed') {
+								hideDatePicker();
 							}
-						  }}
-						  
+							}}
 						/>
-					)}
+						)}
 
 					{/* Email */}
 					<CustomTextField
