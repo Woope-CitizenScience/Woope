@@ -30,6 +30,14 @@ Addressing environmental and socio-economic challenges in Standing Rock’s Lako
 - Once Postgres is running, run `npx db-migrate up` in the `api` directory to run the migrations
 - You can now access the API at `localhost:3000`, check `/health`
 
+## Email Verification
+To enable email verification, also add the following to the `api/.env` file:
+```
+EMAIL_USER=csun.citizen.science@gmail.com
+EMAIL_PASS=pbkk ewjm yxkv fxwh
+```
+If you want to use a different email address, you must enable 2-Factor Authentication on that Gmail account and generate an App Password, then use that as EMAIL_PASS.
+
 ### Admin Website Local Setup
 
 - From the `Woope` directory, `cd` into the `woope-admin` directory
@@ -77,4 +85,3 @@ Focus on discovery, requirements, authentication, architecture, coding, testing,
 
 ## Transforming Needs to Software Requirements
 Capturing community discussions, facilitating focus groups, and integrating community input.
-
