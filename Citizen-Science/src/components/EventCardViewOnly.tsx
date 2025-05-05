@@ -32,7 +32,7 @@ const EventCardViewOnly:React.FC<EventProps> = ({event_id, org_id, name, tagline
                         <Text style={styles.title}>{name}</Text>
                         <Text style={styles.category}>{new Date(time_begin).toLocaleDateString([],{weekday: 'long', month:'long', day:'2-digit', year:'numeric'})}</Text>
                         <Text style={styles.category}>{new Date(time_begin).toLocaleTimeString([],{hour:'2-digit', minute:'2-digit'})} - {new Date(time_end).toLocaleTimeString([],{hour:'2-digit', minute:'2-digit'})}</Text>
-                        <Text style={styles.category}>Location</Text>
+                        {/* <Text style={styles.category}>Location</Text> */}
                     </View>
                 </View>
                 {/*Organization Banner Image */}

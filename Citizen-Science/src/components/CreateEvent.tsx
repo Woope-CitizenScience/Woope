@@ -7,6 +7,7 @@ import React, { useState } from "react";
 import { Modal, View, TextInput, Button, StyleSheet, SafeAreaView, Text, FlatList } from "react-native";
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { createEvents } from "../api/event";
+import { set } from "date-fns";
 interface EventInfo {
     name: string;
     tagline: string;
@@ -36,10 +37,16 @@ const CreateEvent: React.FC<ModalProps> = ({ org_id, isVisible, onClose }) => {
     })
 
     const handleSave = async () => {
-        startDate.setTime(startTime.getTime());
-        endDate.setDate(startDate.getDate());
+        let parseDate = set(startDate, {
+                    hours: startTime.getHours(),
+                    minutes: startTime.getMinutes(),
+                    seconds: startTime.getSeconds(),
+                })
+        let parseTime = set(endDate, {
+            date: startDate.getDate()
+        })
         try {
-            const response = await createEvents(org_id, newInfo.name, newInfo.tagline, newInfo.description, startDate, endDate)
+            const response = await createEvents(org_id, newInfo.name, newInfo.tagline, newInfo.description, parseDate, parseTime)
         } catch (error) {
             console.log('Update Failed', error);
         }

@@ -21,7 +21,7 @@ export const EventHome = ({route}) => {
         }
     useEffect(() => {
         fetchEvents();
-    },[])
+    },[isModalVisible])
     return(
         <SafeAreaView style = {styles.container}>
             <View>
