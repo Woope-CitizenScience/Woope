@@ -23,7 +23,6 @@ interface ModalProps {
 const CreateUserEvent: React.FC<ModalProps> = ({user_id, isVisible, onClose}) => {
     const [startDate, setStartDate] = useState(new Date());
     const [startTime, setStartTime] = useState(new Date());
-    let [startDateTime, setStartDateTime] = useState(new Date())
     const [endDate, setEndDate] = useState(new Date());
     const [showStartDate, setShowStartDate] = useState(false);
     const [showStartTime, setShowStartTime] = useState(false);
@@ -92,6 +91,7 @@ const CreateUserEvent: React.FC<ModalProps> = ({user_id, isVisible, onClose}) =>
                                 }}
                             />
                             }
+                        <Text>{startDate.toLocaleDateString()}</Text>
                     </View>
                     <View style={styles.dateContainer}>
                         <Button onPress={() => setShowStartTime(true)} title="Enter Start Time" />
@@ -107,6 +107,7 @@ const CreateUserEvent: React.FC<ModalProps> = ({user_id, isVisible, onClose}) =>
                                 }}
                             />
                             }
+                            <Text>{startTime.toLocaleTimeString()}</Text>
                     </View>
                     <View style={styles.dateContainer}>
                         <Button onPress={() => setShowEndTime(true)} title="Enter End Time"/>
@@ -119,11 +120,11 @@ const CreateUserEvent: React.FC<ModalProps> = ({user_id, isVisible, onClose}) =>
                                     const currentDate = selectedDate;
                                     setShowEndTime(false);
                                     setEndDate(currentDate!);
-                                    console.log(endDate.toLocaleTimeString())
                                     }
                                 }
                             />
                         }
+                        <Text>{endDate.toLocaleTimeString()}</Text>
                     </View>
                 </View>
                 <View style = {styles.buttonContainer}>
