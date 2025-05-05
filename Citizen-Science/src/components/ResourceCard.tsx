@@ -1,6 +1,8 @@
 import React, {useState, useEffect} from "react";
-import { View, StyleSheet, Text, Image, Dimensions, SafeAreaView, FlatList, TouchableOpacity } from "react-native";
-import {getResourceInfo } from "../api/resources";
+import { View, StyleSheet, Text, Dimensions, SafeAreaView, FlatList, TouchableOpacity, InteractionManager} from "react-native";
+import { Image } from "expo-image";
+import { useFocusEffect } from "@react-navigation/native";
+import { getResourceInfo } from "../api/resources";
 import { Resource } from "../api/types";
 import { AntDesign } from '@expo/vector-icons';
 import UpdateResourceModal from "./UpdateResourceModal";
@@ -16,17 +18,22 @@ const ResourcesCard:React.FC<ResourceProps> = ({resource_id, org_id}) => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [isDeleteVisible, setIsDeleteVisible] = useState(false);
     const [data, setData] = useState<Resource[]>([]);
-        const fetchInfo = async () => {
-            try {
-                const resource = await getResourceInfo(resource_id);
-                setData(resource);
-            } catch (error) {
-                console.log(error);
-            }
-        }
-        useEffect(() => {
+    const [isFinished, setIsFinished] = useState<Boolean>(false);
+    useFocusEffect(
+        React.useCallback(() => {
+          const task = InteractionManager.runAfterInteractions(() => {
             fetchInfo();
-        },[])
+          });
+        }, [isModalVisible, setData, setIsFinished]))
+
+    const fetchInfo = async () => {
+        try {
+            const resource = await getResourceInfo(resource_id);
+            setData(resource);
+        } catch (error) {
+            console.log(error);
+        }
+    }
     return(
         <SafeAreaView>
             <FlatList 
@@ -58,7 +65,12 @@ const ResourcesCard:React.FC<ResourceProps> = ({resource_id, org_id}) => {
                     </View>
                     {/*Optional Banner Image */}
                     <View>
-                        { item.image_path && <Image style={styles.imageStyle} source={{uri: process.env.EXPO_PUBLIC_API_URL + '/uploads/' + item.image_path}}/>}
+                        { item.image_path && <Image 
+                        style={styles.imageStyle} 
+                        source={{uri: process.env.EXPO_PUBLIC_API_URL + '/uploads/' + item.image_path}}
+                        allowDownscaling={true}
+                        onDisplay={() => setIsFinished(!isFinished)}
+                        />}
                     </View>
                     <UpdateResourceModal isVisible = {isModalVisible} resource_id = {resource_id} onClose={() => {
                         setIsModalVisible(false);

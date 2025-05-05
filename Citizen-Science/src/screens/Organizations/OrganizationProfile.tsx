@@ -27,10 +27,11 @@ export const OrganizationProfile = ({route}) => {
         //"refreshes page" when focused and when a resource is added
         useFocusEffect(
                     React.useCallback(() => {
-                        // grabs featured organizations, if any exist
+                        // grabs a resources, if any exist
                         fetchResources();
                     },[isModalVisible])  
                 );
+
         //gets all resources specific to the organization
         const fetchResources = async () => {
             try {

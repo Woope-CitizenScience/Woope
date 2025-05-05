@@ -66,8 +66,8 @@ export const deleteOrganization = async (name: string) => {
     return fetchAPI(`/organizations/deleteorganization`, 'DELETE', {name});
 }
 //update an organizations photo provided its org id
-export const updateOrgPhoto = async (name: string, image_path: string) => {
-    return fetchAPI(`/organizations/updatephoto`, 'PUT', {name, image_path});
+export const updateOrgPhoto = async (org_id: number, image_path: string) => {
+    return fetchAPI(`/organizations/updatephoto`, 'PUT', {org_id, image_path});
 }
 export const following = async(user_id: number, org_id: number) => {
     return fetchAPI(`/organizations/isfollowed/${user_id}/${org_id}`, 'GET');

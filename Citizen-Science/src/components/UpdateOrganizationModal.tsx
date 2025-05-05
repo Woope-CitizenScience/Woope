@@ -34,21 +34,33 @@ const UpdateOrganizationModal: React.FC<ModalProps> = ({org_id, name, isVisible,
     const handleInputChange = (field: keyof OrganizationInfo, value: string) => {
 		setNewInfo(prevState => ({ ...prevState, [field]: value }));
 	};
-    // uploads photo if one is selected and places filename in database
-    const uploadPhoto = async () => {
-         // upload to server
-            const formData = new FormData();
-            formData.append("file", imageInfo as any, imageInfo.name);
-            submitForm("file", formData, (msg) => console.log(msg));
+
+    //uploads photo to server in promise form
+    const uploadPhoto = () => {
+        const formData = new FormData();
+        formData.append("file", imageInfo as any, imageInfo.name);
+        return new Promise((resolve, reject) => {
+        submitForm("file", formData, (response:any) => {
+            if (response === "error") {
+            reject(new Error("Upload failed"));
+            } else {
+            resolve(response);
+            }
+            });
+        });   
+    };
+
+    // uploads photo filename in database
+    const uploadPhotoName = async () => {
             // upload filename to database
             try {
-                const response = await updateOrgPhoto(name, imageInfo.name.toString());
+                const response = await updateOrgPhoto(org_id, imageInfo.name.toString());
             } catch (error) {
-                console.log('Error', error);
+                console.log('Error:', error);
             }
         
     }
-    // updates organization info in database if new info is entered
+    // updates organization info to database database 
     const updateInfo = async () => {
             try {
                 // upload metadata to database
@@ -56,23 +68,6 @@ const UpdateOrganizationModal: React.FC<ModalProps> = ({org_id, name, isVisible,
             }catch(error) {
                 console.log('Organization Info Update Failed', error);
             }
-    }
-    // handles when the save button is pressed
-    const handleSave = async () => {
-        if(imageInfo.name){
-            await uploadPhoto();
-            setImageInfo({ 
-                name: "",
-                uri: "",
-            })
-        }
-        if(newInfo.description || newInfo.tagline){
-            await updateInfo();
-            setNewInfo({
-                tagline: "",
-                description: "",
-            })
-        }
     }
     
     const selectImage = async () => {
@@ -88,7 +83,6 @@ const UpdateOrganizationModal: React.FC<ModalProps> = ({org_id, name, isVisible,
             })
             // if not cancelled
             if (!result.canceled) {
-                console.log("test")
                 const assets = result.assets;
                 const file = assets[0];
                 // set image info to append to form data once submit is pressed
@@ -96,7 +90,7 @@ const UpdateOrganizationModal: React.FC<ModalProps> = ({org_id, name, isVisible,
                     name: Date.now() + '--' + file.fileName,
                     uri: file.uri,
                 })
-            }else {
+            } else {
             console.log("Document selection cancelled.");
             }
         } catch (error) {
@@ -139,11 +133,41 @@ const UpdateOrganizationModal: React.FC<ModalProps> = ({org_id, name, isVisible,
                     title="Close"
                     onPress= {onClose}
                     />
+                    {/* On save, checks forms and runs relevant promises async together, once they finish, closes the modal */}
                     <Button 
                     title="Save"
-                    onPress = {async() => {
-                        await handleSave();
-                        onClose();
+                    onPress = { () => {
+                        if((newInfo.description || newInfo.tagline) && imageInfo.name != ""){
+                            Promise.all([updateInfo(), uploadPhoto(), uploadPhotoName()]).then((values) => {
+                                setNewInfo({
+                                    tagline: "",
+                                    description: "",
+                                })
+                                setImageInfo({ 
+                                    name: "",
+                                    uri: "",
+                                })
+                                onClose();
+                            })
+                        }
+                        else if(imageInfo.name != "" && (!newInfo.description && !newInfo.description)){
+                        Promise.all([uploadPhoto(), uploadPhotoName()]).then((values) => {
+                                setImageInfo({ 
+                                    name: "",
+                                    uri: "",
+                                })
+                                onClose();
+                            })
+                        }
+                        else{
+                            Promise.all([updateInfo()]).then((values) => {
+                                setNewInfo({
+                                    tagline: "",
+                                    description: "",
+                                })
+                                onClose();
+                            })
+                        }
                     }}/>
                 </View>
             </View>

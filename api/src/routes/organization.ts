@@ -193,6 +193,7 @@ router.delete('/unfollow', async (req: express.Request, res: express.Response) =
         }
     }
 });
+
 router.delete('/deleteorganization',
     requireOwnershipOrPermission({
     fetchResource: getOrganizationById,
@@ -215,19 +216,21 @@ router.delete('/deleteorganization',
         }
     }
 });
+
 router.put('/updatephoto',
-    requireOwnershipOrPermission({
-    fetchResource: getOrganizationById,
-    permissionOwn: 'edit_org_posts',
-    permissionAll: 'edit_all_posts',
-    extractUserId: (org) => org.org_id,
-    compareToUser: (user) => user.org_id,
-    idSource: 'query',
-    idKey: 'org_id',
-  }),async(req: express.Request, res: express.Response) => {
+//     requireOwnershipOrPermission({
+//     fetchResource: getOrganizationById,
+//     permissionOwn: 'edit_org_posts',
+//     permissionAll: 'edit_all_posts',
+//     extractUserId: (org) => org.org_id,
+//     compareToUser: (user) => user.org_id,
+//     idSource: 'query',
+//     idKey: 'org_id',
+//   }),
+  async(req: express.Request, res: express.Response) => {
     try{
-        const {name, image_path} = req.body;
-        const edit = await updatePhoto(name, image_path);
+        const {org_id, image_path} = req.body;
+        const edit = await updatePhoto(org_id, image_path);
         res.status(200).json(edit);
     }catch(error){
         if (error instanceof Error) {
