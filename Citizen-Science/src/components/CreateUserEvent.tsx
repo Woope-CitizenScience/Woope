@@ -22,8 +22,12 @@ interface ModalProps {
 
 const CreateUserEvent: React.FC<ModalProps> = ({user_id, isVisible, onClose}) => {
     const [startDate, setStartDate] = useState(new Date());
+    const [startTime, setStartTime] = useState(new Date());
+    let [startDateTime, setStartDateTime] = useState(new Date())
     const [endDate, setEndDate] = useState(new Date());
-    const [show, setShow] = useState(false);
+    const [showStartDate, setShowStartDate] = useState(false);
+    const [showStartTime, setShowStartTime] = useState(false);
+    const [showEndTime, setShowEndTime] = useState(false);
     const [newInfo, setNewInfo] = useState<EventInfo>({
         name: "",
         tagline: "",
@@ -33,17 +37,15 @@ const CreateUserEvent: React.FC<ModalProps> = ({user_id, isVisible, onClose}) =>
         })
 
     const handleSave = async () => {
+        startDate.setTime(startTime.getTime());
+        endDate.setDate(startDate.getDate());
         try {
-            const response = await createUserEvents(user_id, newInfo.name, newInfo.tagline, newInfo.description, startDate, endDate)
+            const response = await createUserEvents(user_id, newInfo.name, newInfo.tagline, newInfo.description, startTime, endDate)
         } catch (error) {
             console.log('Update Failed', error);
         }
     }
     
-    const showMode = () => {
-        setShow(true);
-    };
-
     const handleInputChange = (field: keyof EventInfo, value: string) => {
         setNewInfo(prevState => ({ ...prevState, [field]: value }));
     };
@@ -78,29 +80,50 @@ const CreateUserEvent: React.FC<ModalProps> = ({user_id, isVisible, onClose}) =>
                     style = {styles.textbox}
                     ></TextInput>
                     <View style={styles.dateContainer}>
-                        <Button onPress={showMode} title="Enter Start Date" />
-                        <DateTimePicker
+                        <Button onPress={() => setShowStartDate(true)} title="Enter Start Date" />
+                        {
+                           showStartDate && <DateTimePicker
                             value={startDate}
-                            mode={"datetime"}
+                            mode={"date"}
                             onChange={(event, selectedDate) => {
                                 const currentDate = selectedDate;
-                                setShow(false);
+                                setShowStartDate(false);
                                 setStartDate(currentDate!);
                                 }}
-                        />
-                        
+                            />
+                            }
                     </View>
                     <View style={styles.dateContainer}>
-                        <Button onPress={showMode} title="Enter End Time"/>
-                        <DateTimePicker
-                            value={endDate}
+                        <Button onPress={() => setShowStartTime(true)} title="Enter Start Time" />
+                        {
+                           showStartTime && <DateTimePicker
+                            value={startTime}
                             mode={"time"}
+                            display="spinner"
                             onChange={(event, selectedDate) => {
                                 const currentDate = selectedDate;
-                                setShow(false);
-                                setEndDate(currentDate!);
+                                setShowStartTime(false);
+                                setStartTime(currentDate!);
                                 }}
-                        />
+                            />
+                            }
+                    </View>
+                    <View style={styles.dateContainer}>
+                        <Button onPress={() => setShowEndTime(true)} title="Enter End Time"/>
+                        { 
+                           showEndTime && <DateTimePicker
+                                value={endDate}
+                                mode={"time"}
+                                display="spinner"
+                                onChange={(event, selectedDate) => {
+                                    const currentDate = selectedDate;
+                                    setShowEndTime(false);
+                                    setEndDate(currentDate!);
+                                    console.log(endDate.toLocaleTimeString())
+                                    }
+                                }
+                            />
+                        }
                     </View>
                 </View>
                 <View style = {styles.buttonContainer}>
