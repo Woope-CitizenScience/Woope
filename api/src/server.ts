@@ -22,8 +22,9 @@ const fileStorageEngine = multer.diskStorage({
     destination: (req: Request, file: Express.Multer.File, cb: DestinationCallback) => {
         cb(null, './uploads');
     },
+    //!here
     filename: (req: Request, file: Express.Multer.File, cb: FileNameCallback) => {
-        cb(null, `${Date.now()}-${file.originalname}`)
+        cb(null, `${file.originalname}`)
     }
 });
 

@@ -125,15 +125,17 @@ const OrganizationCard: React.FC<OrganizationProps> = ({org_id, user_id})=> {
                     </View>
                     {/* Container for Events and Posts Button */}
                     <View style={styles.buttonContainer}>
-                    <TouchableOpacity
+                    
+                    {/* <TouchableOpacity
                     style={styles.postButton}
                     onPress={() => {
                         navigation.navigate("OrganizationProfile", { org_id, user_id });
                     }}
                     >
                     <Text>View Posts</Text>
-                    </TouchableOpacity>
 
+                    </TouchableOpacity> */}
+                    
                         <TouchableOpacity style={styles.eventButton} onPress={() => navigation.navigate("EventHome", {
                             org_id: org_id
                         })}>

@@ -316,12 +316,12 @@ export const updateOrganization = async (name: string, tagline: string, text_des
  * @throws {Error} Throws an error if the database query fails.
  */
 
-export const updatePhoto = async (name: string, image_path: string) => {
+export const updatePhoto = async (org_id: number, image_path: string) => {
     try {
         let query = `
-                UPDATE public.organizations SET image_path = $1 WHERE name = $2 RETURNING *
+                UPDATE public.organizations SET image_path = $1 WHERE org_id = $2 RETURNING *
             `;
-        let values = [image_path, name];
+        let values = [image_path, org_id];
         const response = await pool.query(query, values);
         return response.rows;
     }

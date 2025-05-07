@@ -8,7 +8,6 @@ import SplashScreen from "./screens/SplashScreen";
 import NavigationBar from "./components/NavigationBar";
 import DateScreen from './screens/Calendar/DateScreen';
 
-
 const Stack = createNativeStackNavigator();
 
 const AppNavigation = () => {

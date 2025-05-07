@@ -47,7 +47,7 @@ const EventCard:React.FC<EventProps> = ({event_id, org_id}) => {
                         <Text style={styles.title}>{item.name}</Text>
                         <Text style={styles.category}>{new Date(item.time_begin).toLocaleDateString([],{weekday: 'long', month:'long', day:'2-digit', year:'numeric'})}</Text>
                         <Text style={styles.category}>{new Date(item.time_begin).toLocaleTimeString([],{hour:'2-digit', minute:'2-digit'})} - {new Date(item.time_end).toLocaleTimeString([],{hour:'2-digit', minute:'2-digit'})}</Text>
-                        <Text style={styles.category}>Location</Text>
+                        {/* <Text style={styles.category}>Location</Text> */}
                     </View>
                     <View style = {styles.editContainer}>
                         <TouchableOpacity onPress={() => setIsModalVisible(true)}>

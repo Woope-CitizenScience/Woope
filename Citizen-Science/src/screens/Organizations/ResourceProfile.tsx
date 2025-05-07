@@ -87,6 +87,7 @@ export const ResourceProfile = ({route}) => {
             const result = await DocumentPicker.getDocumentAsync();
                 if (!result.canceled) {
                     const file = result.assets[0];
+                    // !server naming file conflict
                     selectedDocuments.name = Date.now() + '--' + file.name;
                     selectedDocuments.uri = file.uri;
                 }else {
@@ -124,9 +125,7 @@ export const ResourceProfile = ({route}) => {
     }
     const pressDelete = (media_id: number, file_path: string) => {
         deleteMedia(media_id);
-        console.log("ppop")
         trueDelete(file_path);
-        console.log("pee")
         setDeleteCheck(!deleteCheck);
     }
     const pressDownload = (file_path: string) => {
