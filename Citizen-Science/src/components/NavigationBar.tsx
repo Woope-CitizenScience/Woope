@@ -22,6 +22,7 @@ import CreateCategory from '../screens/Organizations/CreateCategory';
 import FeatureOrganization from '../screens/Organizations/FeatureOrganization';
 import EventHome from '../screens/Events/EventHome';
 import ReportScreen from '../screens/ReportScreen';
+import DateScreen from '../screens/Calendar/DateScreen';
 
 
 const Tab = createBottomTabNavigator();
@@ -67,6 +68,18 @@ const ResourceStackScreen = () => (
     </ResourceStack.Navigator>
 )
 
+const Stack = createNativeStackNavigator();
+
+const CalendarStackScreen = () => {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="CalendarScreen" component={CalendarScreen} />
+      <Stack.Screen name="DateScreen" component={DateScreen} />
+    </Stack.Navigator>
+  );
+};
+
+
 const NavigationBar = () => {
     return (
         <View style={{ flex: 1 }}>
@@ -105,7 +118,6 @@ const NavigationBar = () => {
                         height: 80,
                         borderTopLeftRadius: 20,
                         borderTopRightRadius: 20,
-
                     },
                     tabBarLabelStyle: {
                         marginBottom: 3,
@@ -113,7 +125,7 @@ const NavigationBar = () => {
                 })}
             >
                 <Tab.Screen name="Home" component={CommunitySideMenu} />
-                <Tab.Screen name="Calendar" component={CalendarScreen} />
+                <Tab.Screen name="Calendar" component={CalendarStackScreen} />
                 <Tab.Screen name="Resources" component={ResourceStackScreen} />
                 <Tab.Screen name="Map" component={MapScreen} />
                 <Tab.Screen name="Report" component={ReportScreen} />

@@ -34,7 +34,6 @@ const AppNavigation = () => {
 				<>
 					{/* View  components/navigationbar to see the rest of the screens, nested under their respective bottom tabs*/}
 					<Stack.Screen name="NavigationBar" component={NavigationBar} />
-					<Stack.Screen name="DateScreen" component={DateScreen}/> 
 
 				</>
 

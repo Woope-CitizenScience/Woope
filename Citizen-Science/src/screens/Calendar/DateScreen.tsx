@@ -88,7 +88,7 @@ const DateScreen = ({route}) => {
             <FlatList
             data={eventData}
             scrollEnabled={true}
-            keyExtractor={(item) => item.event_id} 
+            keyExtractor={(item, index) => `${item.event_id}-${index}`}
             renderItem={({item}) => (
                 <EventCardViewOnly
                     event_id = {item.event_id} 
@@ -201,6 +201,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'center',
         gap: 20,
+        marginBottom: 10,
     }
     
     
