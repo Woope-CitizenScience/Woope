@@ -6,6 +6,8 @@ import {
   createOrganization,
   deleteOrganization,
   getOrganizations,
+  removeFeature,
+  setFeatured,
 } from "../api/organizations";
 import { Organization } from "../interfaces/Organization";
 import Modal from "../components/Modal";
@@ -21,7 +23,7 @@ const OrgManager = () => {
   const [newOrgDesc, setNewOrgDesc] = useState<string>();
   const [orgToDelete, setOrgToDelete] = useState<Organization | null>(null);
   // const [createOrgModal, setCreateOrgModal] = useState<boolean>(false);
-  const tableHeaders = ["ID", "Name", "Tagline", "Actions"];
+  const tableHeaders = ["ID", "Name", "Tagline", "Featured?", "Actions"];
 
   useEffect(() => {
     fetchOrganizations();
@@ -66,19 +68,44 @@ const OrgManager = () => {
           <a href={`/organizations/${org.org_id}`}>{org.name}</a>
         </div>,
         <p className="pt-2">{org.tagline}</p>,
-        <button
-          type="button"
-          className="btn btn-danger btn-small"
-          data-bs-toggle="modal"
-          data-bs-target="#deleteOrgModal"
-          onClick={() => handleOpenDeleteModal(org.org_id)}
-        >
-          Delete
-        </button>,
+        <p className="pt-2">{org.is_featured + ""}</p>,
+        <>
+          <button
+            type="button"
+            className="btn btn-danger btn-small"
+            data-bs-toggle="modal"
+            data-bs-target="#deleteOrgModal"
+            onClick={() => handleOpenDeleteModal(org.org_id)}
+          >
+            Delete
+          </button>
+          <button
+            type="button"
+            className="ms-2 btn btn-primary btn-small"
+            onClick={() => handleToggleFeatured(org.name, org.is_featured)}
+          >
+            Toggle Featured
+          </button>
+        </>,
+        
       ];
     });
     return orgList;
   };
+
+  const handleToggleFeatured = async(orgName: string, isFeatured: Boolean) => {
+    try {
+      if(isFeatured){
+        await removeFeature(orgName)
+      }
+      else{
+        await setFeatured(orgName)
+      }
+      fetchOrganizations()
+    } catch (error) {
+      console.error(error)
+    }
+  }
 
   const handleOpenModal = () => {
     setNewOrgName("");

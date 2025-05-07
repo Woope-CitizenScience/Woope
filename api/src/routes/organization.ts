@@ -154,7 +154,7 @@ router.put('/update',
         }
     }
 })
-router.put('/setfeatured', requirePermission('edit_all_posts'), async(req: express.Request, res: express.Response) => {
+router.put('/setfeatured', /*requirePermission('edit_all_posts'),*/ async(req: express.Request, res: express.Response) => {
     try{
         const {name} = req.body;
         const edit = await featureOrganization(name);
@@ -167,7 +167,7 @@ router.put('/setfeatured', requirePermission('edit_all_posts'), async(req: expre
         }
     }
 })
-router.put('/removefeatured', requirePermission('edit_all_posts'), async(req: express.Request, res: express.Response) => {
+router.put('/removefeatured', /*requirePermission('edit_all_posts'),*/ async(req: express.Request, res: express.Response) => {
     try{
         const {name} = req.body
         const edit = await removeFeature(name);
@@ -194,7 +194,7 @@ router.delete('/unfollow', async (req: express.Request, res: express.Response) =
     }
 });
 router.delete('/deleteorganization',
-    requireOwnershipOrPermission({
+    /* requireOwnershipOrPermission({
     fetchResource: getOrganizationById,
     permissionOwn: 'delete_org_posts',
     permissionAll: 'delete_all_posts',
@@ -202,7 +202,7 @@ router.delete('/deleteorganization',
     compareToUser: (user) => user.org_id,
     idSource: 'query',
     idKey: 'org_id',
-  }), async (req: express.Request, res: express.Response) => {
+  }),*/ async (req: express.Request, res: express.Response) => {
     try {
         const {name} = req.body;
         await deleteOrganization(name);
