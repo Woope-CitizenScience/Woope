@@ -123,7 +123,7 @@ const SignupScreen = () => {
 							userInfo.password,
 							userInfo.firstName,
 							userInfo.lastName,
-							userInfo.dateOfBirth ? moment(userInfo.dateOfBirth).format('MM/DD/YY') : '',
+							'',// userInfo.dateOfBirth ? moment(userInfo.dateOfBirth).format('MM/DD/YY') : '',
 							otp
 						);
 						console.log("User registration successful.");
@@ -176,11 +176,11 @@ const SignupScreen = () => {
 			errorMessages.push('Last name is required');
 		}
 
-		if (!userInfo.dateOfBirth) {
-			newErrors.dateOfBirth = 'Birth date is required';
-			isValid = false;
-			errorMessages.push('Birth date is required');
-		}
+		// if (!userInfo.dateOfBirth) {
+		// 	newErrors.dateOfBirth = 'Birth date is required';
+		// 	isValid = false;
+		// 	errorMessages.push('Birth date is required');
+		// }
 
 
 		setErrors(newErrors);
@@ -246,7 +246,7 @@ const SignupScreen = () => {
 					</View>
 
 					{/* Birth Date */}
-					<TouchableOpacity
+					{/* <TouchableOpacity
 						onPress={showDatePicker}
 						style={{
 						width: responsiveWidth(70),
@@ -287,7 +287,7 @@ const SignupScreen = () => {
 							}}
 						/>
 						)}
-
+					*/}
 					{/* Email */}
 					<CustomTextField
 						size={{ width: responsiveWidth(70), height: responsiveHeight(5.5) }}
