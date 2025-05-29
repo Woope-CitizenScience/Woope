@@ -23,6 +23,9 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import * as MediaLibrary from 'expo-media-library';
 import test from 'node:test';
 import { AuthContext } from '../../util/AuthContext';
+import { logActivity } from '../../api/activity';
+import { jwtDecode } from 'jwt-decode';
+import { AccessToken } from '../../util/token';
 
 const windowWidth = Dimensions.get('window').width;
 
@@ -52,7 +55,9 @@ interface Pin {
 }
 
 export const MapScreen = () => {
-	  const { userToken, setUserToken } = useContext(AuthContext);
+	const { userToken, setUserToken } = useContext(AuthContext);
+	const decodedToken = userToken ? jwtDecode<AccessToken>(userToken) : null;
+	const userId = decodedToken ? decodedToken.user_id : NaN;
 	const [currentLocation, setCurrentLocation] = useState<Location | null>(null);
 	const [initialRegion, setInitialRegion] = useState<Region | null>(null);
 	const [pins, setPins] = useState<Pin[]>([]);
@@ -189,6 +194,7 @@ export const MapScreen = () => {
 
 	const handleMarkerPress = (pin: Pin) => {
 		console.log('Marker pressed:', pin);
+		logActivity(userId, `Marker pressed: ${pin}`)
 		isMarkerPressedRef.current = true; // Update ref value immediately
 		setIsMarkerPressed(true); // Update state for UI
 		setSelectedPin(pin); // Set the selected pin for details
@@ -272,6 +278,7 @@ export const MapScreen = () => {
 			);
 
 			console.log("✅ Pin Created Successfully:", newPin);
+			logActivity(userId, `Created pin: ${newPin}`)
 			await fetchPins(); // Refresh from backend to ensure image URLs are included
 
 			setFormData({
@@ -513,6 +520,7 @@ export const MapScreen = () => {
 			fetchPins();
 
 			alert('Pin updated successfully!');
+			logActivity(userId, `Updated pin`)
 		} catch (error) {
 			console.error('Error updating pin:', error);
 			alert('Failed to update the pin. Please try again.');

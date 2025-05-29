@@ -21,6 +21,7 @@ import { jwtDecode } from "jwt-decode";
 import { AccessToken } from "../../util/token";
 import { AuthContext } from "../../util/AuthContext";
 import * as ImagePicker from 'expo-image-picker';
+import { logActivity } from "../../api/activity";
 
 interface ProfileEditProps {
 	navigation: any;
@@ -29,7 +30,7 @@ interface ProfileEditProps {
 const ProfileEditScreen: React.FC<ProfileEditProps> = ({ navigation }) => {
 	let { userToken } = useContext(AuthContext);
 	const decodedToken = userToken ? jwtDecode<AccessToken>(userToken) : null;
-	const user_id = decodedToken ? decodedToken.user_id : null;
+	const user_id = decodedToken ? decodedToken.user_id : NaN;
 
 	const [editFirstName, setEditFirstName] = useState("");
 	const [editLastName, setEditLastName] = useState("");
@@ -69,6 +70,7 @@ const ProfileEditScreen: React.FC<ProfileEditProps> = ({ navigation }) => {
 					editLastName.trim(),
 					userToken
 				);
+				logActivity(user_id, `Updated username`)
 			}
 		} catch (error) {
 			console.error("Errors: ", error);
@@ -87,6 +89,7 @@ const ProfileEditScreen: React.FC<ProfileEditProps> = ({ navigation }) => {
 			const imageUri = result.assets[0].uri
 			setNewPfp(imageUri)
 			setImageUrl(imageUri)
+			logActivity(user_id, `Selected a new profile picture`)
 		}
 
 	}
@@ -95,6 +98,7 @@ const ProfileEditScreen: React.FC<ProfileEditProps> = ({ navigation }) => {
 		try {
 			if(newPfp){
 				await updatePfp(user_id + "", newPfp)
+				logActivity(user_id, `Updated profile picture`)
 			}
 			
 		} catch (error) {

@@ -32,7 +32,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-import Weather from "../components/Weather";
+import Weather from "../components/weather";
 import {
   createPost,
   getAllPosts,
@@ -54,6 +54,7 @@ import {
 import { PdfFile, Post, Comment, PostWithUsername } from "../api/types";
 import WelcomeBanner from "../components/WelcomeBanner";
 import FixedSwitch from "../components/FixedSwitch";
+import { logActivity } from "../api/activity";
 const HomeScreen = () => {
   const { userToken, setUserToken } = useContext(AuthContext);
   const [data, setData] = useState(null);
@@ -100,7 +101,9 @@ const HomeScreen = () => {
 
   useEffect(() => {
     fetchPosts();
+    logActivity(userId, `Navigated to Home Screen`)
   }, []);
+
 
   const fetchPosts = async () => {
     try {
@@ -124,6 +127,7 @@ const HomeScreen = () => {
     setRefreshing(true);
     await fetchPosts();
     setRefreshing(false);
+    await logActivity(userId, `Refreshed post feed.`)
   };
 
   const pickImage = async () => {
@@ -191,10 +195,12 @@ const HomeScreen = () => {
   const toggleCommentsModal = (post?: PostWithUsername) => {
     setSelectedPost(post || null);
     setCommentsModalVisible(!commentsModalVisible);
+    logActivity(userId, `Toggled comments modal to ${!commentsModalVisible}`)
   };
 
   const togglePostAsOrg = () => {
     setPostAsOrganization(!postAsOrganization);
+    logActivity(userId, `Toggled posting as organization to ${!postAsOrganization}`)
   };
 
   const handleAddComment = (postId: number, newComment: Comment) => {
@@ -210,6 +216,7 @@ const HomeScreen = () => {
       })
     );
     fetchPosts();
+    logActivity(userId, `Added comment to post with id ${postId}`)
   };
 
   const handleDeleteComment = (postId: number, commentId: number) => {
@@ -219,6 +226,7 @@ const HomeScreen = () => {
   const handleLikeComment = async (commentId: number) => {
     try {
       const response = await likeComment(commentId);
+      await logActivity(userId, `Liked comment with id ${commentId}`)
       fetchPosts();
     } catch (error) {
       console.error(error);
@@ -229,6 +237,7 @@ const HomeScreen = () => {
   const handleUnlikeComment = async (commentId: number) => {
     try {
       unlikeComment(commentId);
+      await logActivity(userId, `Unliked comment with id ${commentId}`)
       fetchPosts();
     } catch (error) {
       console.error(error);
@@ -263,6 +272,7 @@ const HomeScreen = () => {
 
     try {
       const updatedPost = await updatePost(editingPostId, postText, setUserToken); // Adjust parameters as needed
+      await logActivity(userId, `User edited post with id ${editingPostId}`)
       fetchPosts();
 
       // Reset the form and editing state
@@ -289,6 +299,7 @@ const HomeScreen = () => {
     try {
       const postOrgId = postAsOrganization ? userOrgId : NaN;
       await createPost(Number(userId), postOrgId, postText, setUserToken);
+      await logActivity(userId, `User created new post with text: "${postText}"`)
       fetchPosts();
 
       // Clear the form
@@ -307,6 +318,7 @@ const HomeScreen = () => {
     if (userCanDeletePost(postToDelete)) {
       try {
         deletePost(postToDelete.post_id, setUserToken);
+        await logActivity(userId, `User deleted post with post id ${postToDelete.post_id}`)
         setPosts((currentPosts) =>
           currentPosts.filter((post) => post.post_id !== postToDelete.post_id)
         );

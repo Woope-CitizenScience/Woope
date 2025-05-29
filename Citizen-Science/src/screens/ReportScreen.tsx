@@ -1,9 +1,17 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
+import { AuthContext } from "../util/AuthContext";
+import { jwtDecode } from "jwt-decode";
+import "core-js/stable/atob";
+import { AccessToken, deleteToken } from "../util/token";
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { createReport } from '../api/report';
+import { logActivity } from '../api/activity';
 
 export const ReportScreen = () => {
+    const { userToken, setUserToken } = useContext(AuthContext);
+    const decodedToken = userToken ? jwtDecode<AccessToken>(userToken) : null;
+    const userId = decodedToken ? decodedToken.user_id : NaN;
     const [formData, setFormData] = useState({
         label: '',
         title: '',
@@ -27,6 +35,7 @@ export const ReportScreen = () => {
             await createReport(formData.label, formData.title, formData.description);
             Alert.alert('Success', 'Report created successfully!');
             setFormData({ label: '', title: '', description: '' });
+            logActivity(userId, 'Submitted Report')
         } catch (error) {
             Alert.alert('Error', 'Failed to create the report. Please try again.');
         }
