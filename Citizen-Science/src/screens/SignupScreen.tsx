@@ -123,7 +123,7 @@ const SignupScreen = () => {
 							userInfo.password,
 							userInfo.firstName,
 							userInfo.lastName,
-							'',// userInfo.dateOfBirth ? moment(userInfo.dateOfBirth).format('MM/DD/YY') : '',
+							'1/1/1900',// userInfo.dateOfBirth ? moment(userInfo.dateOfBirth).format('MM/DD/YY') : '',
 							otp
 						);
 						console.log("User registration successful.");
