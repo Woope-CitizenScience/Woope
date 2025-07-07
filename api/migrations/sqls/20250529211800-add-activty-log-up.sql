@@ -1,3 +1,5 @@
+CREATE SEQUENCE IF NOT EXISTS activity_id_seq START 1 INCREMENT 1;
+
 CREATE TABLE IF NOT EXISTS public.activity
 (
     id integer NOT NULL DEFAULT nextval('activity_id_seq'::regclass),
