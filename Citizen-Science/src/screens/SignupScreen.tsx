@@ -94,11 +94,15 @@ const SignupScreen = () => {
 		if (!otpSent) {
 			if (validate()) {
 				try {
-					if (!apiUrl) {
-						console.log('API URL not defined. Check your app config or environment.');
-						return;
-					}
+					// console.log(apiUrl);
+					// if (!apiUrl) {
+					// 	console.log('API URL not defined. Check your app config or environment.');
+					// 	return;
+					// }
+					console.log(apiUrl, "1");
+					console.log(userInfo);
 					await axios.post(`${apiUrl}/otp/send-otp`, { email: userInfo.email });
+					console.log(apiUrl);
 					setOtpSent(true);
 					Alert.alert('OTP Sent', 'Please check your email for the OTP.');
 				} catch (error) {
@@ -108,6 +112,7 @@ const SignupScreen = () => {
 			}
 		} else {
 			try {
+				console.log("in try");
 				const verifyRes = await axios.post(`${apiUrl}/otp/verify-otp`, {
 					email: userInfo.email,
 					otp,
