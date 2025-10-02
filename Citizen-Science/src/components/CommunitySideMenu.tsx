@@ -70,6 +70,7 @@ function CommunitySideMenu() {
   return (
     <View style={{ flex: 1 }}>
       <Drawer.Navigator
+        useLegacyImplementation={ false } //removed useLegacyImplementation manually 
         defaultStatus="closed"
         screenOptions={{
           header: ({ navigation, route, options }) => {
