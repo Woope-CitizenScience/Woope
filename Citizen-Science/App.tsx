@@ -3,6 +3,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import AppNavigation from '../Citizen-Science/src/Navigation';
 import {AuthProvider} from './src/util/AuthContext';
 import * as React from "react";
+import 'react-native-reanimated';
 
 export default function App() {
 	return (
