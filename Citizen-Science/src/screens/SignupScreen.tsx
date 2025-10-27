@@ -349,7 +349,17 @@ const SignupScreen = () => {
 							onChangeText={(value) => setOtp(value)}
 							borderColor="#5EA1E9"
 							borderRadius={10}
-							position={{ top: 17, left: 0 }}
+							//testing code below
+							position={{ top: 3, left: 0 }} // Adjust position of OTP field
+							textContentType={'oneTimeCode'} //testing
+							autoFocus={true} //auto focus on OTP field when it appears
+<<<<<<< Updated upstream
+							keyboardType ="number-pad"	//changes keyboard to number pad
+
+=======
+								//changes keyboard to number pad
+>>>>>>> Stashed changes
+
 						/>
 					)}
 					{/* Signup Button */}

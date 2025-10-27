@@ -5,6 +5,7 @@ import {
 	TextInput,
 	Text,
 	Pressable,
+	Image,
 } from "react-native";
 import { useEffect, useMemo } from "react";
 import {
@@ -138,16 +139,23 @@ const ProfileSearchScreen: React.FC<ProfileSearchScreenProps> = ({
 											},
 										]}
 									>
-										{/* temp For Profile Picture */}
-										<View
-											style={{
-												height: responsiveHeight(5),
-												width: responsiveHeight(5),
-												borderRadius: 50,
-												backgroundColor: "lightblue",
-											}}
-										></View>
+										
+										{/*eddited logic for default profile picture*/}
+										<Image
+										source={
+											(item as any).image_url
+											? { uri: `${process.env.EXPO_PUBLIC_API_URL}${(item as any).image_url}` }
+											: { uri: 'https://upload.wikimedia.org/wikipedia/commons/0/03/Twitter_default_profile_400x400.png' }
+										}
+										style={{
+											height: responsiveHeight(5),
+											width: responsiveHeight(5),
+											borderRadius: responsiveHeight(5) / 2,
+										}}
+										resizeMode="cover"
+										/>
 
+										
 										<View
 											style={{
 												maxWidth: responsiveWidth(80),

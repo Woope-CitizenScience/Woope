@@ -41,18 +41,22 @@ const ProfileEditScreen: React.FC<ProfileEditProps> = ({ navigation }) => {
 		/* Will load profile data of user */
 	}
 	useEffect(() => {
-		if (user_id !== null)
-			getProfile(user_id)
-				.then((data) => {
-					getProfile(data);
-					setEditFirstName(data.user.first_name);
-					setEditLastName(data.user.last_name);
-					setImageUrl(`${process.env.EXPO_PUBLIC_API_URL}${data.user.image_url}`)
-				})
-				.catch((error) => {
-					console.error("Error: ", error);
-				});
-	}, []);
+ 	 if (user_id !== null)
+    getProfile(user_id)
+      .then((data) => {
+        setEditFirstName(data.user.first_name);
+        setEditLastName(data.user.last_name);
+        
+        if (data.user.image_url && process.env.EXPO_PUBLIC_API_URL) {
+          setImageUrl(`${process.env.EXPO_PUBLIC_API_URL}${data.user.image_url}`);
+        } else {
+          setImageUrl("");
+        }
+      })
+      .catch((error) => {
+        console.error("Error: ", error);
+      });
+}, []);
 
 	{
 		/* Calls updateName api to set users name */
@@ -175,14 +179,28 @@ const ProfileEditScreen: React.FC<ProfileEditProps> = ({ navigation }) => {
 						iconName={"circle"}
 						onPress={handleEditPfp}
 						iconSize={responsiveHeight(11)}
-						iconColor={"lightblue"}
+						
 					/> */}
 					<TouchableOpacity onPress={handleEditPfp}>
-						<Image
+						{/* <Image
 							source={{ uri: imageUrl }}
 							style={{ width: responsiveHeight(11), height: responsiveHeight(11), borderRadius: responsiveHeight(11) / 2 }}
 							resizeMode="cover"
 						/>
+						old version*/}
+						
+					{/* New version  added defaultprofile and linked url for profile pic*/}
+					<Image
+						source={
+							imageUrl
+								? { uri: imageUrl }
+								: {uri:'https://upload.wikimedia.org/wikipedia/commons/0/03/Twitter_default_profile_400x400.png'}
+						}
+						style={{ width: responsiveHeight(11), height: responsiveHeight(11), borderRadius: responsiveHeight(11) / 2 }}
+						resizeMode="cover"
+					/>
+						
+
 					</TouchableOpacity>
 					<View style={styles.container}>
 						<Text style={{ fontSize: responsiveFontSize(1.5) }}>

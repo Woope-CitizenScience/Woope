@@ -1,9 +1,26 @@
 const pool = require('../db');
-
+/* old code for OTP storage
 export async function storeOTP(email: string, otp: string): Promise<void> {
     const expires_at = new Date(Date.now() + 10 * 60 * 1000); // OTP expires in 10 minutes
     await pool.query(
         'INSERT INTO otp (email, otp, expires_at) VALUES ($1, $2, $3)',
+        [email, otp, expires_at]
+    );
+    console.log(`🔐 Stored OTP for ${email} with expiry at ${expires_at}`);
+}
+*/
+//new code with upsert
+export async function storeOTP(email: string, otp: string): Promise<void> {
+    const expires_at = new Date(Date.now() + 10 * 60 * 1000); // OTP expires in 10 minutes
+    
+    // Changed from INSERT to UPSERT
+    //on conflict of email, update the otp and expires_at
+    //excluded is a special table that contains the values that were proposed for insertion
+    await pool.query(
+        `INSERT INTO otp (email, otp, expires_at)
+        VALUES ($1, $2, $3)
+        ON CONFLICT (email)
+        DO UPDATE SET otp = EXCLUDED.otp, expires_at = EXCLUDED.expires_at`,
         [email, otp, expires_at]
     );
     console.log(`🔐 Stored OTP for ${email} with expiry at ${expires_at}`);

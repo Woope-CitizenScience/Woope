@@ -144,7 +144,7 @@ export const createUser = async (email: string, phoneNumber: string, hashedPassw
 
 		const userResult = await pool.query(query, values);
 		const user = userResult.rows[0];
-		const userPermissions = await getUserPermissions(user.user_id);
+		// const userPermissions = await getUserPermissions(user.user_id); old code
 
 		query = 'INSERT INTO profile_information (user_id, first_name, last_name, date_of_birth) VALUES ($1, $2, $3, $4)';
 		values = [user.user_id, firstName, lastName, dateOfBirth];
@@ -153,6 +153,7 @@ export const createUser = async (email: string, phoneNumber: string, hashedPassw
 		// Additional inserts (like account_verifications) can be handled here
 
 		await pool.query('COMMIT');
+		const userPermissions = await getUserPermissions(user.user_id);
 
 		return {
 			user_id: user.user_id,
@@ -255,13 +256,17 @@ export const getUserFullNameByID = async (userId: string) => {
 			return null;
 		}
 		const userINFO = result.rows[0];
-		return userINFO;
-	} catch (error) {
+
+		return {
+			...userINFO,
+			image_url: userINFO.image_url === '/uploads/default.jpg' ? null : userINFO.image_url
+		};
+		} catch (error) {
 		throw new Error("Error getting user's name " + (error as Error).message);
-	}
-	finally {
+		}
+		finally {
 		client.release();
-	  }
+	}
 }
 
 /**
