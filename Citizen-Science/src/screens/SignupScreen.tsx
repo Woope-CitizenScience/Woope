@@ -102,7 +102,7 @@ const SignupScreen = () => {
 					console.log(apiUrl, "1");
 					console.log(userInfo);
 					await axios.post(`${apiUrl}/otp/send-otp`, { email: userInfo.email });
-					console.log(apiUrl);
+					console.log('WE ARE PASSED AXIOS.POST');
 					setOtpSent(true);
 					Alert.alert('OTP Sent', 'Please check your email for the OTP.');
 				} catch (error) {

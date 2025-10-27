@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-
+import cors from 'cors';
 import express from 'express';
 import { sendOtpEmail, verifyOtp, storeOTP } from '../models/otp';
 
@@ -23,6 +23,9 @@ router.post('/send-otp', async (req, res) => {
         res.status(500).json({ error: 'Failed to send OTP' });
     }
 });
+router.get('/send-otp', (req: express.Request, res: express.Response) => {
+    res.send("YOU REACHED ME")
+})
 
 // Route to verify OTP
 router.post('/verify-otp', async (req, res) => {
@@ -43,5 +46,9 @@ router.post('/verify-otp', async (req, res) => {
         res.status(500).json({ success: false, error: 'Failed to verify OTP' });
     }
 });
+
+router.get('/verify-otp', (req: express.Request, res: express.Response) => {
+    res.send('YOU REACHED ME');
+})
 
 export default router;

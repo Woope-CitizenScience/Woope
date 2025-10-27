@@ -43,3 +43,8 @@ Citizen-Science/%ProgramData%/Microsoft/Windows/UUS/State/_active.uusver
 /.vscode
 
 api/uploads/
+
+#CERTS
+
+*.pem
+/api/*.pem

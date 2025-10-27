@@ -1,16 +1,21 @@
 import { Request, Response } from 'express'
 import { createPinNew } from './models/pins';
 require('dotenv').config();
-
+import cors, {CorsOptions} from 'cors';
 const express = require('express')
-const cors = require('cors');
 const app = express()
-app.use(cors()); // Moved here
+app.use(cors({
+    origin: true,
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"]
+  }));// Moved here
 
 const port = process.env.PORT || '3000'
 const multer = require('multer')
 const path = require('path');
 const fs = require('fs');
+const https = require('https');
 
 type DestinationCallback = (error: Error | null, destination: string) => void
 type FileNameCallback = (error: Error | null, filename: string) => void
@@ -56,5 +61,16 @@ app.use('/', pinRoutes);
 app.use('/auth', authRoutes);
 app.use('/otp', otpRoutes);
 
+//HTTPS CHANGES START HERE 
+const options = {
+    key: fs.readFileSync('./localhost+4-key.pem'),
+    cert: fs.readFileSync('./localhost+4.pem')
+}
+
 require('./startup/routes')(app);
-app.listen(port, () => console.log(`Server running on port ${port}`))
+
+//start the https listening port
+https.createServer(options, app).listen(port, () => {
+    console.log(`Secure server running on port ${port}`);
+});
+// app.listen(port, () => console.log(`Server running on port ${port}`)) // We use https instead
