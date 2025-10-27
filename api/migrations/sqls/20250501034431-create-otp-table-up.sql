@@ -1,8 +1,7 @@
 CREATE TABLE otp (
     id SERIAL PRIMARY KEY,
-    email VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
     otp VARCHAR(10) NOT NULL,
-    expires_at TIMESTAMP NOT NULL
+    expires_at TIMESTAMP NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
-CREATE INDEX idx_otp_email ON otp(email);

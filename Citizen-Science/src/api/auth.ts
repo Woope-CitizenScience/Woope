@@ -2,7 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { storeToken } from '../util/token';
 
 
-export const loginUser = async (email: string, password: string) => {
+/* export const loginUser = async (email: string, password: string) => {
 	const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/auth/login`, {
 		method: 'POST',
 		headers: {
@@ -31,6 +31,43 @@ export const loginUser = async (email: string, password: string) => {
 
 	return data;
 };
+old version*/
+export const loginUser = async (email: string, password: string) => {
+	console.log('🔵 Login attempt:', { email, password: '***', url: `${process.env.EXPO_PUBLIC_API_URL}/auth/login` });
+	
+	const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/auth/login`, {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify({ email, password }),
+	});
+
+	console.log('🔵 Response status:', response.status);
+	
+	if (!response.ok) {
+		const errorResponse = await response.json();
+		console.log('🔴 Error response:', errorResponse);
+		const error = new Error(errorResponse.error || response.statusText);
+		error.name = `HTTP Error ${response.status}`;
+		throw error;
+	}
+
+	const data = await response.json();
+	console.log('✅ Login success');
+
+	if (data?.accessToken) {
+		await storeToken("accessToken", data.accessToken);
+		console.log("Access token stored (login)");
+	}
+	if (data?.refreshToken) {
+		await storeToken("refreshToken", data.refreshToken);
+		console.log("Refresh token stored (login)");
+	}
+
+	return data;
+};
+
 
 export const registerUser = async (
 	email: string,
@@ -95,3 +132,4 @@ export const logoutUser = async (userId: number) => {
 		throw error;
 	}
 };
+

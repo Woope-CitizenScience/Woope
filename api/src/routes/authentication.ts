@@ -10,6 +10,7 @@ const pool = require('../db');
 const router = require('express').Router();
 const refreshTokenSecret: string = config.refreshTokenSecret!;
 
+/* old login code
 router.post('/login', async (req: express.Request, res: express.Response) => {
     try {
         const { email, phoneNumber, password } = req.body;
@@ -46,7 +47,60 @@ router.post('/login', async (req: express.Request, res: express.Response) => {
         res.status(500).json(`Internal server error: ${err.message}`);
     }
 });
+*/
+router.post('/login', async (req: express.Request, res: express.Response) => {
+    try {
+        console.log('🔵 Login request received:', { email: req.body.email, hasPassword: !!req.body.password });
+        
+        const { email, phoneNumber, password } = req.body;
 
+        if (!email && !phoneNumber) {
+            console.log('🔴 Missing email/phone');
+            return res.status(400).json({ error: 'Email or phone number is required' });
+        }
+
+        if (!password) {
+            console.log('🔴 Missing password');
+            return res.status(400).json({ error: 'Password is required' });
+        }
+
+        console.log('🔵 Looking up user...');
+        const user = await getUser(email, phoneNumber);
+        
+        if (!user) {
+            console.log('🔴 User not found for email:', email);
+            return res.status(404).json({ error: 'User does not exist' });
+        }
+
+        console.log('✅ User found:', user.email);
+        console.log('🔵 Comparing passwords...');
+
+        if (await comparePasswords(password, user.password_hash as string)) {
+            console.log('✅ Password correct - generating tokens');
+            const accessToken = await createAccessToken(user);
+            const refreshToken = await createRefreshToken(user);
+            const hashedRefreshToken = await hashPassword(refreshToken);
+
+            await pool.query('UPDATE users SET last_login = NOW() WHERE user_id = $1', [user.user_id]);
+            await pool.query('UPDATE users SET refresh_token = $1 WHERE user_id = $2', [hashedRefreshToken, user.user_id]);
+
+            console.log('✅ Login successful');
+            res.status(200).json({
+                accessToken,
+                refreshToken,
+                role_id: user.role_id,
+            });
+        } else {
+            console.log('🔴 Invalid password');
+            res.status(401).json({ error: 'Invalid password' });
+        }
+
+    } catch (error) {
+        const err = error as Error;
+        console.error('🔴 Login error:', err.message);
+        res.status(500).json({ error: `Internal server error: ${err.message}` });
+    }
+});
 
 router.post('/logout', async (req: express.Request, res: express.Response) => {
     const { userId } = req.body;
