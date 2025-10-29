@@ -7,6 +7,7 @@ import {Text, SafeAreaView, FlatList, TouchableOpacity, StyleSheet, StatusBar, V
 import { Organization } from '../../api/types';
 import { getOrganizationsFollowed } from '../../api/organizations';
 import { useNavigation } from '@react-navigation/native';
+import BackButton from '../../components/BackButton';
 import { AuthContext } from '../../util/AuthContext';
 import { jwtDecode } from 'jwt-decode';
 import { AccessToken } from '../../util/token';
@@ -31,11 +32,12 @@ export const OrganizationFollowed = () => {
     if (data[0] !== undefined){
         return(
             <SafeAreaView style={styles.container}>
+                <BackButton position={{ top: 5, left: 3 }} />
             {/*using a flatlist to display organizations, keyextractor to use the org_id as key*/}
             <FlatList
                 data={data}
                 numColumns={1}
-                keyExtractor={item => item.org_id}
+                keyExtractor={item => String(item.org_id)}
                 renderItem={({item}) => (
                 <TouchableOpacity style={styles.postBox} onPress={() => navigation.navigate("OrganizationProfile", {
                     org_id: item.org_id,
@@ -53,6 +55,7 @@ export const OrganizationFollowed = () => {
     else{
         return(
             <SafeAreaView style = {styles.errorContainer}>
+                            <BackButton position={{ top: 5, left: 3 }} />
                             <Text style={styles.error}>No groups followed</Text>
             </SafeAreaView>
         );
