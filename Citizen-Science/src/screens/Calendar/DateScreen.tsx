@@ -35,6 +35,7 @@ const DateScreen = ({route}) => {
 
     //sets flatlist to show general events as default
     const getRange = async() => {
+        console.log("Getting Range");
         dayAfter = addDays(selectedDate, 1);
         try {
             const eventList = await getDayEvents(selectedDate, dayAfter);
@@ -46,6 +47,7 @@ const DateScreen = ({route}) => {
 
     // retrieve all events from the given date, updatesflatlist
     const fetchEvents = async () => {
+        console.log("Fetching Events");
         try {
             const eventList = await getDayEvents(selectedDate, dayAfter);
             setGeneralEventList(eventList);
@@ -72,6 +74,7 @@ const DateScreen = ({route}) => {
         }
     }
     return(
+        
         <SafeAreaView style={styles.container}>
              <View>
                 <View style={styles.upcomingEvents}>
@@ -145,6 +148,7 @@ const DateScreen = ({route}) => {
         </SafeAreaView>
     );
 };
+
 const styles = StyleSheet.create({
     scrollview: {
         flex: 1,
