@@ -6,6 +6,7 @@ import { StyleSheet, Text, SafeAreaView, FlatList, StatusBar, TouchableOpacity, 
 import { getAllOrganizations } from '../../api/organizations';
 import { Organization } from '../../api/types';
 import { useNavigation } from '@react-navigation/native';
+import BackButton from '../../components/BackButton';
 
 const OrganizationSearch = () => {
     const navigation = useNavigation<any>();
@@ -25,11 +26,12 @@ const OrganizationSearch = () => {
     if (data[0] !== undefined){
         return(
             <SafeAreaView style={styles.container}>
+                <BackButton position={{ top: 5, left: 3 }} />
                 {/*using a flatlist to display organizations, using the org_id as key*/}
                 <FlatList
                 data={data}
                 numColumns={1}
-                keyExtractor={item => item.org_id}
+                keyExtractor={item => String(item.org_id)}
                 renderItem={({item}) => 
                     (
                     <TouchableOpacity style={styles.postBox} onPress={() => navigation.navigate("OrganizationProfile",{
@@ -47,6 +49,7 @@ const OrganizationSearch = () => {
     else{
         return(
             <SafeAreaView style = {styles.errorContainer}>
+                <BackButton position={{ top: 5, left: 3 }} />
                 <Text style={styles.error}>No groups exist</Text>
             </SafeAreaView>
         );

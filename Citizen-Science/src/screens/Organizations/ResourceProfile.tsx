@@ -4,6 +4,7 @@
 import React, {useEffect, useState}from "react";
 import { Text,View, SafeAreaView, ScrollView,StyleSheet, Image ,StatusBar, TouchableOpacity, Button, FlatList, TextInput, Modal} from "react-native";
 import ResourceCard from "../../components/ResourceCard";
+import BackButton from '../../components/BackButton';
 import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from "expo-sharing";
@@ -25,7 +26,7 @@ interface FileName{
 }
 
 
-export const ResourceProfile = ({route}) => {
+export const ResourceProfile = ({ route }: { route: any }) => {
     const [selectedDocuments, setSelectedDocuments] = useState<ResourceInfo>({
         name: "",
         uri: "", 
@@ -66,7 +67,7 @@ export const ResourceProfile = ({route}) => {
         const formData = new FormData();
         formData.append("file", selectedDocuments as any, selectedDocuments.name.toString());
         console.log(formData);
-        submitForm("file", formData, (msg) => console.log(msg)); 
+    submitForm("file", formData, (msg: any) => console.log(msg)); 
         try {
             let result = await insertResourceMedia(route.params.resource_id, fileName.name, selectedDocuments.name.toString())
         } catch (error) {
@@ -142,9 +143,10 @@ export const ResourceProfile = ({route}) => {
     const downloadFromUrl = async (file_path: string) => {
         try {
             const url = API_BASE + "/uploads/" + file_path;
+            const cacheDir = (FileSystem as any).cacheDirectory || '';
             const result = await FileSystem.downloadAsync(
             url,
-            FileSystem.cacheDirectory + file_path
+            cacheDir + file_path
             )
             saveFile(result.uri)
         } catch (error) {
@@ -157,6 +159,7 @@ export const ResourceProfile = ({route}) => {
     }
     return(
         <SafeAreaView style = {styles.container}>
+            <BackButton position={{ top: 5, left: 3 }} />
                 {/* Resource Card */}
                 <ResourceCard resource_id={route.params.resource_id} org_id={route.params.org_id}/>
                 {/* Resources Container */}
@@ -167,7 +170,7 @@ export const ResourceProfile = ({route}) => {
                     style={styles.flatlist}
                     data={resourceMedia}
                     numColumns={1}
-                    keyExtractor={item => item.media_id}
+                    keyExtractor={item => String(item.media_id)}
                     renderItem={({item}) => 
                     (
                         <View style={styles.mediarow}>
@@ -185,7 +188,7 @@ export const ResourceProfile = ({route}) => {
                             <TouchableOpacity onPress={() => {
                                 pressPreview(item.file_path, item.name);
                             }}>
-                                <AntDesign name="eyeo" size={30}/>
+                                <AntDesign name="eye" size={30}/>
                             </TouchableOpacity> 
 
                             <TouchableOpacity onPress={() => {

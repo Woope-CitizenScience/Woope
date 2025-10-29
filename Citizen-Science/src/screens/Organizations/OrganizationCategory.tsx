@@ -8,6 +8,7 @@
 import React, {useState, useEffect} from 'react';
 import { View, Text, StyleSheet, StatusBar, ScrollView, Pressable, SafeAreaView, TouchableOpacity, FlatList} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import BackButton from '../../components/BackButton';
 import { Category } from '../../api/types';
 import { getAllCategories } from '../../api/organizations';
 export const OrganizationCategory = () => {
@@ -28,6 +29,7 @@ export const OrganizationCategory = () => {
     if (data[0] !== undefined){
         return(
             <SafeAreaView style={styles.container}>
+                <BackButton position={{ top: 5, left: 3 }} />
                 {/*
                     using a flatlist to display categories, keyextractor to use the categoy_id as key
                     then passing the category_id that was clicked to next screen
@@ -35,7 +37,7 @@ export const OrganizationCategory = () => {
                 <FlatList
                     data={data}
                     numColumns={1}
-                    keyExtractor={item => item.category_id}
+                    keyExtractor={item => String(item.category_id)}
                     renderItem={({item}) => (
                     <TouchableOpacity style={styles.postBox} onPress={() => navigation.navigate("SpecificCategory",{category: item.category_id})}> 
                         <View style = {styles.postBoxInner}>

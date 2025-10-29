@@ -101,7 +101,7 @@ const SignupScreen = () => {
 					// }
 					console.log(apiUrl, "1");
 					console.log(userInfo);
-					await axios.post(`${apiUrl}/otp/send-otp`, { email: userInfo.email });
+					await axios.post(`${apiUrl}/otp/send-otp`, { email: String(userInfo.email).toLowerCase() });
 					console.log(apiUrl);
 					setOtpSent(true);
 					Alert.alert('OTP Sent', 'Please check your email for the OTP.');
@@ -114,7 +114,7 @@ const SignupScreen = () => {
 			try {
 				console.log("in try");
 				const verifyRes = await axios.post(`${apiUrl}/otp/verify-otp`, {
-					email: userInfo.email,
+					email: String(userInfo.email).toLowerCase(),
 					otp,
 				});
 
@@ -124,7 +124,7 @@ const SignupScreen = () => {
 					console.log("OTP verified. Proceeding to register user.");
 					try {
 						const response = await registerUser(
-							userInfo.email,
+							String(userInfo.email).toLowerCase(),
 							userInfo.password,
 							userInfo.firstName,
 							userInfo.lastName,

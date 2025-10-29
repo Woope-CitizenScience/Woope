@@ -77,4 +77,10 @@ export type PopupProps = {
     isVisible: boolean;
     message: string;
     onClose: () => void;
+    buttons?: Array<{
+        label: string;
+        onPress: () => void;
+        backgroundColor?: string;
+        labelColor?: string;
+    }>;
 };
