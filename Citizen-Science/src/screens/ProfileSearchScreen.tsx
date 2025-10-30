@@ -5,6 +5,7 @@ import {
 	TextInput,
 	Text,
 	Pressable,
+	Image,
 } from "react-native";
 import {
 	responsiveFontSize,
@@ -147,7 +148,7 @@ const ProfileSearchScreen: React.FC<ProfileSearchScreenProps> = ({
 											},
 										]}
 									>
-										{/* temp For Profile Picture */}
+										{/* temp For Profile Picture
 										<View
 											style={{
 												height: responsiveHeight(5),
@@ -156,6 +157,22 @@ const ProfileSearchScreen: React.FC<ProfileSearchScreenProps> = ({
 												backgroundColor: "lightblue",
 											}}
 										></View>
+										*/}
+										{/*eddited logic for default profile picture*/}
+										<Image
+										source={
+											(item as any).image_url
+											? { uri: `${process.env.EXPO_PUBLIC_API_URL}${(item as any).image_url}` }
+											: { uri: 'https://upload.wikimedia.org/wikipedia/commons/0/03/Twitter_default_profile_400x400.png' }
+										}
+										style={{
+											height: responsiveHeight(5),
+											width: responsiveHeight(5),
+											borderRadius: responsiveHeight(5) / 2,
+											marginRight: responsiveWidth(2),
+										}}
+										resizeMode="cover"
+										/>
 
 										<View
 											style={{

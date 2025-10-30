@@ -3,7 +3,7 @@ import { Modal, Text, View, StyleSheet } from 'react-native';
 import { PopupProps } from '../types';
 import CustomButton from '../components/CustomButton';
 
-const Popup: React.FC<PopupProps> = ({ isVisible, message, onClose }) => {
+const Popup: React.FC<PopupProps> = ({ isVisible, message, onClose, buttons }) => {
     return (
         <Modal
             transparent={true}
@@ -13,15 +13,32 @@ const Popup: React.FC<PopupProps> = ({ isVisible, message, onClose }) => {
             <View style={styles.centeredView}>
                 <View style={styles.modalView}>
                     <Text style={styles.modalText}>{message}</Text>
-                    <CustomButton
-                        label="OK"
-                        onPress={onClose}
-                        size={{ width: 100, height: 40 }} // Adjust the size as needed
-                        labelColor="white"
-                        backgroundColor="#2196F3"
-                        borderRadius={10}
-                        position={{ top: 0, left: 0 }}
-                    />
+                    <View style={styles.buttonRow}>
+                        {buttons && buttons.length > 0 ? (
+                            buttons.map((b, i) => (
+                                <CustomButton
+                                    key={i}
+                                    label={b.label}
+                                    onPress={b.onPress}
+                                    size={{ width: 120, height: 40 }}
+                                    labelColor={b.labelColor || 'white'}
+                                    backgroundColor={b.backgroundColor || '#2196F3'}
+                                    borderRadius={10}
+                                    position={{ top: 0, left: 0 }}
+                                />
+                            ))
+                        ) : (
+                            <CustomButton
+                                label="OK"
+                                onPress={onClose}
+                                size={{ width: 100, height: 40 }}
+                                labelColor="white"
+                                backgroundColor="#2196F3"
+                                borderRadius={10}
+                                position={{ top: 0, left: 0 }}
+                            />
+                        )}
+                    </View>
                 </View>
             </View>
         </Modal>
@@ -53,6 +70,12 @@ const styles = StyleSheet.create({
     modalText: {
         marginBottom: 15,
         textAlign: 'center',
+    },
+    buttonRow: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        gap: 12,
+        marginTop: 8,
     },
 });
 

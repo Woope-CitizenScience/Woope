@@ -8,7 +8,8 @@ import { StyleSheet, Text, SafeAreaView, FlatList, View, Button, StatusBar, Touc
 import { getOrganizationsByCategoryId} from '../../api/organizations';
 import { Organization} from '../../api/types';
 import { useNavigation } from '@react-navigation/native';
-export const SpecificCategory = ({route}) => {
+import BackButton from '../../components/BackButton';
+export const SpecificCategory = ({ route }: { route: any }) => {
     // using api to retrieve the specified organizations
     const navigation = useNavigation<any>();
     const [data,setData] = useState<Organization[]>([]);
@@ -27,11 +28,12 @@ export const SpecificCategory = ({route}) => {
     // displaying organizations using a flatlist, passing the organization data to the next screen when clicked
     return(
         <SafeAreaView style={styles.container}>
+    <BackButton position={{ top: 5, left: 3 }} />
         {/*using a flatlist to display organizations, keyextractor to use the org_id as key*/}
         <FlatList
             data={data}
             numColumns={1}
-            keyExtractor={item => item.org_id}
+            keyExtractor={item => String(item.org_id)}
             renderItem={({item}) => (
             <TouchableOpacity style={styles.directoryButton} onPress={() => navigation.navigate("OrganizationProfile",{
                 org_id: item.org_id,

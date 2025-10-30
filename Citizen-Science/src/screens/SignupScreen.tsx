@@ -101,8 +101,8 @@ const SignupScreen = () => {
 					// }
 					console.log(apiUrl, "1");
 					console.log(userInfo);
-					await axios.post(`${apiUrl}/otp/send-otp`, { email: userInfo.email });
-					console.log('WE ARE PASSED AXIOS.POST');
+					await axios.post(`${apiUrl}/otp/send-otp`, { email: String(userInfo.email).toLowerCase() });
+					console.log(apiUrl);
 					setOtpSent(true);
 					Alert.alert('OTP Sent', 'Please check your email for the OTP.');
 				} catch (error) {
@@ -114,7 +114,7 @@ const SignupScreen = () => {
 			try {
 				console.log("in try");
 				const verifyRes = await axios.post(`${apiUrl}/otp/verify-otp`, {
-					email: userInfo.email,
+					email: String(userInfo.email).toLowerCase(),
 					otp,
 				});
 
@@ -124,7 +124,7 @@ const SignupScreen = () => {
 					console.log("OTP verified. Proceeding to register user.");
 					try {
 						const response = await registerUser(
-							userInfo.email,
+							String(userInfo.email).toLowerCase(),
 							userInfo.password,
 							userInfo.firstName,
 							userInfo.lastName,
@@ -349,7 +349,13 @@ const SignupScreen = () => {
 							onChangeText={(value) => setOtp(value)}
 							borderColor="#5EA1E9"
 							borderRadius={10}
-							position={{ top: 17, left: 0 }}
+							//testing code below
+							position={{ top: 3, left: 0 }} // Adjust position of OTP field
+							textContentType={'oneTimeCode'} //testing
+							autoFocus={true} //auto focus on OTP field when it appears
+							keyboardType ="number-pad"	//changes keyboard to number pad
+
+
 						/>
 					)}
 					{/* Signup Button */}

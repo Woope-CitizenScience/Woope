@@ -60,7 +60,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ route, navigation }) => {
       null
     );
   const [commentsModalVisible, setCommentsModalVisible] = useState(false);
-  const [userPfp, setUserPfp] = useState("")
+  const [userPfp, setUserPfp] = useState<string | null>(null);
 
   interface CommentsMap {
       [key: number]: Comment[];
@@ -80,7 +80,13 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ route, navigation }) => {
       .then((data) => {
         setFirstName(data.user.first_name);
         setLastName(data.user.last_name);
+
+        //added logic for profile picture, only set userPfp if image_url exists
+        if (data.user.image_url){
         setUserPfp(`${process.env.EXPO_PUBLIC_API_URL}${data.user.image_url}`);
+        }else{
+        setUserPfp(null); // set to empty string if no profile picture
+        }
 
         setFollowerCount(data.followerCount.follower_of_count);
         setFollowingCount(data.followingCount.following_of_count);
@@ -286,15 +292,30 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ route, navigation }) => {
         ListHeaderComponent={
           <>
             <View style={styles.profileUser}>
+              {/* Profile Picture */}
               <Image
+                key ={userPfp || 'default'}
                 style={{
                   height: responsiveHeight(9),
                   width: responsiveHeight(9),
                   borderRadius: 50,
-                  backgroundColor: "lightblue",
                 }}
-                source={{ uri: userPfp }}
-              ></Image>
+                //Removed source={{ uri: userPfp }}
+                // Added conditional to check if userPfp is a valid URL
+                // If not, use default avatar
+                // Added defaultSource to show default avatar while loading
+                // Added require for default avatar at top of file
+              source={
+              userPfp 
+              ? { uri: userPfp }
+              : {uri:'https://upload.wikimedia.org/wikipedia/commons/0/03/Twitter_default_profile_400x400.png'}
+              }
+              onError={(e) => console.log('Profile image error:', e.nativeEvent.error)}
+              onLoad={() => console.log('Profile image loaded')}
+              resizeMode="cover"
+              />
+              
+
               {/* Posts, Followers, Following */}
               <View style={styles.attributes}>
                 <TouchableOpacity
@@ -462,10 +483,23 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ route, navigation }) => {
         renderItem={({ item }) => (
           <View style={styles.post}>
             <View style={styles.headerRow}>
-              <Image
+
+              {/* old code */}{/* <Image
                 source={{ uri: `${process.env.EXPO_PUBLIC_API_URL}${item.image_url}` }}
                 style={styles.avatar}
               />
+              */}
+              {/*eddited logic for default profile picture*/}
+              <Image
+                source={
+                  item.image_url
+                    ?{ uri: `${process.env.EXPO_PUBLIC_API_URL}${item.image_url}` }
+                    :{uri: 'https://upload.wikimedia.org/wikipedia/commons/0/03/Twitter_default_profile_400x400.png'}
+                }
+                style={styles.avatar}
+              />
+              {/*end of edits */}
+              
               <View style={styles.headerTextContainer}>
                 <Text style={styles.userName}>
                   {editFirstName + " " + editLastName}

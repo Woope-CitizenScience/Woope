@@ -7,6 +7,7 @@ import {
 	ActivityIndicator,
 	RefreshControl,
 	TouchableOpacity,
+	Image,
 } from "react-native";
 import {
 	responsiveFontSize,
@@ -159,15 +160,22 @@ const ProfileFollowingScreen: React.FC<ProfileFollowingScreenProps> = ({
 											},
 										]}
 									>
-										{/* temp For Profile Picture */}
-										<View
-											style={{
+										
+										{/*eddited logic for default profile picture*/}
+										<Image
+											source={
+												(item as { image_url?: string }).image_url
+												? { uri: `${process.env.EXPO_PUBLIC_API_URL}${(item as { image_url: string }).image_url}` }
+												: { uri:'https://upload.wikimedia.org/wikipedia/commons/0/03/Twitter_default_profile_400x400.png'}
+												}
+												style={{
 												height: responsiveHeight(5),
 												width: responsiveHeight(5),
 												borderRadius: 50,
-												backgroundColor: "lightblue",
-											}}
-										></View>
+												
+												}}
+												/>
+										{/*end of edits */}
 
 										<View
 											style={{

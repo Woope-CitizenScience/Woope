@@ -1,16 +1,14 @@
 import React, {useState, Fragment, useCallback, useMemo, useRef, useEffect, useContext} from 'react';
-import {StyleSheet, View, ScrollView, Text, TouchableOpacity, Button, Dimensions} from 'react-native';
-import {Calendar, CalendarUtils} from 'react-native-calendars';
-import { useFocusEffect } from '@react-navigation/native';
-import testIDs from './testIDs';
+import {StyleSheet, View, Text, TouchableOpacity, Dimensions} from 'react-native';
+import {Calendar} from 'react-native-calendars';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { getDates, getFollowedDates, getUserDates } from '../../api/event';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { addMonths, DateArg, getDay, getMonth, getYear, subMonths, fromUnixTime, addDays} from 'date-fns';
-import { useNavigation } from '@react-navigation/native';
+import { addMonths, DateArg, subMonths} from 'date-fns';
 import { AuthContext } from '../../util/AuthContext';
 import { jwtDecode } from 'jwt-decode';
 import { AccessToken } from '../../util/token';
-import CreateUserEvent from '../../components/CreateUserEvent';
+import CreateUserEvent from './CreateUserEvent';
 
 interface Arguments {
   marked: boolean;
@@ -34,7 +32,6 @@ const CalendarScreen = () => {
   let [generalMarks, setGeneralMarks] = useState<Marks[]>([]);
   let [followedMarks, setFollowedMarks] = useState<Marks[]>([]);
   let [userMarks, setUserMarks] = useState<Marks[]>([]);
-  let [items, setItems] = useState<string[]>([]);
   let [followedItems, setFollowedItems] = useState<string[]>([]);
   let [marks, setMarks] = useState<any>({});
   const generalColor = {color:'blue'};
@@ -45,44 +42,59 @@ const CalendarScreen = () => {
   // gets all dates with marks/types of marks and once all promises are successful
   // creates the marks and applies them to the calendar
   useFocusEffect(
-    React.useCallback(() => {
-      Promise.all([getGeneralMarks(), getFollowedMarks(), getUserMarks()]).then((values) => {
-        createMarks();
-      })
-    },[selectedValue, modalVisible])
-  )
+    useCallback(() => {
+      const loadData = async () => {
+        setMarks({}); // clear old dots
+        await Promise.all([
+          getGeneralMarks(),
+          getFollowedMarks(),
+          getUserMarks(),
+        ]);
+      };
+      loadData();
+    }, [selectedValue, modalVisible])
+  );
+
+  //if event is added or a different month is viewed update the marks
+  useEffect(() => {
+    if (generalMarks.length || followedMarks.length || userMarks.length) { //are any of these arrays populated
+      createMarks();
+    }
+  }, [generalMarks, followedMarks, userMarks]);
 
 // creates the marks object to send to the calendar
-  const createMarks = () => {
-    // Marks all dates with any organization date first
-    generalMarks.forEach((element) => {
-      let day = new Date(element.time_begin).toLocaleDateString("sv-SE")
-      marks[day] = {marked:true, dots:[generalColor]}
-    });
-    // adds a dot for personal/user events
-    followedMarks.forEach((element) => {
-      let day = new Date(element.time_begin).toLocaleDateString("sv-SE")
-      if(marks[day].dots.some(({color}) => color == 'red')){
-    
-      }
-      else{ 
-        marks[day].dots.push(followedColor)
-      }
-    });
-    //adds a dot for events that are followed
-    userMarks.forEach((element) => {
-      let day = new Date(element.time_begin).toLocaleDateString("sv-SE")
-      if(!marks[day]){
-        marks[day] = {marked:true, dots:[userColor]}
-      }
-      else if(marks[day].dots.some(({color}) => color == 'lightgreen')){
-        
-      }
-      else{ 
-        marks[day].dots.push(userColor)
-      }
-    });
-  }
+ const createMarks = useCallback(() => {
+  //newMarks is a map. Key<string>: Date, Value<bool, string>: isDotForEvent, color
+  const newMarks: Record<string, { marked: boolean; dots: { color: string }[] }> = {};
+
+  //go through all public events, mark as blue
+  generalMarks.forEach(({ time_begin }) => {
+    const day = new Date(time_begin).toLocaleDateString('sv-SE');
+    newMarks[day] = { marked: true, dots: [{ color: 'blue' }] };
+  });
+
+  //go through all followed events, mark as red
+  followedMarks.forEach(({ time_begin }) => {
+    const day = new Date(time_begin).toLocaleDateString('sv-SE');
+    if (!newMarks[day]) newMarks[day] = { marked: true, dots: [] };
+    if (!newMarks[day].dots.some(({ color }) => color === 'red')) {
+      newMarks[day].dots.push({ color: 'red' });
+    }
+  });
+
+  //go through all private user events, mark as light green
+  userMarks.forEach(({ time_begin }) => {
+    const day = new Date(time_begin).toLocaleDateString('sv-SE');
+    if (!newMarks[day]) newMarks[day] = { marked: true, dots: [] };
+    if (!newMarks[day].dots.some(({ color }) => color === 'lightgreen')) {
+      newMarks[day].dots.push({ color: 'lightgreen' });
+    }
+  });
+
+  setMarks(newMarks);
+}, [generalMarks, followedMarks, userMarks]);
+
+
   // Navigates to day selected to display all events
   const onDayPress = useCallback((day) => {
     navigation.navigate("DateScreen", {
@@ -97,8 +109,7 @@ const CalendarScreen = () => {
   // gets all days that have events
   const getGeneralMarks = async() => {
     try {
-      generalMarks = await getDates(selectedValue.getMonth() + 1, selectedValue.getFullYear());
-      setGeneralMarks(generalMarks);
+      setGeneralMarks(await getDates(selectedValue.getMonth() + 1, selectedValue.getFullYear()));
     } catch (error) {
         console.log(error);
     }
@@ -135,12 +146,10 @@ const CalendarScreen = () => {
                 onDayPress={onDayPress}
                 onPressArrowLeft={subtractMonth => {
                   setSelectedValue(subMonths(selectedValue, 1));
-                  setItems([])
                   subtractMonth();
                 }}
                 onPressArrowRight={addMonth => {
                   setSelectedValue(addMonths(selectedValue, 1));
-                  setItems([]);
                   addMonth();
                 }}
                 markingType={'multi-dot'}
