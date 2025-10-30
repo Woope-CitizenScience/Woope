@@ -29,7 +29,7 @@
     "axios": "^1.6.7",
     "core-js": "^3.39.0",
     "date-fns": "^4.1.0",
-    "expo": "54.0.20",
+    "expo": "^54.0.21",
     "expo-auth-session": "~7.0.8",
     "expo-build-properties": "~1.0.9",
     "expo-camera": "~17.0.8",
