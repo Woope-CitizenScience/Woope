@@ -48,7 +48,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 					}
 				}
 			} catch (error) {
-				console.error("Error verifying token:", error);
+				console.log("Error verifying token:", error);
 			}
 		};
 
